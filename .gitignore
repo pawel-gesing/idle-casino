@@ -20,3 +20,4 @@
 TestResults*.xml
 TestRun*.log
 SetupRun.log
+ProjectSettings/PackageManagerSettings.asset

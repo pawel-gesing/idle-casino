@@ -58,9 +58,9 @@ namespace DistilleryDiscovery
 
     public static class ContractRequirementType
     {
-        public const string Recipe = "deliver_recipe";
-        public const string Rarity = "deliver_rarity";
-        public const string Category = "deliver_category";
+        public const string Recipe = "produce_recipe";
+        public const string Rarity = "produce_rarity";
+        public const string Category = "produce_category";
     }
 
     [Serializable] public sealed class ContractDefinition
@@ -75,6 +75,9 @@ namespace DistilleryDiscovery
     }
     [Serializable] public sealed class ContractFile { public List<ContractDefinition> contracts = new(); }
 
+    [Serializable] public sealed class LocalizationDefinition { public string key; public string pl; public string en; }
+    [Serializable] public sealed class LocalizationFile { public List<LocalizationDefinition> entries = new(); }
+
     public sealed class GameConfig
     {
         public List<RarityDefinition> Rarities { get; }
@@ -83,6 +86,7 @@ namespace DistilleryDiscovery
         public List<RecipeCategoryDefinition> Categories { get; }
         public List<LaboratoryLevelDefinition> LaboratoryLevels { get; }
         public List<ContractDefinition> Contracts { get; }
+        public List<LocalizationDefinition> Localizations { get; }
         public EconomyDefinition Economy { get; }
 
         public GameConfig(
@@ -92,7 +96,8 @@ namespace DistilleryDiscovery
             EconomyDefinition economy,
             List<RecipeCategoryDefinition> categories = null,
             List<LaboratoryLevelDefinition> laboratoryLevels = null,
-            List<ContractDefinition> contracts = null)
+            List<ContractDefinition> contracts = null,
+            List<LocalizationDefinition> localizations = null)
         {
             Rarities = rarities ?? new();
             Ingredients = ingredients ?? new();
@@ -101,6 +106,7 @@ namespace DistilleryDiscovery
             Categories = categories ?? new();
             LaboratoryLevels = laboratoryLevels ?? new();
             Contracts = contracts ?? new();
+            Localizations = localizations ?? new();
         }
 
         public IngredientDefinition Ingredient(string id) => Ingredients.Find(x => x.id == id);
@@ -109,5 +115,12 @@ namespace DistilleryDiscovery
         public RecipeCategoryDefinition Category(string id) => Categories.Find(x => x.id == id);
         public LaboratoryLevelDefinition LaboratoryLevel(int level) => LaboratoryLevels.Find(x => x.level == level);
         public ContractDefinition Contract(string id) => Contracts.Find(x => x.id == id);
+        public string Text(string key, string languageCode, string fallback = null)
+        {
+            var entry = Localizations.Find(x => x.key == key);
+            if (entry == null) return fallback ?? key;
+            var value = languageCode == "pl" ? entry.pl : entry.en;
+            return string.IsNullOrEmpty(value) ? fallback ?? key : value;
+        }
     }
 }

@@ -13,8 +13,9 @@ namespace DistilleryDiscovery
             var categories = Load<RecipeCategoryFile>("GameData/categories");
             var laboratories = Load<LaboratoryFile>("GameData/laboratories");
             var contracts = Load<ContractFile>("GameData/contracts");
+            var localization = Load<LocalizationFile>("GameData/localization");
             var config = new GameConfig(rarities.rarities, ingredients.ingredients, recipes.recipes, economy,
-                categories.categories, laboratories.levels, contracts.contracts);
+                categories.categories, laboratories.levels, contracts.contracts, localization.entries);
             ConfigValidator.ValidateOrThrow(config);
             return config;
         }

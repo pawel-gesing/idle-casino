@@ -1,9 +1,9 @@
 {
   "levels": [
     { "level": 1, "upgradeCost": 0, "productQualityBonus": 0.00 },
-    { "level": 2, "upgradeCost": 150, "productQualityBonus": 0.05 },
-    { "level": 3, "upgradeCost": 400, "productQualityBonus": 0.10 },
-    { "level": 4, "upgradeCost": 900, "productQualityBonus": 0.15 },
-    { "level": 5, "upgradeCost": 1800, "productQualityBonus": 0.20 }
+    { "level": 2, "upgradeCost": 1500, "productQualityBonus": 0.05 },
+    { "level": 3, "upgradeCost": 4000, "productQualityBonus": 0.10 },
+    { "level": 4, "upgradeCost": 9000, "productQualityBonus": 0.15 },
+    { "level": 5, "upgradeCost": 18000, "productQualityBonus": 0.20 }
   ]
 }

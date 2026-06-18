@@ -20,6 +20,7 @@ namespace DistilleryDiscovery
             CheckUnique(config.Recipes.Select(x => x.id), "recipe", errors);
             CheckUnique(config.Categories.Select(x => x.id), "recipe category", errors);
             CheckUnique(config.Contracts.Select(x => x.id), "contract", errors);
+            CheckUnique(config.Localizations.Select(x => x.key), "localization", errors);
             CheckUnique(config.Economy.deliveryPools.Select(x => x.id), "delivery pool", errors);
             var rarityIds = config.Rarities.Select(x => x.id).ToHashSet();
             var recipeIds = config.Recipes.Select(x => x.id).ToHashSet();
@@ -90,7 +91,20 @@ namespace DistilleryDiscovery
                         break;
                 }
             }
+            foreach (var localization in config.Localizations)
+                if (string.IsNullOrWhiteSpace(localization.pl) || string.IsNullOrWhiteSpace(localization.en))
+                    errors.Add($"Localization {localization.key} must define Polish and English text.");
+            foreach (var rarity in config.Rarities) RequireLocalization(config, $"rarity.{rarity.id}", errors);
+            foreach (var ingredient in config.Ingredients) RequireLocalization(config, $"ingredient.{ingredient.id}", errors);
+            foreach (var recipe in config.Recipes) RequireLocalization(config, $"recipe.{recipe.id}", errors);
+            foreach (var category in config.Categories) RequireLocalization(config, $"category.{category.id}", errors);
+            foreach (var contract in config.Contracts) RequireLocalization(config, $"contract.{contract.id}", errors);
             return errors;
+        }
+
+        private static void RequireLocalization(GameConfig config, string key, List<string> errors)
+        {
+            if (!config.Localizations.Any(x => x.key == key)) errors.Add($"Missing localization: {key}.");
         }
 
         private static void CheckUnique(IEnumerable<string> ids, string type, List<string> errors)

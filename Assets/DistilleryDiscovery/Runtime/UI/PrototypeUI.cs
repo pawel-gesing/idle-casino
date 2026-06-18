@@ -10,32 +10,41 @@ namespace DistilleryDiscovery
 {
     public sealed class PrototypeUI : MonoBehaviour
     {
-        private enum FooterMode { Experiment, Production, Sale, Contract, Laboratory, None }
+        private enum FooterMode { Experiment, Production, Contract, Laboratory, None }
+
+        private sealed class LocalizedBinding
+        {
+            public Text Text;
+            public string Key;
+            public string Fallback;
+        }
 
         private static readonly Color Ink = new(0.09f, 0.08f, 0.12f);
         private static readonly Color Plum = new(0.25f, 0.08f, 0.22f);
         private static readonly Color Gold = new(0.95f, 0.68f, 0.18f);
         private static readonly Color Cream = new(0.96f, 0.91f, 0.79f);
+        private readonly List<string> selection = new();
+        private readonly List<LocalizedBinding> localizedBindings = new();
         private GameService game;
         private SaveService save;
         private Font font;
+        private CanvasScaler canvasScaler;
+        private RectTransform safeAreaRoot;
+        private GridLayoutGroup navigationGrid;
         private Text statusText;
         private Text contentText;
         private Text selectionText;
         private Text currentIngredientText;
         private Text secondaryActionText;
         private Text primaryActionText;
-        private CanvasScaler canvasScaler;
-        private RectTransform safeAreaRoot;
-        private GridLayoutGroup navigationGrid;
+        private GameObject settingsModal;
         private Rect lastSafeArea;
         private Vector2Int lastScreenSize;
-        private readonly List<string> selection = new();
         private FooterMode footerMode;
         private int currentIngredientIndex;
         private int currentRecipeIndex = -1;
-        private int currentProductIndex = -1;
-        private int currentContractIndex = -1;
+
+        private string Language => game.State.languageCode == "pl" ? "pl" : "en";
 
         private void Update()
         {
@@ -49,7 +58,7 @@ namespace DistilleryDiscovery
             save = saveService;
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             Build();
-            ShowState("Laboratorium gotowe. Odbierz dostawę, aby zacząć.");
+            ShowState(T("ui.status.ready", "Ready. Receive a delivery to begin."));
         }
 
         private void Build()
@@ -58,32 +67,28 @@ namespace DistilleryDiscovery
             var canvasObject = Node("Canvas", transform, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvasScaler = canvasObject.GetComponent<CanvasScaler>(); canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; canvasScaler.referenceResolution = new Vector2(1080, 1920); canvasScaler.matchWidthOrHeight = 0f;
-            if (FindFirstObjectByType<EventSystem>() == null) Node("EventSystem", transform, typeof(EventSystem), typeof(StandaloneInputModule));
+            if (FindAnyObjectByType<EventSystem>() == null) Node("EventSystem", transform, typeof(EventSystem), typeof(StandaloneInputModule));
             safeAreaRoot = Node("SafeArea", canvasObject.transform, typeof(RectTransform)).GetComponent<RectTransform>();
             Stretch(safeAreaRoot.gameObject);
             var background = Panel("Background", safeAreaRoot, Ink); Stretch(background);
 
             var header = Panel("Header", background.transform, Plum); Rect(header, 0, .88f, 1, 1);
-            var title = Label("DISTILLERY DISCOVERY\n<color=#F2AD2E>EKONOMIA PROTOTYPU</color>", header.transform, 50, TextAnchor.MiddleCenter); Stretch(title.gameObject);
+            var title = Label("DISTILLERY DISCOVERY", header.transform, 52, TextAnchor.MiddleCenter); Rect(title.gameObject, .04f, 0, .84f, 1);
+            var settings = AddButton(header.transform, "⚙", OpenSettings, Gold, Ink); Rect(settings, .86f, .20f, .97f, .80f);
+
             var status = Panel("Status", background.transform, new Color(.14f, .12f, .18f)); Rect(status, 0, .81f, 1, .88f);
             statusText = Label("", status.transform, 29, TextAnchor.MiddleCenter); Stretch(statusText.gameObject, 20, 8);
 
             var nav = Panel("Menu", background.transform, new Color(.11f, .10f, .14f)); Rect(nav, 0, .60f, 1, .81f);
-            navigationGrid = nav.AddComponent<GridLayoutGroup>(); navigationGrid.padding = new RectOffset(18, 18, 12, 12); navigationGrid.spacing = new Vector2(10, 8); navigationGrid.cellSize = new Vector2(338, 66); navigationGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount; navigationGrid.constraintCount = 3;
-            AddButton(nav.transform, "STAN", () => ShowState());
-            AddButton(nav.transform, "DOSTAWA", ReceiveDelivery);
-            AddButton(nav.transform, "SKŁADNIKI", ShowIngredientInventory);
-            AddButton(nav.transform, "PRODUKTY", ShowProducts);
-            AddButton(nav.transform, "EKSPERYMENT", ShowExperiment);
-            AddButton(nav.transform, "PRODUKCJA", ShowProduction);
-            AddButton(nav.transform, "SPRZEDAŻ", ShowSale);
-            AddButton(nav.transform, "KONTRAKTY", ShowContracts);
-            AddButton(nav.transform, "RECEPTURY", ShowRecipeBook);
-            AddButton(nav.transform, "LABORATORIUM", ShowLaboratory);
-            AddButton(nav.transform, "ZAPISZ", SaveGame);
-            AddButton(nav.transform, "WCZYTAJ", LoadGame);
-            AddButton(nav.transform, "RESET", ResetGame);
-            AddButton(nav.transform, "WYJDŹ", Application.Quit);
+            navigationGrid = nav.AddComponent<GridLayoutGroup>(); navigationGrid.padding = new RectOffset(18, 18, 12, 12); navigationGrid.spacing = new Vector2(10, 8); navigationGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount; navigationGrid.constraintCount = 3;
+            AddLocalizedButton(nav.transform, "ui.nav.state", "STATE", () => ShowState());
+            AddLocalizedButton(nav.transform, "ui.nav.ingredients", "INGREDIENTS", ShowIngredientInventory);
+            AddLocalizedButton(nav.transform, "ui.nav.recipes", "RECIPES", ShowRecipeBook);
+            AddLocalizedButton(nav.transform, "ui.nav.experiment", "EXPERIMENT", ShowExperiment);
+            AddLocalizedButton(nav.transform, "ui.nav.production", "PRODUCTION", ShowProduction);
+            AddLocalizedButton(nav.transform, "ui.nav.contracts", "CONTRACTS", ShowContracts);
+            AddLocalizedButton(nav.transform, "ui.nav.delivery", "DELIVERY", ReceiveDelivery);
+            AddLocalizedButton(nav.transform, "ui.nav.laboratory", "LABORATORY", ShowLaboratory);
 
             var scroll = Panel("Content", background.transform, new Color(.07f, .065f, .09f)); Rect(scroll, .025f, .16f, .975f, .59f);
             scroll.AddComponent<ScrollRect>();
@@ -95,15 +100,31 @@ namespace DistilleryDiscovery
             var scrollRect = scroll.GetComponent<ScrollRect>(); scrollRect.viewport = viewport.GetComponent<RectTransform>(); scrollRect.content = bodyRect; scrollRect.horizontal = false;
 
             var footer = Panel("ActionBar", background.transform, Plum); Rect(footer, 0, 0, 1, .15f);
-            selectionText = Label("Wybrane: —", footer.transform, 27, TextAnchor.MiddleCenter); Rect(selectionText.gameObject, .02f, .69f, .98f, .98f);
+            selectionText = Label("", footer.transform, 27, TextAnchor.MiddleCenter); Rect(selectionText.gameObject, .02f, .69f, .98f, .98f);
             var previous = AddButton(footer.transform, "‹", () => ChangeIngredient(-1)); Rect(previous, .02f, .38f, .12f, .67f);
             currentIngredientText = Label("", footer.transform, 25, TextAnchor.MiddleCenter); Rect(currentIngredientText.gameObject, .13f, .38f, .60f, .67f);
             var next = AddButton(footer.transform, "›", () => ChangeIngredient(1)); Rect(next, .61f, .38f, .71f, .67f);
-            var add = AddButton(footer.transform, "DODAJ", AddCurrentIngredient, Gold, Ink); Rect(add, .73f, .38f, .98f, .67f);
-            var secondary = AddButton(footer.transform, "WYCZYŚĆ", DispatchSecondary); Rect(secondary, .02f, .05f, .30f, .33f); secondaryActionText = secondary.GetComponentInChildren<Text>();
-            var primary = AddButton(footer.transform, "URUCHOM", DispatchPrimary, Gold, Ink); Rect(primary, .32f, .05f, .98f, .33f); primaryActionText = primary.GetComponentInChildren<Text>();
+            var add = AddLocalizedButton(footer.transform, "ui.action.add", "ADD", AddCurrentIngredient, Gold, Ink); Rect(add, .73f, .38f, .98f, .67f);
+            var secondary = AddButton(footer.transform, "—", DispatchSecondary); Rect(secondary, .02f, .05f, .30f, .33f); secondaryActionText = secondary.GetComponentInChildren<Text>();
+            var primary = AddButton(footer.transform, "—", DispatchPrimary, Gold, Ink); Rect(primary, .32f, .05f, .98f, .33f); primaryActionText = primary.GetComponentInChildren<Text>();
+
+            BuildSettingsModal();
             RefreshCurrentIngredient();
             ApplyMobileLayout();
+        }
+
+        private void BuildSettingsModal()
+        {
+            settingsModal = Panel("SettingsModal", safeAreaRoot, new Color(0f, 0f, 0f, .78f)); Stretch(settingsModal);
+            var card = Panel("SettingsCard", settingsModal.transform, new Color(.13f, .10f, .16f)); Rect(card, .12f, .20f, .88f, .80f);
+            var title = Label("", card.transform, 42, TextAnchor.MiddleCenter); Rect(title.gameObject, .10f, .83f, .80f, .96f); Bind(title, "ui.settings.title", "SETTINGS");
+            var close = AddButton(card.transform, "X", CloseSettings, Gold, Ink); Rect(close, .84f, .85f, .96f, .96f);
+            var saveButton = AddLocalizedButton(card.transform, "ui.settings.save", "SAVE", SaveGame); Rect(saveButton, .12f, .65f, .88f, .76f);
+            var loadButton = AddLocalizedButton(card.transform, "ui.settings.load", "LOAD", LoadGame); Rect(loadButton, .12f, .52f, .88f, .63f);
+            var resetButton = AddLocalizedButton(card.transform, "ui.settings.reset", "RESET", ResetGame); Rect(resetButton, .12f, .39f, .88f, .50f);
+            var languageButton = AddLocalizedButton(card.transform, "ui.settings.language", "LANGUAGE: ENGLISH", ToggleLanguage); Rect(languageButton, .12f, .26f, .88f, .37f);
+            var exitButton = AddLocalizedButton(card.transform, "ui.settings.exit", "EXIT", Application.Quit); Rect(exitButton, .12f, .10f, .88f, .21f);
+            settingsModal.SetActive(false);
         }
 
         private void ApplyMobileLayout()
@@ -121,17 +142,14 @@ namespace DistilleryDiscovery
             canvasScaler.matchWidthOrHeight = Screen.width > Screen.height ? 1f : 0f;
             safeAreaRoot.anchorMin = new Vector2(safeArea.xMin / Screen.width, safeArea.yMin / Screen.height);
             safeAreaRoot.anchorMax = new Vector2(safeArea.xMax / Screen.width, safeArea.yMax / Screen.height);
-            safeAreaRoot.offsetMin = Vector2.zero;
-            safeAreaRoot.offsetMax = Vector2.zero;
-            lastSafeArea = rawSafeArea;
-            lastScreenSize = new Vector2Int(Screen.width, Screen.height);
+            safeAreaRoot.offsetMin = Vector2.zero; safeAreaRoot.offsetMax = Vector2.zero;
+            lastSafeArea = rawSafeArea; lastScreenSize = new Vector2Int(Screen.width, Screen.height);
 
-            if (navigationGrid == null) return;
             Canvas.ForceUpdateCanvases();
             var rect = navigationGrid.GetComponent<RectTransform>().rect;
             if (rect.width <= 0f || rect.height <= 0f) return;
             const int columns = 3;
-            const int rows = 5;
+            const int rows = 3;
             var width = (rect.width - navigationGrid.padding.horizontal - navigationGrid.spacing.x * (columns - 1)) / columns;
             var height = (rect.height - navigationGrid.padding.vertical - navigationGrid.spacing.y * (rows - 1)) / rows;
             navigationGrid.cellSize = new Vector2(Mathf.Max(1f, width), Mathf.Max(1f, height));
@@ -139,50 +157,36 @@ namespace DistilleryDiscovery
 
         private void ShowState(string message = null)
         {
-            SetMode(FooterMode.None);
-            SetStatus(message ?? "Aktualny stan gracza");
-            contentText.text = $"<color=#F2AD2E><b>STAN GRACZA</b></color>\n\nZłoto: <b>{game.State.gold}</b>\nLaboratorium: <b>poziom {game.State.laboratoryLevel}</b>\nEksperymenty: <b>{game.State.experimentsCompleted}</b>\nProdukcje: <b>{game.State.productionsCompleted}</b>\nSkładniki: <b>{game.State.inventory.Sum(x => Math.Max(0, x.amount))}</b>\nProdukty: <b>{game.State.products.Sum(x => x.amount)}</b>\nOdkryte receptury: <b>{game.State.recipes.Count}/{game.Config.Recipes.Count}</b> ({Completion():0.#}%)\n\nPętla ekonomii:\nDostawa → eksperyment → magazyn produktów → sprzedaż lub kontrakt → ulepszenie laboratorium → produkcja";
+            SetMode(FooterMode.None); SetStatus(message ?? T("ui.status.state", "Current player state"));
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.state", "PLAYER STATE")}</b></color>\n\n{T("ui.label.gold", "Gold")}: <b>{game.State.gold}</b>\n{T("ui.label.laboratory", "Laboratory")}: <b>{T("ui.label.level", "level")} {game.State.laboratoryLevel}</b>\n{T("ui.label.experiments", "Experiments")}: <b>{game.State.experimentsCompleted}</b>\n{T("ui.label.productions", "Productions")}: <b>{game.State.productionsCompleted}</b>\n{T("ui.label.ingredients", "Ingredients")}: <b>{game.State.inventory.Sum(x => Math.Max(0, x.amount))}</b>\n{T("ui.label.recipes", "Discovered recipes")}: <b>{game.State.recipes.Count}/{game.Config.Recipes.Count}</b> ({Completion():0.#}%)\n{T("ui.label.contracts", "Active contracts")}: <b>{game.State.activeContracts.Count}</b>";
         }
 
         private void ReceiveDelivery()
         {
             SetMode(FooterMode.None);
             var delivery = game.ReceiveDelivery();
-            var lines = delivery.Items.Select(x => $"+{x.Value}  {game.Config.Ingredient(x.Key).displayName}");
-            SetStatus("Dostawa odebrana");
-            contentText.text = "<color=#F2AD2E><b>NOWA DOSTAWA</b></color>\n\n" + string.Join("\n", lines);
+            var lines = delivery.Items.Select(x => $"+{x.Value}  {IngredientName(x.Key)}");
+            SetStatus(T("ui.status.delivery", "Delivery received"));
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.delivery", "NEW DELIVERY")}</b></color>\n\n" + string.Join("\n", lines);
             RefreshCurrentIngredient();
         }
 
         private void ShowIngredientInventory()
         {
-            SetMode(FooterMode.None); SetStatus("Magazyn składników");
-            var sb = new StringBuilder("<color=#F2AD2E><b>SKŁADNIKI</b></color>\n\n");
+            SetMode(FooterMode.None); SetStatus(T("ui.status.ingredients", "Ingredient storage"));
+            var sb = new StringBuilder($"<color=#F2AD2E><b>{T("ui.heading.ingredients", "INGREDIENTS")}</b></color>\n\n");
             foreach (var item in game.Config.Ingredients)
             {
                 var rarity = game.Config.Rarity(item.rarityId);
-                sb.Append($"<color={rarity.colorHex}>●</color>  {item.displayName,-20}  <b>x{game.State.AmountOf(item.id)}</b>\n");
-            }
-            contentText.text = sb.ToString();
-        }
-
-        private void ShowProducts()
-        {
-            SetMode(FooterMode.None); SetStatus("Magazyn produktów");
-            var sb = new StringBuilder("<color=#F2AD2E><b>PRODUKTY</b></color>\n\n");
-            if (game.State.products.Count == 0) sb.Append("Magazyn produktów jest pusty.");
-            foreach (var product in game.State.products)
-            {
-                var rarity = game.Config.Rarity(product.rarityId);
-                sb.Append($"<b>{game.Config.Recipe(product.recipeId).displayName}</b> · <color={rarity.colorHex}>{rarity.displayName}</color>\n  x{product.amount} · {product.saleValue} zł/szt.\n\n");
+                sb.Append($"<color={rarity.colorHex}>●</color>  {IngredientName(item.id),-20}  <b>x{game.State.AmountOf(item.id)}</b>\n");
             }
             contentText.text = sb.ToString();
         }
 
         private void ShowExperiment()
         {
-            SetMode(FooterMode.Experiment); SetStatus("Wybierz dokładnie trzy składniki");
-            contentText.text = "<color=#F2AD2E><b>EKSPERYMENT</b></color>\n\nWybierz 3 składniki. Receptura i rzadkość zostaną wylosowane, a produkt trafi do magazynu.\n\nPo zebraniu trzech składników zobaczysz podgląd możliwych receptur.";
+            SetMode(FooterMode.Experiment); SetStatus(T("ui.status.select_three", "Select exactly three ingredients"));
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.experiment", "EXPERIMENT")}</b></color>\n\n{T("ui.experiment.help", "Choose 3 ingredients. The recipe and rarity are rolled, then the product is sold automatically.")}";
             UpdateSelection();
         }
 
@@ -192,35 +196,29 @@ namespace DistilleryDiscovery
             SetMode(FooterMode.Production);
             if (discovered.Count == 0)
             {
-                currentRecipeIndex = -1; SetStatus("Najpierw odkryj recepturę"); contentText.text = "<color=#F2AD2E><b>PRODUKCJA</b></color>\n\nBrak odkrytych receptur."; return;
+                currentRecipeIndex = -1; SetStatus(T("ui.status.discover_first", "Discover a recipe first")); contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.production", "PRODUCTION")}</b></color>\n\n{T("ui.production.none", "No discovered recipes.")}"; return;
             }
             currentRecipeIndex = (currentRecipeIndex + 1 + discovered.Count) % discovered.Count;
             var recipe = discovered[currentRecipeIndex];
-            var valid = game.Config.Ingredients.Where(i => i.outcomeWeights.Any(x => x.recipeId == recipe.id && x.weight > 0)).Select(i => i.displayName);
-            SetStatus("Ponowne kliknięcie PRODUKCJA wybiera następną recepturę");
-            contentText.text = $"<color=#F2AD2E><b>PRODUKCJA: {recipe.displayName}</b></color>\n\nWybierz dokładnie 3 składniki wpływające na tę recepturę. Duplikaty są dozwolone.\n\nPoprawne składniki:\n• {string.Join("\n• ", valid)}\n\nRezultat receptury jest gwarantowany; losowana jest tylko rzadkość.";
+            var valid = game.Config.Ingredients.Where(i => i.outcomeWeights.Any(x => x.recipeId == recipe.id && x.weight > 0)).Select(i => IngredientName(i.id));
+            SetStatus(T("ui.status.production_cycle", "Press PRODUCTION again to select the next recipe"));
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.production", "PRODUCTION")}: {RecipeName(recipe.id)}</b></color>\n\n{T("ui.production.help", "Choose exactly 3 contributing ingredients. Duplicates are allowed.")}\n\n{T("ui.label.valid_ingredients", "Valid ingredients")}:\n• {string.Join("\n• ", valid)}\n\n{T("ui.production.guaranteed", "The recipe is guaranteed; only rarity is rolled. The product is sold automatically.")}";
             UpdateSelection();
-        }
-
-        private void ShowSale()
-        {
-            SetMode(FooterMode.Sale);
-            if (game.State.products.Count == 0) { SetStatus("Brak produktów do sprzedaży"); contentText.text = "<color=#F2AD2E><b>SPRZEDAŻ</b></color>\n\nMagazyn jest pusty."; return; }
-            currentProductIndex = (currentProductIndex + 1 + game.State.products.Count) % game.State.products.Count;
-            var product = game.State.products[currentProductIndex];
-            var rarity = game.Config.Rarity(product.rarityId);
-            SetStatus("Ponowne kliknięcie SPRZEDAŻ wybiera następną pozycję");
-            contentText.text = $"<color=#F2AD2E><b>SPRZEDAŻ</b></color>\n\nWybrano: <b>{game.Config.Recipe(product.recipeId).displayName}</b>\nRzadkość: <color={rarity.colorHex}>{rarity.displayName}</color>\nIlość: {product.amount}\nCena sztuki: <b>{product.saleValue} zł</b>\n\nMożesz sprzedać jedną sztukę albo cały magazyn.";
         }
 
         private void ShowContracts()
         {
-            SetMode(FooterMode.Contract);
-            if (game.State.activeContractIds.Count == 0) { SetStatus("Brak aktywnych kontraktów"); contentText.text = "<color=#F2AD2E><b>KONTRAKTY</b></color>\n\nBrak aktywnych kontraktów."; return; }
-            currentContractIndex = (currentContractIndex + 1 + game.State.activeContractIds.Count) % game.State.activeContractIds.Count;
-            var contract = game.Config.Contract(game.State.activeContractIds[currentContractIndex]);
-            SetStatus("Ponowne kliknięcie KONTRAKTY wybiera następny kontrakt");
-            contentText.text = $"<color=#F2AD2E><b>KONTRAKT: {contract.displayName}</b></color>\n\nWymaganie: <b>{DescribeRequirement(contract)}</b>\nNagroda: <b>{contract.goldReward} złota</b>\n\nRealizacja zużywa pasujące produkty.";
+            SetMode(FooterMode.Contract); SetStatus(T("ui.status.contracts", "Three contracts are active at once"));
+            var sb = new StringBuilder($"<color=#F2AD2E><b>{T("ui.heading.contracts", "ACTIVE CONTRACTS")}</b></color>\n\n");
+            foreach (var state in game.State.activeContracts)
+            {
+                var contract = game.Config.Contract(state.contractId);
+                var complete = state.progress >= contract.amount;
+                sb.Append($"<b>{ContractName(contract.id)}</b>\n{DescribeRequirement(contract)}\n{T("ui.label.progress", "Progress")}: <b>{state.progress}/{contract.amount}</b> · {T("ui.label.reward", "Reward")}: <b>{contract.goldReward} {T("ui.label.gold_lower", "gold")}</b>\n");
+                if (complete) sb.Append($"<color=#63D889><b>{T("ui.contract.ready", "READY TO CLAIM")}</b></color>\n");
+                sb.Append("\n");
+            }
+            contentText.text = sb.ToString();
         }
 
         private void ShowLaboratory()
@@ -228,23 +226,23 @@ namespace DistilleryDiscovery
             SetMode(FooterMode.Laboratory);
             var current = game.Config.LaboratoryLevel(game.State.laboratoryLevel);
             var next = game.Config.LaboratoryLevel(game.State.laboratoryLevel + 1);
-            SetStatus("Laboratorium wpływa na losowanie rzadkości");
-            contentText.text = $"<color=#F2AD2E><b>LABORATORIUM · POZIOM {current.level}</b></color>\n\nBonus do wyższej rzadkości: <b>+{current.productQualityBonus:P0}</b>\n\n" + (next == null ? "Osiągnięto maksymalny poziom." : $"Następny poziom: <b>{next.level}</b>\nNowy bonus: <b>+{next.productQualityBonus:P0}</b>\nKoszt: <b>{next.upgradeCost} złota</b>");
+            SetStatus(T("ui.status.laboratory", "Laboratory improves product rarity"));
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.laboratory", "LABORATORY")} · {T("ui.label.level", "LEVEL")} {current.level}</b></color>\n\n{T("ui.label.rarity_bonus", "Higher rarity bonus")}: <b>+{current.productQualityBonus:P0}</b>\n\n" + (next == null ? T("ui.laboratory.max", "Maximum level reached.") : $"{T("ui.label.next_level", "Next level")}: <b>{next.level}</b>\n{T("ui.label.new_bonus", "New bonus")}: <b>+{next.productQualityBonus:P0}</b>\n{T("ui.label.cost", "Cost")}: <b>{next.upgradeCost} {T("ui.label.gold_lower", "gold")}</b>");
         }
 
         private void ShowRecipeBook()
         {
-            SetMode(FooterMode.None); SetStatus($"Książka receptur — ukończono {Completion():0.#}%");
-            var sb = new StringBuilder($"<color=#F2AD2E><b>KSIĄŻKA RECEPTUR  {game.State.recipes.Count}/{game.Config.Recipes.Count}</b></color>\n\n");
+            SetMode(FooterMode.None); SetStatus(F("ui.status.recipe_book", "Recipe book — {0:0.#}% complete", Completion()));
+            var sb = new StringBuilder($"<color=#F2AD2E><b>{T("ui.heading.recipe_book", "RECIPE BOOK")}  {game.State.recipes.Count}/{game.Config.Recipes.Count}</b></color>\n\n");
             foreach (var recipe in game.Config.Recipes)
             {
                 var state = game.State.RecipeState(recipe.id);
-                if (state == null) sb.Append("◇  ???\n    Nieodkryta receptura\n\n");
+                if (state == null) sb.Append($"◇  ???\n    {T("ui.recipe.undiscovered", "Undiscovered recipe")}\n\n");
                 else
                 {
                     var rarity = game.Config.Rarity(state.highestProductRarityId);
-                    var ingredients = string.Join(", ", state.revealedIngredientIds.Select(x => game.Config.Ingredient(x).displayName));
-                    sb.Append($"◆  <b>{recipe.displayName}</b>\n    Rekord: <color={rarity.colorHex}>{rarity.displayName}</color> · Wytworzenia: {state.timesCreated}\n    Odkryte składniki: {ingredients}\n\n");
+                    var ingredients = string.Join(", ", state.revealedIngredientIds.Select(IngredientName));
+                    sb.Append($"◆  <b>{RecipeName(recipe.id)}</b>\n    {T("ui.label.record", "Record")}: <color={rarity.colorHex}>{RarityName(rarity.id)}</color> · {T("ui.label.created", "Created")}: {state.timesCreated}\n    {T("ui.label.discovered_ingredients", "Discovered ingredients")}: {ingredients}\n\n");
                 }
             }
             contentText.text = sb.ToString();
@@ -252,11 +250,11 @@ namespace DistilleryDiscovery
 
         private void AddCurrentIngredient()
         {
-            if (footerMode != FooterMode.Experiment && footerMode != FooterMode.Production) { SetStatus("Składniki wybiera się w eksperymencie lub produkcji."); return; }
+            if (footerMode != FooterMode.Experiment && footerMode != FooterMode.Production) { SetStatus(T("ui.error.select_mode", "Ingredients are selected in experiment or production mode.")); return; }
             var required = footerMode == FooterMode.Experiment ? game.Config.Economy.ingredientsPerExperiment : game.Config.Economy.ingredientsPerProduction;
             var id = game.Config.Ingredients[currentIngredientIndex].id;
-            if (selection.Count >= required) { SetStatus("Wybrano już wymaganą liczbę składników."); return; }
-            if (game.State.AmountOf(id) <= selection.Count(x => x == id)) { SetStatus("Brak kolejnej sztuki tego składnika."); return; }
+            if (selection.Count >= required) { SetStatus(T("ui.error.selection_full", "The required number of ingredients is already selected.")); return; }
+            if (game.State.AmountOf(id) <= selection.Count(x => x == id)) { SetStatus(T("ui.error.no_ingredient", "No more of this ingredient.")); return; }
             selection.Add(id); UpdateSelection();
             if (footerMode == FooterMode.Experiment && selection.Count == required) ShowPreview();
         }
@@ -271,13 +269,13 @@ namespace DistilleryDiscovery
         {
             try
             {
-                var sb = new StringBuilder("<color=#F2AD2E><b>MOŻLIWE WYNIKI</b></color>\n\n");
+                var sb = new StringBuilder($"<color=#F2AD2E><b>{T("ui.heading.outcomes", "POSSIBLE OUTCOMES")}</b></color>\n\n");
                 foreach (var outcome in game.Preview(selection))
                 {
                     var known = game.State.RecipeState(outcome.RecipeId) != null;
-                    sb.Append($"{(known ? game.Config.Recipe(outcome.RecipeId).displayName : "???"),-24} <b>{outcome.Probability:P1}</b>\n");
+                    sb.Append($"{(known ? RecipeName(outcome.RecipeId) : "???"),-24} <b>{outcome.Probability:P1}</b>\n");
                 }
-                contentText.text = sb.ToString(); SetStatus("Podgląd gotowy");
+                contentText.text = sb.ToString(); SetStatus(T("ui.status.preview", "Preview ready"));
             }
             catch (Exception ex) { SetStatus(ex.Message); }
         }
@@ -290,8 +288,7 @@ namespace DistilleryDiscovery
                 {
                     case FooterMode.Experiment: RunExperiment(); break;
                     case FooterMode.Production: RunProduction(); break;
-                    case FooterMode.Sale: SellSelected(); break;
-                    case FooterMode.Contract: FulfillSelectedContract(); break;
+                    case FooterMode.Contract: ClaimCompletedContract(); break;
                     case FooterMode.Laboratory: game.UpgradeLaboratory(); ShowLaboratory(); break;
                 }
             }
@@ -300,11 +297,7 @@ namespace DistilleryDiscovery
 
         private void DispatchSecondary()
         {
-            if (footerMode == FooterMode.Sale)
-            {
-                var result = game.SellAllProducts(); ShowState($"Sprzedano {result.ItemsSold} produktów za {result.GoldEarned} złota");
-            }
-            else if (footerMode == FooterMode.Experiment || footerMode == FooterMode.Production)
+            if (footerMode == FooterMode.Experiment || footerMode == FooterMode.Production)
             {
                 selection.Clear(); UpdateSelection();
             }
@@ -314,44 +307,35 @@ namespace DistilleryDiscovery
         {
             var result = game.RunExperiment(selection);
             var rarity = game.Config.Rarity(result.RarityId);
-            contentText.text = $"<color=#F2AD2E><b>WYNIK EKSPERYMENTU</b></color>\n\nPowstało: <b>{game.Config.Recipe(result.RecipeId).displayName}</b>\nJakość: <color={rarity.colorHex}><b>{rarity.displayName}</b></color>\nWartość: <b>{result.SaleValue} zł</b>\n\nProdukt trafił do magazynu.\n{(result.WasDiscovered ? "NOWA RECEPTURA ODKRYTA!" : result.RarityImproved ? "NOWY REKORD RZADKOŚCI!" : "Znana receptura — rekord bez zmian.")}";
-            SetStatus("Eksperyment zakończony — produkt czeka w magazynie"); selection.Clear(); UpdateSelection();
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.experiment_result", "EXPERIMENT RESULT")}</b></color>\n\n{T("ui.label.created_product", "Created")}: <b>{RecipeName(result.RecipeId)}</b>\n{T("ui.label.quality", "Quality")}: <color={rarity.colorHex}><b>{RarityName(rarity.id)}</b></color>\n{T("ui.label.auto_sale", "Automatic sale")}: <b>+{result.SaleValue} {T("ui.label.gold_lower", "gold")}</b>\n\n{(result.WasDiscovered ? T("ui.result.discovered", "NEW RECIPE DISCOVERED!") : result.RarityImproved ? T("ui.result.record", "NEW RARITY RECORD!") : T("ui.result.known", "Known recipe — record unchanged."))}";
+            SetStatus(T("ui.status.auto_sold", "Product created and sold automatically")); selection.Clear(); UpdateSelection();
         }
 
         private void RunProduction()
         {
             var discovered = game.Config.Recipes.Where(x => game.State.RecipeState(x.id) != null).ToList();
-            if (currentRecipeIndex < 0 || discovered.Count == 0) throw new InvalidOperationException("Wybierz odkrytą recepturę.");
+            if (currentRecipeIndex < 0 || discovered.Count == 0) throw new InvalidOperationException(T("ui.error.choose_recipe", "Choose a discovered recipe."));
             var result = game.RunProduction(discovered[currentRecipeIndex].id, selection);
             var rarity = game.Config.Rarity(result.RarityId);
-            contentText.text = $"<color=#F2AD2E><b>PRODUKCJA ZAKOŃCZONA</b></color>\n\nProdukt: <b>{game.Config.Recipe(result.RecipeId).displayName}</b>\nRzadkość: <color={rarity.colorHex}>{rarity.displayName}</color>\nWartość: {result.SaleValue} zł\n\nProdukt dodano do magazynu.";
-            SetStatus("Produkcja zakończona"); selection.Clear(); UpdateSelection();
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.production_result", "PRODUCTION COMPLETE")}</b></color>\n\n{T("ui.label.created_product", "Product")}: <b>{RecipeName(result.RecipeId)}</b>\n{T("ui.label.quality", "Rarity")}: <color={rarity.colorHex}>{RarityName(rarity.id)}</color>\n{T("ui.label.auto_sale", "Automatic sale")}: <b>+{result.SaleValue} {T("ui.label.gold_lower", "gold")}</b>";
+            SetStatus(T("ui.status.auto_sold", "Product created and sold automatically")); selection.Clear(); UpdateSelection();
         }
 
-        private void SellSelected()
+        private void ClaimCompletedContract()
         {
-            if (game.State.products.Count == 0) throw new InvalidOperationException("Brak produktów do sprzedaży.");
-            currentProductIndex %= game.State.products.Count;
-            var product = game.State.products[currentProductIndex];
-            var result = game.SellProduct(product.recipeId, product.rarityId, product.saleValue);
-            currentProductIndex = -1; ShowSale(); SetStatus($"Sprzedano 1 produkt za {result.GoldEarned} złota");
-        }
-
-        private void FulfillSelectedContract()
-        {
-            if (game.State.activeContractIds.Count == 0) throw new InvalidOperationException("Brak aktywnych kontraktów.");
-            currentContractIndex %= game.State.activeContractIds.Count;
-            var result = game.FulfillContract(game.State.activeContractIds[currentContractIndex]);
-            currentContractIndex = -1; ShowContracts(); SetStatus($"Kontrakt zrealizowany: +{result.GoldEarned} złota");
+            var completed = game.State.activeContracts.FirstOrDefault(x => x.progress >= game.Config.Contract(x.contractId).amount);
+            if (completed == null) throw new InvalidOperationException(T("ui.error.no_completed_contract", "No completed contract to claim."));
+            var result = game.ClaimContract(completed.contractId);
+            ShowContracts(); SetStatus(F("ui.status.contract_claimed", "Reward claimed: +{0} gold", result.GoldEarned));
         }
 
         private string DescribeRequirement(ContractDefinition contract)
         {
             return contract.requirementType switch
             {
-                ContractRequirementType.Recipe => $"{contract.amount} × {game.Config.Recipe(contract.targetId).displayName}",
-                ContractRequirementType.Rarity => $"{contract.amount} × produkt {game.Config.Rarity(contract.targetId).displayName}",
-                ContractRequirementType.Category => $"{contract.amount} × {game.Config.Category(contract.targetId).displayName}",
+                ContractRequirementType.Recipe => F("ui.contract.recipe", "Create {0} × {1}", contract.amount, RecipeName(contract.targetId)),
+                ContractRequirementType.Rarity => F("ui.contract.rarity", "Create {0} × {1} product", contract.amount, RarityName(contract.targetId)),
+                ContractRequirementType.Category => F("ui.contract.category", "Create {0} × {1}", contract.amount, CategoryName(contract.targetId)),
                 _ => contract.targetId
             };
         }
@@ -359,28 +343,49 @@ namespace DistilleryDiscovery
         private void SetMode(FooterMode mode)
         {
             footerMode = mode;
-            secondaryActionText.text = mode == FooterMode.Sale ? "SPRZEDAJ WSZYSTKO" : mode is FooterMode.Experiment or FooterMode.Production ? "WYCZYŚĆ" : "—";
+            secondaryActionText.text = mode is FooterMode.Experiment or FooterMode.Production ? T("ui.action.clear", "CLEAR") : "—";
             primaryActionText.text = mode switch
             {
-                FooterMode.Experiment => "URUCHOM EKSPERYMENT",
-                FooterMode.Production => "WYPRODUKUJ",
-                FooterMode.Sale => "SPRZEDAJ 1 SZTUKĘ",
-                FooterMode.Contract => "ZREALIZUJ KONTRAKT",
-                FooterMode.Laboratory => "ULEPSZ LABORATORIUM",
+                FooterMode.Experiment => T("ui.action.run_experiment", "RUN EXPERIMENT"),
+                FooterMode.Production => T("ui.action.produce", "PRODUCE"),
+                FooterMode.Contract => T("ui.action.claim", "CLAIM REWARD"),
+                FooterMode.Laboratory => T("ui.action.upgrade", "UPGRADE LABORATORY"),
                 _ => "—"
             };
             if (mode != FooterMode.Experiment && mode != FooterMode.Production) selection.Clear();
             UpdateSelection();
         }
 
-        private void SaveGame() { save.Save(game.State); ShowState("Gra zapisana lokalnie"); }
-        private void LoadGame() { try { game.ReplaceState(save.Load()); currentRecipeIndex = -1; ShowState("Wczytano lokalny zapis"); } catch (Exception ex) { SetStatus(ex.Message); } }
-        private void ResetGame() { save.Reset(); game.ReplaceState(GameService.NewState(game.Config)); currentRecipeIndex = -1; ShowState("Zapis usunięty, stan gry zresetowany"); }
-        private void RefreshCurrentIngredient() { if (currentIngredientText != null && game.Config.Ingredients.Count > 0) { var item = game.Config.Ingredients[currentIngredientIndex]; currentIngredientText.text = $"{item.displayName}  x{game.State.AmountOf(item.id)}"; } }
-        private void UpdateSelection() { if (selectionText != null) selectionText.text = "Wybrane: " + (selection.Count == 0 ? "—" : string.Join(" + ", selection.Select(x => game.Config.Ingredient(x).displayName))) + $"  ({selection.Count}/3)"; RefreshCurrentIngredient(); }
+        private void OpenSettings() => settingsModal.SetActive(true);
+        private void CloseSettings() => settingsModal.SetActive(false);
+        private void ToggleLanguage()
+        {
+            game.State.languageCode = Language == "pl" ? "en" : "pl";
+            RefreshLocalizedBindings();
+            ShowState(T("ui.status.language_changed", "Language changed"));
+            settingsModal.SetActive(true);
+        }
+
+        private void SaveGame() { save.Save(game.State); CloseSettings(); ShowState(T("ui.status.saved", "Game saved locally")); }
+        private void LoadGame() { try { game.ReplaceState(save.Load()); currentRecipeIndex = -1; RefreshLocalizedBindings(); CloseSettings(); ShowState(T("ui.status.loaded", "Local save loaded")); } catch (Exception ex) { SetStatus(ex.Message); } }
+        private void ResetGame() { save.Reset(); game.ReplaceState(GameService.NewState(game.Config, Language)); currentRecipeIndex = -1; RefreshLocalizedBindings(); CloseSettings(); ShowState(T("ui.status.reset", "Save deleted and game reset")); }
+
+        private string T(string key, string fallback) => game.Config.Text(key, Language, fallback);
+        private string F(string key, string fallback, params object[] args) => string.Format(T(key, fallback), args);
+        private string IngredientName(string id) => game.Config.Text($"ingredient.{id}", Language, game.Config.Ingredient(id)?.displayName ?? id);
+        private string RecipeName(string id) => game.Config.Text($"recipe.{id}", Language, game.Config.Recipe(id)?.displayName ?? id);
+        private string RarityName(string id) => game.Config.Text($"rarity.{id}", Language, game.Config.Rarity(id)?.displayName ?? id);
+        private string CategoryName(string id) => game.Config.Text($"category.{id}", Language, game.Config.Category(id)?.displayName ?? id);
+        private string ContractName(string id) => game.Config.Text($"contract.{id}", Language, game.Config.Contract(id)?.displayName ?? id);
+
+        private void RefreshCurrentIngredient() { if (currentIngredientText != null && game.Config.Ingredients.Count > 0) { var item = game.Config.Ingredients[currentIngredientIndex]; currentIngredientText.text = $"{IngredientName(item.id)}  x{game.State.AmountOf(item.id)}"; } }
+        private void UpdateSelection() { if (selectionText != null) selectionText.text = T("ui.label.selected", "Selected") + ": " + (selection.Count == 0 ? "—" : string.Join(" + ", selection.Select(IngredientName))) + $"  ({selection.Count}/3)"; RefreshCurrentIngredient(); }
         private float Completion() => game.Config.Recipes.Count == 0 ? 0 : 100f * game.State.recipes.Count / game.Config.Recipes.Count;
         private void SetStatus(string value) => statusText.text = value;
 
+        private void Bind(Text text, string key, string fallback) { localizedBindings.Add(new LocalizedBinding { Text = text, Key = key, Fallback = fallback }); text.text = T(key, fallback); }
+        private void RefreshLocalizedBindings() { foreach (var binding in localizedBindings) binding.Text.text = T(binding.Key, binding.Fallback); SetMode(footerMode); }
+        private GameObject AddLocalizedButton(Transform parent, string key, string fallback, Action action, Color? color = null, Color? textColor = null) { var node = AddButton(parent, T(key, fallback), action, color, textColor); Bind(node.GetComponentInChildren<Text>(), key, fallback); return node; }
         private GameObject Node(string name, Transform parent, params Type[] components) { var node = new GameObject(name, components); node.transform.SetParent(parent, false); return node; }
         private GameObject Panel(string name, Transform parent, Color color) { var node = Node(name, parent, typeof(RectTransform), typeof(Image)); node.GetComponent<Image>().color = color; return node; }
         private Text Label(string value, Transform parent, int size, TextAnchor anchor) { var node = Node("Label", parent, typeof(RectTransform), typeof(Text)); var text = node.GetComponent<Text>(); text.font = font; text.fontSize = size; text.color = Cream; text.alignment = anchor; text.text = value; text.supportRichText = true; return text; }

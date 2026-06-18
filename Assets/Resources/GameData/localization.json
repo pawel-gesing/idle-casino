@@ -59,8 +59,10 @@
     { "key": "ui.settings.reset", "pl": "RESET", "en": "RESET" },
     { "key": "ui.settings.language", "pl": "JĘZYK: POLSKI", "en": "LANGUAGE: ENGLISH" },
     { "key": "ui.settings.exit", "pl": "WYJDŹ", "en": "EXIT" },
+    { "key": "ui.header.gold", "pl": "ZŁOTO", "en": "GOLD" },
+    { "key": "ui.header.recipes", "pl": "RECEPTURY", "en": "RECIPES" },
+    { "key": "ui.header.ingredients", "pl": "SKŁADNIKI", "en": "INGREDIENTS" },
 
-    { "key": "ui.action.add", "pl": "DODAJ", "en": "ADD" },
     { "key": "ui.action.clear", "pl": "WYCZYŚĆ", "en": "CLEAR" },
     { "key": "ui.action.run_experiment", "pl": "URUCHOM EKSPERYMENT", "en": "RUN EXPERIMENT" },
     { "key": "ui.action.produce", "pl": "WYPRODUKUJ", "en": "PRODUCE" },
@@ -114,17 +116,18 @@
     { "key": "ui.status.laboratory", "pl": "Laboratorium poprawia rzadkość produktów", "en": "Laboratory improves product rarity" },
     { "key": "ui.status.recipe_book", "pl": "Książka receptur — ukończono {0:0.#}%", "en": "Recipe book — {0:0.#}% complete" },
     { "key": "ui.status.preview", "pl": "Podgląd gotowy", "en": "Preview ready" },
-    { "key": "ui.status.auto_sold", "pl": "Produkt wytworzony i automatycznie sprzedany", "en": "Product created and sold automatically" },
     { "key": "ui.status.contract_claimed", "pl": "Odebrano nagrodę: +{0} złota", "en": "Reward claimed: +{0} gold" },
     { "key": "ui.status.language_changed", "pl": "Zmieniono język", "en": "Language changed" },
     { "key": "ui.status.saved", "pl": "Gra zapisana lokalnie", "en": "Game saved locally" },
     { "key": "ui.status.loaded", "pl": "Wczytano lokalny zapis", "en": "Local save loaded" },
     { "key": "ui.status.reset", "pl": "Zapis usunięty, stan gry zresetowany", "en": "Save deleted and game reset" },
+    { "key": "ui.status.choose_ingredient_tiles", "pl": "Klikaj kafelki, aby zarezerwować dokładnie trzy składniki", "en": "Tap ingredient tiles to reserve exactly three" },
+    { "key": "ui.status.choose_recipe_tile", "pl": "Wybierz odkrytą recepturę", "en": "Choose a discovered recipe" },
+    { "key": "ui.status.chosen_recipe", "pl": "Receptura: {0}. Wybierz trzy składniki.", "en": "Recipe: {0}. Select three ingredients." },
+    { "key": "ui.status.reward_claimed", "pl": "Odebrano {0} złota", "en": "Claimed {0} gold" },
 
-    { "key": "ui.experiment.help", "pl": "Wybierz 3 składniki. Receptura i rzadkość zostaną wylosowane, a produkt automatycznie sprzedany.", "en": "Choose 3 ingredients. The recipe and rarity are rolled, then the product is sold automatically." },
     { "key": "ui.production.none", "pl": "Brak odkrytych receptur.", "en": "No discovered recipes." },
     { "key": "ui.production.help", "pl": "Wybierz dokładnie 3 składniki wpływające na recepturę. Duplikaty są dozwolone.", "en": "Choose exactly 3 contributing ingredients. Duplicates are allowed." },
-    { "key": "ui.production.guaranteed", "pl": "Receptura jest gwarantowana; losowana jest tylko rzadkość. Produkt zostanie automatycznie sprzedany.", "en": "The recipe is guaranteed; only rarity is rolled. The product is sold automatically." },
     { "key": "ui.laboratory.max", "pl": "Osiągnięto maksymalny poziom.", "en": "Maximum level reached." },
     { "key": "ui.recipe.undiscovered", "pl": "Nieodkryta receptura", "en": "Undiscovered recipe" },
     { "key": "ui.contract.ready", "pl": "GOTOWY DO ODBIORU", "en": "READY TO CLAIM" },
@@ -140,5 +143,9 @@
     { "key": "ui.error.no_ingredient", "pl": "Brak kolejnej sztuki tego składnika.", "en": "No more of this ingredient." },
     { "key": "ui.error.choose_recipe", "pl": "Wybierz odkrytą recepturę.", "en": "Choose a discovered recipe." },
     { "key": "ui.error.no_completed_contract", "pl": "Brak ukończonego kontraktu do odbioru.", "en": "No completed contract to claim." }
+    ,{ "key": "ui.pending.contract_progress", "pl": "POSTĘP KONTRAKTÓW", "en": "CONTRACT PROGRESS" }
+    ,{ "key": "ui.pending.no_progress", "pl": "Brak postępu kontraktów.", "en": "No contract progress." }
+    ,{ "key": "ui.pending.contract_bonus", "pl": "Bonus kontraktów", "en": "Contract bonus" }
+    ,{ "key": "ui.pending.total_reward", "pl": "ŁĄCZNA NAGRODA", "en": "TOTAL REWARD" }
   ]
 }

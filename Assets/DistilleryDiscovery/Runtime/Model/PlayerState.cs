@@ -20,6 +20,25 @@ namespace DistilleryDiscovery
         public int progress;
     }
 
+    [Serializable] public sealed class PendingContractProgress
+    {
+        public string contractId;
+        public int previousProgress;
+        public int currentProgress;
+        public bool completed;
+    }
+
+    [Serializable] public sealed class PendingResultState
+    {
+        public string source;
+        public string recipeId;
+        public string rarityId;
+        public int saleValue;
+        public bool wasDiscovered;
+        public bool rarityImproved;
+        public List<PendingContractProgress> contractProgress = new();
+    }
+
     [Serializable] public sealed class PlayerRecipeState
     {
         public string recipeId;
@@ -31,7 +50,7 @@ namespace DistilleryDiscovery
 
     [Serializable] public sealed class PlayerState
     {
-        public int version = 3;
+        public int version = 4;
         public int gold;
         public int experimentsCompleted;
         public int productionsCompleted;
@@ -40,6 +59,7 @@ namespace DistilleryDiscovery
         public List<InventoryEntry> inventory = new();
         public List<PlayerRecipeState> recipes = new();
         public List<ActiveContractState> activeContracts = new();
+        public PendingResultState pendingResult;
 
         // Legacy version 2 fields. They are emptied when GameService normalizes the save.
         public List<ProductEntry> products = new();
@@ -61,5 +81,5 @@ namespace DistilleryDiscovery
     public sealed class DeliveryResult { public readonly Dictionary<string, int> Items = new(); }
     public class ProductResult { public string RecipeId; public string RarityId; public int SaleValue; }
     public sealed class ExperimentResult : ProductResult { public bool WasDiscovered; public bool RarityImproved; }
-    public sealed class ContractResult { public string ContractId; public int GoldEarned; }
+    public sealed class PendingClaimResult { public int ProductGold; public int ContractGold; public int TotalGold; public List<string> CompletedContractIds = new(); }
 }

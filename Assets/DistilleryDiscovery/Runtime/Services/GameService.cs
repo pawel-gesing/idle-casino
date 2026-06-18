@@ -34,16 +34,17 @@ namespace DistilleryDiscovery
         public void ReplaceState(PlayerState state)
         {
             State = state ?? throw new ArgumentNullException(nameof(state));
-            var wasLegacySave = State.version < 3;
+            var version = State.version;
             State.inventory ??= new List<InventoryEntry>();
             State.recipes ??= new List<PlayerRecipeState>();
             State.products ??= new List<ProductEntry>();
             State.activeContractIds ??= new List<string>();
             State.activeContracts ??= new List<ActiveContractState>();
+            if (State.pendingResult != null) State.pendingResult.contractProgress ??= new List<PendingContractProgress>();
             if (State.laboratoryLevel < 1) State.laboratoryLevel = 1;
             if (State.languageCode != "pl" && State.languageCode != "en") State.languageCode = "en";
 
-            if (wasLegacySave)
+            if (version < 3)
             {
                 State.gold = checked(State.gold + State.products.Sum(x => checked(x.saleValue * x.amount)));
                 foreach (var id in State.activeContractIds.Where(id => Config.Contract(id)?.enabled == true).Distinct())
@@ -54,11 +55,20 @@ namespace DistilleryDiscovery
             State.activeContractIds.Clear();
             State.activeContracts.RemoveAll(x => x == null || Config.Contract(x.contractId)?.enabled != true);
             RemoveDuplicateContracts();
-            var targetContractCount = Math.Min(Config.Economy.activeContractCount, Config.Contracts.Count(x => x.enabled));
-            if (State.activeContracts.Count > targetContractCount)
-                State.activeContracts.RemoveRange(targetContractCount, State.activeContracts.Count - targetContractCount);
+
+            if (version < 4)
+            {
+                var completed = State.activeContracts.Where(x => x.progress >= Config.Contract(x.contractId).amount).ToList();
+                foreach (var contractState in completed)
+                    State.gold = checked(State.gold + Config.Contract(contractState.contractId).goldReward);
+                State.activeContracts.RemoveAll(completed.Contains);
+            }
+
+            var targetCount = Math.Min(Config.Economy.activeContractCount, Config.Contracts.Count(x => x.enabled));
+            if (State.activeContracts.Count > targetCount)
+                State.activeContracts.RemoveRange(targetCount, State.activeContracts.Count - targetCount);
             EnsureActiveContracts();
-            State.version = 3;
+            State.version = 4;
         }
 
         public List<OutcomeChance> Preview(IReadOnlyList<string> ingredientIds)
@@ -76,12 +86,14 @@ namespace DistilleryDiscovery
 
         public ExperimentResult RunExperiment(IReadOnlyList<string> ingredientIds)
         {
+            EnsureNoPendingResult();
             var outcomes = Preview(ingredientIds);
             ConsumeIngredients(ingredientIds);
             var recipeId = WeightedPick(outcomes.Select(x => (x.RecipeId, x.Weight)).ToList());
-            var product = CreateAndSellProduct(recipeId, ingredientIds);
+            var product = CreateProduct(recipeId, ingredientIds);
             var bookChange = UpdateRecipeBook(recipeId, product.RarityId, ingredientIds);
             State.experimentsCompleted++;
+            BeginPendingResult("experiment", product, bookChange.discovered, bookChange.improved);
             return new ExperimentResult
             {
                 RecipeId = product.RecipeId,
@@ -94,6 +106,7 @@ namespace DistilleryDiscovery
 
         public ProductResult RunProduction(string recipeId, IReadOnlyList<string> ingredientIds)
         {
+            EnsureNoPendingResult();
             var recipe = Config.Recipe(recipeId) ?? throw new InvalidOperationException($"Unknown recipe: {recipeId}");
             if (State.RecipeState(recipeId) == null) throw new InvalidOperationException("Production requires a discovered recipe.");
             ValidateIngredientSelection(ingredientIds, Config.Economy.ingredientsPerProduction);
@@ -102,25 +115,35 @@ namespace DistilleryDiscovery
                     throw new InvalidOperationException($"{Config.Ingredient(ingredientId).displayName} does not contribute to {recipe.displayName}.");
 
             ConsumeIngredients(ingredientIds);
-            var product = CreateAndSellProduct(recipeId, ingredientIds);
-            UpdateRecipeBook(recipeId, product.RarityId, ingredientIds);
+            var product = CreateProduct(recipeId, ingredientIds);
+            var bookChange = UpdateRecipeBook(recipeId, product.RarityId, ingredientIds);
             State.productionsCompleted++;
+            BeginPendingResult("production", product, false, bookChange.improved);
             return product;
         }
 
-        public ContractResult ClaimContract(string contractId)
+        public PendingClaimResult ClaimPendingResult()
         {
-            var state = State.ContractState(contractId) ?? throw new InvalidOperationException("Contract is not active.");
-            var contract = Config.Contract(contractId) ?? throw new InvalidOperationException($"Unknown contract: {contractId}");
-            if (state.progress < contract.amount) throw new InvalidOperationException("Contract is not complete.");
-            State.gold = checked(State.gold + contract.goldReward);
-            State.activeContracts.Remove(state);
-            EnsureActiveContracts(contractId);
-            return new ContractResult { ContractId = contractId, GoldEarned = contract.goldReward };
+            var pending = State.pendingResult ?? throw new InvalidOperationException("There is no result to claim.");
+            var completedIds = pending.contractProgress.Where(x => x.completed).Select(x => x.contractId).Distinct().ToList();
+            var contractGold = completedIds.Sum(id => Config.Contract(id)?.goldReward ?? 0);
+            var total = checked(pending.saleValue + contractGold);
+            State.gold = checked(State.gold + total);
+            State.activeContracts.RemoveAll(x => completedIds.Contains(x.contractId));
+            State.pendingResult = null;
+            EnsureActiveContracts(completedIds);
+            return new PendingClaimResult
+            {
+                ProductGold = pending.saleValue,
+                ContractGold = contractGold,
+                TotalGold = total,
+                CompletedContractIds = completedIds
+            };
         }
 
         public LaboratoryLevelDefinition UpgradeLaboratory()
         {
+            EnsureNoPendingResult();
             var next = Config.LaboratoryLevel(State.laboratoryLevel + 1)
                 ?? throw new InvalidOperationException("Laboratory is already at maximum level.");
             if (State.gold < next.upgradeCost) throw new InvalidOperationException("Not enough gold for the laboratory upgrade.");
@@ -131,6 +154,7 @@ namespace DistilleryDiscovery
 
         public DeliveryResult ReceiveDelivery(string poolId = "pool_base")
         {
+            EnsureNoPendingResult();
             var pool = Config.Economy.deliveryPools.Find(x => x.id == poolId) ?? throw new InvalidOperationException($"Unknown delivery pool: {poolId}");
             var result = new DeliveryResult();
             for (var i = 0; i < pool.rolls; i++)
@@ -160,26 +184,48 @@ namespace DistilleryDiscovery
             }).ToList();
         }
 
-        private ProductResult CreateAndSellProduct(string recipeId, IReadOnlyList<string> ingredientIds)
+        private ProductResult CreateProduct(string recipeId, IReadOnlyList<string> ingredientIds)
         {
             var rarityId = WeightedPick(ProductRarityWeights(ingredientIds).Select(x => (x.rarityId, x.weight)).ToList());
             var recipe = Config.Recipe(recipeId);
             var rarity = Config.Rarity(rarityId);
             var ingredientBonus = ingredientIds.Average(id => Config.Ingredient(id).qualityBonus);
             var saleValue = Math.Max(1, (int)Math.Round(recipe.baseValue * rarity.valueMultiplier * (1f + ingredientBonus)));
-            State.gold = checked(State.gold + saleValue);
-            AdvanceContracts(recipeId, rarityId);
             return new ProductResult { RecipeId = recipeId, RarityId = rarityId, SaleValue = saleValue };
         }
 
-        private void AdvanceContracts(string recipeId, string rarityId)
+        private void BeginPendingResult(string source, ProductResult product, bool wasDiscovered, bool rarityImproved)
         {
+            State.pendingResult = new PendingResultState
+            {
+                source = source,
+                recipeId = product.RecipeId,
+                rarityId = product.RarityId,
+                saleValue = product.SaleValue,
+                wasDiscovered = wasDiscovered,
+                rarityImproved = rarityImproved,
+                contractProgress = AdvanceContracts(product.RecipeId, product.RarityId)
+            };
+        }
+
+        private List<PendingContractProgress> AdvanceContracts(string recipeId, string rarityId)
+        {
+            var changes = new List<PendingContractProgress>();
             foreach (var state in State.activeContracts)
             {
                 var contract = Config.Contract(state.contractId);
-                if (contract != null && state.progress < contract.amount && Matches(contract, recipeId, rarityId))
-                    state.progress++;
+                if (contract == null || state.progress >= contract.amount || !Matches(contract, recipeId, rarityId)) continue;
+                var previous = state.progress;
+                state.progress++;
+                changes.Add(new PendingContractProgress
+                {
+                    contractId = contract.id,
+                    previousProgress = previous,
+                    currentProgress = state.progress,
+                    completed = previous < contract.amount && state.progress >= contract.amount
+                });
             }
+            return changes;
         }
 
         private bool Matches(ContractDefinition contract, string recipeId, string rarityId)
@@ -193,13 +239,13 @@ namespace DistilleryDiscovery
             };
         }
 
-        private void EnsureActiveContracts(string justClaimedId = null)
+        private void EnsureActiveContracts(IReadOnlyCollection<string> justCompletedIds = null)
         {
             var targetCount = Math.Min(Config.Economy.activeContractCount, Config.Contracts.Count(x => x.enabled));
             while (State.activeContracts.Count < targetCount)
             {
                 var activeIds = State.activeContracts.Select(x => x.contractId).ToHashSet();
-                var candidates = Config.Contracts.Where(x => x.enabled && !activeIds.Contains(x.id) && x.id != justClaimedId).ToList();
+                var candidates = Config.Contracts.Where(x => x.enabled && !activeIds.Contains(x.id) && (justCompletedIds == null || !justCompletedIds.Contains(x.id))).ToList();
                 if (candidates.Count == 0)
                     candidates = Config.Contracts.Where(x => x.enabled && !activeIds.Contains(x.id)).ToList();
                 if (candidates.Count == 0) break;
@@ -242,6 +288,11 @@ namespace DistilleryDiscovery
             var roll = random.Range(0, total);
             foreach (var value in values) { roll -= value.weight; if (roll < 0) return value.id; }
             return values[^1].id;
+        }
+
+        private void EnsureNoPendingResult()
+        {
+            if (State.pendingResult != null) throw new InvalidOperationException("Claim the current result first.");
         }
 
         private void ConsumeIngredients(IReadOnlyList<string> ingredientIds)

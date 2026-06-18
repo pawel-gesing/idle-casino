@@ -25,6 +25,7 @@ namespace DistilleryDiscovery
         private Text currentIngredientText;
         private Text secondaryActionText;
         private Text primaryActionText;
+        private CanvasScaler canvasScaler;
         private RectTransform safeAreaRoot;
         private GridLayoutGroup navigationGrid;
         private Rect lastSafeArea;
@@ -56,7 +57,7 @@ namespace DistilleryDiscovery
             Screen.orientation = ScreenOrientation.Portrait;
             var canvasObject = Node("Canvas", transform, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = canvasObject.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1080, 1920); scaler.matchWidthOrHeight = 0f;
+            canvasScaler = canvasObject.GetComponent<CanvasScaler>(); canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; canvasScaler.referenceResolution = new Vector2(1080, 1920); canvasScaler.matchWidthOrHeight = 0f;
             if (FindFirstObjectByType<EventSystem>() == null) Node("EventSystem", transform, typeof(EventSystem), typeof(StandaloneInputModule));
             safeAreaRoot = Node("SafeArea", canvasObject.transform, typeof(RectTransform)).GetComponent<RectTransform>();
             Stretch(safeAreaRoot.gameObject);
@@ -108,12 +109,21 @@ namespace DistilleryDiscovery
         private void ApplyMobileLayout()
         {
             if (safeAreaRoot == null || Screen.width <= 0 || Screen.height <= 0) return;
-            var safeArea = Screen.safeArea;
+            var rawSafeArea = Screen.safeArea;
+            var safeArea = rawSafeArea;
+            const float portraitAspect = 9f / 16f;
+            if (safeArea.height > 0f && safeArea.width / safeArea.height > portraitAspect)
+            {
+                var portraitWidth = safeArea.height * portraitAspect;
+                safeArea.x += (safeArea.width - portraitWidth) * .5f;
+                safeArea.width = portraitWidth;
+            }
+            canvasScaler.matchWidthOrHeight = Screen.width > Screen.height ? 1f : 0f;
             safeAreaRoot.anchorMin = new Vector2(safeArea.xMin / Screen.width, safeArea.yMin / Screen.height);
             safeAreaRoot.anchorMax = new Vector2(safeArea.xMax / Screen.width, safeArea.yMax / Screen.height);
             safeAreaRoot.offsetMin = Vector2.zero;
             safeAreaRoot.offsetMax = Vector2.zero;
-            lastSafeArea = safeArea;
+            lastSafeArea = rawSafeArea;
             lastScreenSize = new Vector2Int(Screen.width, Screen.height);
 
             if (navigationGrid == null) return;
@@ -374,7 +384,7 @@ namespace DistilleryDiscovery
         private GameObject Node(string name, Transform parent, params Type[] components) { var node = new GameObject(name, components); node.transform.SetParent(parent, false); return node; }
         private GameObject Panel(string name, Transform parent, Color color) { var node = Node(name, parent, typeof(RectTransform), typeof(Image)); node.GetComponent<Image>().color = color; return node; }
         private Text Label(string value, Transform parent, int size, TextAnchor anchor) { var node = Node("Label", parent, typeof(RectTransform), typeof(Text)); var text = node.GetComponent<Text>(); text.font = font; text.fontSize = size; text.color = Cream; text.alignment = anchor; text.text = value; text.supportRichText = true; return text; }
-        private GameObject AddButton(Transform parent, string label, Action action, Color? color = null, Color? textColor = null) { var node = Panel(label, parent, color ?? new Color(.28f, .20f, .31f)); node.AddComponent<Button>().onClick.AddListener(() => action()); var text = Label(label, node.transform, 24, TextAnchor.MiddleCenter); text.color = textColor ?? Cream; text.fontStyle = FontStyle.Bold; Stretch(text.gameObject, 5, 3); return node; }
+        private GameObject AddButton(Transform parent, string label, Action action, Color? color = null, Color? textColor = null) { var node = Panel(label, parent, color ?? new Color(.28f, .20f, .31f)); node.AddComponent<Button>().onClick.AddListener(() => action()); var text = Label(label, node.transform, 24, TextAnchor.MiddleCenter); text.color = textColor ?? Cream; text.fontStyle = FontStyle.Bold; text.resizeTextForBestFit = true; text.resizeTextMinSize = 12; text.resizeTextMaxSize = 24; Stretch(text.gameObject, 5, 3); return node; }
         private static void Stretch(GameObject node, float x = 0, float y = 0) { var rect = node.GetComponent<RectTransform>(); rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = new Vector2(x, y); rect.offsetMax = new Vector2(-x, -y); }
         private static void Rect(GameObject node, float xMin, float yMin, float xMax, float yMax) { var rect = node.GetComponent<RectTransform>(); rect.anchorMin = new Vector2(xMin, yMin); rect.anchorMax = new Vector2(xMax, yMax); rect.offsetMin = Vector2.zero; rect.offsetMax = Vector2.zero; }
     }

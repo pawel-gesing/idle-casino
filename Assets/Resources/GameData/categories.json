@@ -1,0 +1,10 @@
+{
+  "categories": [
+    { "id": "beer", "displayName": "Piwa" },
+    { "id": "whisky", "displayName": "Whisky" },
+    { "id": "mead", "displayName": "Miody" },
+    { "id": "fruit", "displayName": "Trunki owocowe" },
+    { "id": "spirit", "displayName": "Destylaty" },
+    { "id": "elixir", "displayName": "Eliksiry" }
+  ]
+}

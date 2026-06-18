@@ -1,26 +1,82 @@
 # Distillery Discovery — Unity MVP
 
-Tekstowo-tabelkowy prototyp mobilnej gry kolekcjonerskiej. Implementuje pełną pętlę MVP:
+Tekstowo-tabelkowy prototyp mobilnej gry kolekcjonersko-ekonomicznej w Unity 6 LTS.
 
-`dostawa → wybór 3 składników → podgląd szans → eksperyment → odkrycie receptury → automatyczna sprzedaż → progres kolekcji`
+Aktualna pętla gry:
+
+`dostawa → eksperyment → odkrycie receptury i produkt → sprzedaż lub kontrakt → ulepszenie laboratorium → produkcja znanych receptur`
 
 ## Wymagania i uruchomienie
 
 - Unity `6000.4.10f1` (Unity 6 LTS),
-- moduł Android Build Support jest potrzebny wyłącznie do budowania APK.
+- Android Build Support tylko do budowania APK.
 
 1. Dodaj główny folder repozytorium jako projekt w Unity Hub.
-2. Otwórz projekt w Unity 6 LTS.
-3. Otwórz `Assets/Scenes/Main.unity` i naciśnij **Play**. Prototyp uruchamia się automatycznie i buduje szczątkowy interfejs uGUI w runtime.
-4. Dla Androida wybierz `File → Build Profiles → Android`, przełącz platformę i wykonaj build. Scena startowa jest już dodana do ustawień buildu, orientacja to portrait, a minimalna wersja Androida to API 26.
+2. Otwórz `Assets/Scenes/Main.unity` i naciśnij **Play**.
+3. Prototyp automatycznie buduje prosty interfejs uGUI w runtime.
 
-Zapis gry trafia do `Application.persistentDataPath/distillery_save.json`. Przycisk **RESET** usuwa plik i tworzy świeży stan.
+Zapis trafia do `Application.persistentDataPath/distillery_save.json`. Przycisk **RESET** usuwa zapis i tworzy nowy stan.
+
+## Systemy rozgrywki
+
+### Eksperyment
+
+Gracz wybiera dokładnie 3 składniki. Ich konfigurowalne wagi wyznaczają możliwe receptury, a wynik jest losowany. Receptura trafia do książki lub aktualizuje najlepszą osiągniętą rzadkość. Powstały produkt jest odkładany w magazynie — eksperyment nie sprzedaje go automatycznie.
+
+### Produkcja
+
+Produkcja działa wyłącznie dla odkrytych receptur. Gracz wybiera recepturę i dokładnie 3 składniki; każdy musi mieć dodatni wpływ na wybraną recepturę. Duplikaty są dozwolone. Receptura produktu jest gwarantowana, losowana jest tylko rzadkość zależna od jakości składników i poziomu laboratorium.
+
+### Produkty i sprzedaż
+
+Produkty są grupowane według receptury, rzadkości i wartości sprzedaży. Ekran sprzedaży pozwala sprzedać jedną sztukę wybranej pozycji albo cały magazyn. Złoto jest przyznawane dopiero podczas sprzedaży.
+
+### Kontrakty
+
+Aktywne kontrakty pochodzą z danych i obsługują trzy wymagania:
+
+- konkretną recepturę,
+- konkretną rzadkość produktu,
+- kategorię receptury.
+
+Realizacja kontraktu atomowo zużywa wymaganą liczbę pasujących produktów i przyznaje złoto. Niespełniony kontrakt nie zmienia magazynu.
+
+### Laboratorium
+
+Gracz ma jedno laboratorium z poziomami zdefiniowanymi w konfiguracji. Ulepszenie pobiera złoto i zwiększa wagę wyższych rzadkości produktu. Prototyp zawiera 5 poziomów z bonusami od 0% do 20%.
+
+## Dane gry
+
+Konfiguracja znajduje się w `Assets/Resources/GameData/`:
+
+- `rarities.json` — rzadkości, mnożniki ceny i jakość,
+- `ingredients.json` — składniki oraz wpływy na receptury,
+- `recipes.json` — receptury i wartości bazowe,
+- `categories.json` — kategorie receptur używane m.in. przez kontrakty,
+- `economy.json` — parametry eksperymentu, produkcji, losowania i dostaw,
+- `laboratories.json` — poziomy, koszty i bonusy laboratorium,
+- `contracts.json` — wymagania i złote nagrody kontraktów.
+
+Konfiguracja jest walidowana przy starcie: sprawdzane są unikalne ID, referencje, dodatnie wagi i wartości, ciągłość poziomów laboratorium oraz poprawność kontraktów.
+
+## Zapis stanu
+
+Wersja zapisu `2` przechowuje:
+
+- złoto i magazyn składników,
+- książkę receptur,
+- pogrupowane produkty,
+- poziom laboratorium,
+- aktywne kontrakty,
+- liczniki eksperymentów i produkcji.
+
+Starszy zapis prototypu jest normalizowany przy wczytaniu i otrzymuje początkowe kontrakty oraz laboratorium poziomu 1.
 
 ## Testy
 
 W Unity otwórz `Window → General → Test Runner`, wybierz **EditMode** i uruchom **Run All**.
 
-Z wiersza poleceń (dostosuj ścieżkę Unity, jeśli potrzebne):
+Z wiersza poleceń:
 
 ```powershell
 & 'C:\Program Files\Unity\Hub\Editor\6000.4.10f1\Editor\Unity.exe' `
@@ -28,39 +84,18 @@ Z wiersza poleceń (dostosuj ścieżkę Unity, jeśli potrzebne):
   -testResults TestResults.xml -logFile TestRun.log -quit
 ```
 
-## Dane gry
-
-Content znajduje się w `Assets/Resources/GameData/`:
-
-- `rarities.json` — rzadkości składników i produktów, mnożniki ceny i jakość,
-- `ingredients.json` — składniki oraz ich wpływy na receptury,
-- `recipes.json` — receptury, kategorie i wartości bazowe,
-- `economy.json` — startowa ekonomia, losowanie jakości oraz pula dostaw.
-
-Konfiguracja jest walidowana przy starcie. Błędne ID, odwołania, wagi lub puste pule zatrzymują uruchomienie czytelnym wyjątkiem.
-
-### Dodanie składnika
-
-1. Dodaj obiekt do tablicy `ingredients` w `ingredients.json` z niezmiennym, unikalnym `id`.
-2. Wskaż istniejące `rarityId` i co najmniej jedną dodatnią wagę `outcomeWeights`.
-3. Dodaj składnik do `entries` wybranej puli w `economy.json`, jeśli ma wypadać z dostaw.
-
-### Dodanie receptury
-
-1. Dodaj obiekt do tablicy `recipes` w `recipes.json`.
-2. Użyj istniejącej rzadkości kolekcjonerskiej i dodatniej wartości bazowej.
-3. Dodaj jej dodatnią wagę do co najmniej jednego składnika w `ingredients.json`.
+Testy obejmują eksperymenty, produkcję, magazyn produktów, sprzedaż, wszystkie reguły kontraktów, koszt i wpływ laboratorium, dostawy, konfigurację oraz zapis ekonomii.
 
 ## Architektura
 
 - `Runtime/Model` — serializowalne definicje konfiguracji i zapisu,
 - `Runtime/Config` — ładowanie oraz walidacja JSON,
-- `Runtime/Services` — testowalna logika gry i zapis lokalny,
-- `Runtime/UI` — prosty, generowany programowo interfejs uGUI,
-- `Tests/EditMode` — testy najważniejszych reguł.
+- `Runtime/Services` — testowalna logika ekonomii i zapis lokalny,
+- `Runtime/UI` — prosty interfejs uGUI generowany programowo,
+- `Tests/EditMode` — testy reguł rozgrywki.
 
 ## Celowo poza zakresem
 
-Docelowa grafika, animacje, prawdziwe timery, produkcja znanych receptur, laboratoria i ulepszenia, kontrakty, mastery, sezony, reklamy, IAP, backend, konta, Firebase/Remote Config, Addressables oraz iOS. Te systemy nie są potrzebne do walidacji pierwszej pętli MVP.
+Timery czasu rzeczywistego, reklamy, IAP, sezony, wiele laboratoriów, Firebase, Addressables, backend, konta, docelowa grafika, animacje i mastery receptur.
 
 Dokumenty projektowe znajdują się w `docs/`.

@@ -10,7 +10,11 @@ namespace DistilleryDiscovery
             var ingredients = Load<IngredientFile>("GameData/ingredients");
             var recipes = Load<RecipeFile>("GameData/recipes");
             var economy = Load<EconomyDefinition>("GameData/economy");
-            var config = new GameConfig(rarities.rarities, ingredients.ingredients, recipes.recipes, economy);
+            var categories = Load<RecipeCategoryFile>("GameData/categories");
+            var laboratories = Load<LaboratoryFile>("GameData/laboratories");
+            var contracts = Load<ContractFile>("GameData/contracts");
+            var config = new GameConfig(rarities.rarities, ingredients.ingredients, recipes.recipes, economy,
+                categories.categories, laboratories.levels, contracts.contracts);
             ConfigValidator.ValidateOrThrow(config);
             return config;
         }
@@ -25,4 +29,3 @@ namespace DistilleryDiscovery
         }
     }
 }
-

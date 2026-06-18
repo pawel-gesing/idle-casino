@@ -31,7 +31,10 @@ namespace DistilleryDiscovery
         private RectTransform textContentRect;
         private GameObject tileContentObject;
         private RectTransform tileContentRect;
+        private GameObject tileGridObject;
+        private VerticalLayoutGroup tileLayout;
         private GridLayoutGroup tileGrid;
+        private Text experimentPreviewText;
         private Text statusText;
         private Text contentText;
         private Text selectionText;
@@ -117,10 +120,19 @@ namespace DistilleryDiscovery
             textContentRect = textContentObject.GetComponent<RectTransform>(); textContentRect.anchorMin = new Vector2(0, 1); textContentRect.anchorMax = new Vector2(1, 1); textContentRect.pivot = new Vector2(.5f, 1); textContentRect.offsetMin = new Vector2(28, 0); textContentRect.offsetMax = new Vector2(-28, 0);
             textContentObject.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-            tileContentObject = Node("TileContent", viewport.transform, typeof(RectTransform), typeof(GridLayoutGroup), typeof(ContentSizeFitter));
+            tileContentObject = Node("TileContent", viewport.transform, typeof(RectTransform), typeof(VerticalLayoutGroup), typeof(ContentSizeFitter));
             tileContentRect = tileContentObject.GetComponent<RectTransform>(); tileContentRect.anchorMin = new Vector2(0, 1); tileContentRect.anchorMax = new Vector2(1, 1); tileContentRect.pivot = new Vector2(.5f, 1); tileContentRect.offsetMin = new Vector2(12, 0); tileContentRect.offsetMax = new Vector2(-12, 0);
-            tileGrid = tileContentObject.GetComponent<GridLayoutGroup>(); tileGrid.padding = new RectOffset(8, 8, 12, 12); tileGrid.spacing = new Vector2(12, 12); tileGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount; tileGrid.constraintCount = 2;
+            tileLayout = tileContentObject.GetComponent<VerticalLayoutGroup>(); tileLayout.padding = new RectOffset(8, 8, 12, 12); tileLayout.spacing = 20; tileLayout.childControlWidth = true; tileLayout.childControlHeight = true; tileLayout.childForceExpandWidth = true; tileLayout.childForceExpandHeight = false;
             tileContentObject.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            tileGridObject = Node("TileGrid", tileContentObject.transform, typeof(RectTransform), typeof(GridLayoutGroup), typeof(ContentSizeFitter));
+            tileGrid = tileGridObject.GetComponent<GridLayoutGroup>(); tileGrid.spacing = new Vector2(12, 12); tileGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount; tileGrid.constraintCount = 2;
+            tileGridObject.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            experimentPreviewText = Label("", tileContentObject.transform, 30, TextAnchor.UpperLeft);
+            experimentPreviewText.supportRichText = true;
+            experimentPreviewText.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            experimentPreviewText.gameObject.SetActive(false);
             tileContentObject.SetActive(false);
 
             scrollRect.viewport = viewport.GetComponent<RectTransform>(); scrollRect.content = textContentRect; scrollRect.horizontal = false;
@@ -168,7 +180,7 @@ namespace DistilleryDiscovery
             lastSafeArea = raw; lastScreenSize = new Vector2Int(Screen.width, Screen.height);
             Canvas.ForceUpdateCanvases();
             ResizeGrid(navigationGrid, 3, 2);
-            var tileWidth = (tileContentRect.rect.width - tileGrid.padding.horizontal - tileGrid.spacing.x) / 2f;
+            var tileWidth = (tileContentRect.rect.width - tileLayout.padding.horizontal - tileGrid.spacing.x) / 2f;
             tileGrid.cellSize = new Vector2(Mathf.Max(1f, tileWidth), 112f);
         }
 
@@ -246,6 +258,23 @@ namespace DistilleryDiscovery
                 var available = game.State.AmountOf(item.id) - selection.Count(x => x == item.id);
                 return new TileOption { Label = $"{IngredientName(item.id)}\nx{Math.Max(0, available)}", Action = () => ReserveIngredient(item.id) };
             }));
+            UpdateExperimentPreview();
+        }
+
+        private void UpdateExperimentPreview()
+        {
+            experimentPreviewText.gameObject.SetActive(footerMode == FooterMode.Experiment && selection.Count == game.Config.Economy.ingredientsPerExperiment);
+            if (!experimentPreviewText.gameObject.activeSelf) return;
+
+            var sb = new StringBuilder($"<color=#F2AD2E><b>{T("ui.heading.outcomes", "POSSIBLE OUTCOMES")}</b></color>\n\n");
+            foreach (var outcome in game.Preview(selection))
+            {
+                var productName = game.State.RecipeState(outcome.RecipeId) == null ? "???" : RecipeName(outcome.RecipeId);
+                sb.Append($"{productName}  <b>{outcome.Probability:P1}</b>\n");
+            }
+            experimentPreviewText.text = sb.ToString();
+            SetStatus(T("ui.status.preview", "Preview ready"));
+            Canvas.ForceUpdateCanvases();
         }
 
         private void ReserveIngredient(string ingredientId)
@@ -347,8 +376,9 @@ namespace DistilleryDiscovery
 
         private void ShowTiles(IEnumerable<TileOption> options)
         {
-            foreach (Transform child in tileContentObject.transform) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
-            foreach (var option in options) AddButton(tileContentObject.transform, option.Label, option.Action);
+            experimentPreviewText.gameObject.SetActive(false);
+            foreach (Transform child in tileGridObject.transform) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
+            foreach (var option in options) AddButton(tileGridObject.transform, option.Label, option.Action);
             textContentObject.SetActive(false); tileContentObject.SetActive(true); scrollRect.content = tileContentRect; scrollRect.verticalNormalizedPosition = 1f;
             Canvas.ForceUpdateCanvases();
         }

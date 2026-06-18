@@ -25,12 +25,22 @@ namespace DistilleryDiscovery
         private Text currentIngredientText;
         private Text secondaryActionText;
         private Text primaryActionText;
+        private RectTransform safeAreaRoot;
+        private GridLayoutGroup navigationGrid;
+        private Rect lastSafeArea;
+        private Vector2Int lastScreenSize;
         private readonly List<string> selection = new();
         private FooterMode footerMode;
         private int currentIngredientIndex;
         private int currentRecipeIndex = -1;
         private int currentProductIndex = -1;
         private int currentContractIndex = -1;
+
+        private void Update()
+        {
+            var screenSize = new Vector2Int(Screen.width, Screen.height);
+            if (Screen.safeArea != lastSafeArea || screenSize != lastScreenSize) ApplyMobileLayout();
+        }
 
         public void Initialize(GameService gameService, SaveService saveService)
         {
@@ -46,9 +56,11 @@ namespace DistilleryDiscovery
             Screen.orientation = ScreenOrientation.Portrait;
             var canvasObject = Node("Canvas", transform, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = canvasObject.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1080, 1920); scaler.matchWidthOrHeight = 0.5f;
+            var scaler = canvasObject.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1080, 1920); scaler.matchWidthOrHeight = 0f;
             if (FindFirstObjectByType<EventSystem>() == null) Node("EventSystem", transform, typeof(EventSystem), typeof(StandaloneInputModule));
-            var background = Panel("Background", canvasObject.transform, Ink); Stretch(background);
+            safeAreaRoot = Node("SafeArea", canvasObject.transform, typeof(RectTransform)).GetComponent<RectTransform>();
+            Stretch(safeAreaRoot.gameObject);
+            var background = Panel("Background", safeAreaRoot, Ink); Stretch(background);
 
             var header = Panel("Header", background.transform, Plum); Rect(header, 0, .88f, 1, 1);
             var title = Label("DISTILLERY DISCOVERY\n<color=#F2AD2E>EKONOMIA PROTOTYPU</color>", header.transform, 50, TextAnchor.MiddleCenter); Stretch(title.gameObject);
@@ -56,7 +68,7 @@ namespace DistilleryDiscovery
             statusText = Label("", status.transform, 29, TextAnchor.MiddleCenter); Stretch(statusText.gameObject, 20, 8);
 
             var nav = Panel("Menu", background.transform, new Color(.11f, .10f, .14f)); Rect(nav, 0, .60f, 1, .81f);
-            var grid = nav.AddComponent<GridLayoutGroup>(); grid.padding = new RectOffset(18, 18, 12, 12); grid.spacing = new Vector2(10, 8); grid.cellSize = new Vector2(250, 66); grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount; grid.constraintCount = 4;
+            navigationGrid = nav.AddComponent<GridLayoutGroup>(); navigationGrid.padding = new RectOffset(18, 18, 12, 12); navigationGrid.spacing = new Vector2(10, 8); navigationGrid.cellSize = new Vector2(338, 66); navigationGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount; navigationGrid.constraintCount = 3;
             AddButton(nav.transform, "STAN", () => ShowState());
             AddButton(nav.transform, "DOSTAWA", ReceiveDelivery);
             AddButton(nav.transform, "SKŁADNIKI", ShowIngredientInventory);
@@ -90,6 +102,29 @@ namespace DistilleryDiscovery
             var secondary = AddButton(footer.transform, "WYCZYŚĆ", DispatchSecondary); Rect(secondary, .02f, .05f, .30f, .33f); secondaryActionText = secondary.GetComponentInChildren<Text>();
             var primary = AddButton(footer.transform, "URUCHOM", DispatchPrimary, Gold, Ink); Rect(primary, .32f, .05f, .98f, .33f); primaryActionText = primary.GetComponentInChildren<Text>();
             RefreshCurrentIngredient();
+            ApplyMobileLayout();
+        }
+
+        private void ApplyMobileLayout()
+        {
+            if (safeAreaRoot == null || Screen.width <= 0 || Screen.height <= 0) return;
+            var safeArea = Screen.safeArea;
+            safeAreaRoot.anchorMin = new Vector2(safeArea.xMin / Screen.width, safeArea.yMin / Screen.height);
+            safeAreaRoot.anchorMax = new Vector2(safeArea.xMax / Screen.width, safeArea.yMax / Screen.height);
+            safeAreaRoot.offsetMin = Vector2.zero;
+            safeAreaRoot.offsetMax = Vector2.zero;
+            lastSafeArea = safeArea;
+            lastScreenSize = new Vector2Int(Screen.width, Screen.height);
+
+            if (navigationGrid == null) return;
+            Canvas.ForceUpdateCanvases();
+            var rect = navigationGrid.GetComponent<RectTransform>().rect;
+            if (rect.width <= 0f || rect.height <= 0f) return;
+            const int columns = 3;
+            const int rows = 5;
+            var width = (rect.width - navigationGrid.padding.horizontal - navigationGrid.spacing.x * (columns - 1)) / columns;
+            var height = (rect.height - navigationGrid.padding.vertical - navigationGrid.spacing.y * (rows - 1)) / rows;
+            navigationGrid.cellSize = new Vector2(Mathf.Max(1f, width), Mathf.Max(1f, height));
         }
 
         private void ShowState(string message = null)

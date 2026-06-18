@@ -15,6 +15,8 @@ Aktualna pętla gry:
 2. Otwórz `Assets/Scenes/Main.unity` i naciśnij **Play**.
 3. Prototyp automatycznie buduje prosty interfejs uGUI w runtime.
 
+Interfejs jest przeznaczony dla urządzeń mobilnych w orientacji pionowej. Skaluje się względem szerokości ekranu i respektuje `Screen.safeArea`, więc przyciski oraz treść nie wchodzą pod notch, wycięcia ani systemowe obszary ekranu.
+
 Zapis trafia do `Application.persistentDataPath/distillery_save.json`. Przycisk **RESET** usuwa zapis i tworzy nowy stan.
 
 ## Systemy rozgrywki

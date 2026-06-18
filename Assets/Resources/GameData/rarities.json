@@ -1,0 +1,10 @@
+{
+  "rarities": [
+    { "id": "rarity_common", "displayName": "Pospolity", "rank": 1, "colorHex": "#B8B8B8", "valueMultiplier": 1.0, "qualityScore": 0 },
+    { "id": "rarity_rare", "displayName": "Rzadki", "rank": 2, "colorHex": "#5B9DFF", "valueMultiplier": 2.0, "qualityScore": 15 },
+    { "id": "rarity_epic", "displayName": "Epicki", "rank": 3, "colorHex": "#C06BFF", "valueMultiplier": 4.0, "qualityScore": 40 },
+    { "id": "rarity_legendary", "displayName": "Legendarny", "rank": 4, "colorHex": "#F2AD2E", "valueMultiplier": 8.0, "qualityScore": 80 },
+    { "id": "rarity_mythic", "displayName": "Mityczny", "rank": 5, "colorHex": "#FF5B83", "valueMultiplier": 14.0, "qualityScore": 130 }
+  ]
+}
+

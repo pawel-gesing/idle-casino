@@ -1,0 +1,27 @@
+{
+  "startingGold": 100,
+  "ingredientsPerExperiment": 3,
+  "ingredientQualityInfluence": 1.0,
+  "productRarityWeights": [
+    { "rarityId": "rarity_common", "weight": 7000 },
+    { "rarityId": "rarity_rare", "weight": 2200 },
+    { "rarityId": "rarity_epic", "weight": 700 },
+    { "rarityId": "rarity_legendary", "weight": 95 },
+    { "rarityId": "rarity_mythic", "weight": 5 }
+  ],
+  "deliveryPools": [
+    {
+      "id": "pool_base", "rolls": 6,
+      "entries": [
+        { "ingredientId": "ingredient_malt_common", "weight": 100, "minAmount": 1, "maxAmount": 3 },
+        { "ingredientId": "ingredient_hops_common", "weight": 90, "minAmount": 1, "maxAmount": 3 },
+        { "ingredientId": "ingredient_honey_common", "weight": 70, "minAmount": 1, "maxAmount": 2 },
+        { "ingredientId": "ingredient_plum_common", "weight": 70, "minAmount": 1, "maxAmount": 2 },
+        { "ingredientId": "ingredient_juniper_rare", "weight": 30, "minAmount": 1, "maxAmount": 2 },
+        { "ingredientId": "ingredient_peat_rare", "weight": 25, "minAmount": 1, "maxAmount": 1 },
+        { "ingredientId": "ingredient_amber_epic", "weight": 8, "minAmount": 1, "maxAmount": 1 },
+        { "ingredientId": "ingredient_ghost_mushroom_epic", "weight": 5, "minAmount": 1, "maxAmount": 1 }
+      ]
+    }
+  ]
+}

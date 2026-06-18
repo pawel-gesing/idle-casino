@@ -1,0 +1,9 @@
+{
+  "name": "DistilleryDiscovery.Tests",
+  "rootNamespace": "DistilleryDiscovery.Tests",
+  "references": ["DistilleryDiscovery.Runtime"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": false
+}
+

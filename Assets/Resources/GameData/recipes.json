@@ -1,0 +1,20 @@
+{
+  "recipes": [
+    { "id": "recipe_table_beer", "displayName": "Piwo Stołowe", "categoryId": "beer", "baseValue": 18, "collectionRarityId": "rarity_common", "enabled": true },
+    { "id": "recipe_amber_ale", "displayName": "Bursztynowe Ale", "categoryId": "beer", "baseValue": 42, "collectionRarityId": "rarity_rare", "enabled": true },
+    { "id": "recipe_forest_stout", "displayName": "Leśny Stout", "categoryId": "beer", "baseValue": 66, "collectionRarityId": "rarity_epic", "enabled": true },
+    { "id": "recipe_malt_whisky", "displayName": "Whisky Słodowa", "categoryId": "whisky", "baseValue": 55, "collectionRarityId": "rarity_common", "enabled": true },
+    { "id": "recipe_smoked_whisky", "displayName": "Whisky Dymna", "categoryId": "whisky", "baseValue": 95, "collectionRarityId": "rarity_rare", "enabled": true },
+    { "id": "recipe_amber_whisky", "displayName": "Whisky Bursztynowa", "categoryId": "whisky", "baseValue": 155, "collectionRarityId": "rarity_epic", "enabled": true },
+    { "id": "recipe_mead", "displayName": "Miód Pitny", "categoryId": "mead", "baseValue": 45, "collectionRarityId": "rarity_common", "enabled": true },
+    { "id": "recipe_trojniak", "displayName": "Trójniak Koronny", "categoryId": "mead", "baseValue": 105, "collectionRarityId": "rarity_rare", "enabled": true },
+    { "id": "recipe_royal_mead", "displayName": "Miód Królewski", "categoryId": "mead", "baseValue": 190, "collectionRarityId": "rarity_epic", "enabled": true },
+    { "id": "recipe_plum_brandy", "displayName": "Śliwowica", "categoryId": "fruit", "baseValue": 48, "collectionRarityId": "rarity_common", "enabled": true },
+    { "id": "recipe_spiced_plum", "displayName": "Śliwka Korzenna", "categoryId": "fruit", "baseValue": 90, "collectionRarityId": "rarity_rare", "enabled": true },
+    { "id": "recipe_juniper_spirit", "displayName": "Jałowcówka", "categoryId": "spirit", "baseValue": 62, "collectionRarityId": "rarity_rare", "enabled": true },
+    { "id": "recipe_ghost_gin", "displayName": "Widmowy Gin", "categoryId": "spirit", "baseValue": 145, "collectionRarityId": "rarity_epic", "enabled": true },
+    { "id": "recipe_moon_elixir", "displayName": "Eliksir Księżycowy", "categoryId": "elixir", "baseValue": 240, "collectionRarityId": "rarity_legendary", "enabled": true },
+    { "id": "recipe_winged_barrel", "displayName": "Destylat Skrzydlatej Beczki", "categoryId": "elixir", "baseValue": 400, "collectionRarityId": "rarity_legendary", "enabled": true }
+  ]
+}
+

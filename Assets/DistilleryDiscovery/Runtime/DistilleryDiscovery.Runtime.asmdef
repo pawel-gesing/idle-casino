@@ -1,0 +1,7 @@
+{
+  "name": "DistilleryDiscovery.Runtime",
+  "rootNamespace": "DistilleryDiscovery",
+  "references": ["Unity.ugui"],
+  "autoReferenced": true
+}
+

@@ -1,0 +1,53 @@
+{
+  "ingredients": [
+    {
+      "id": "ingredient_malt_common", "baseIngredientId": "malt", "displayName": "Słód", "rarityId": "rarity_common", "qualityBonus": 0.00, "enabled": true,
+      "outcomeWeights": [
+        { "recipeId": "recipe_table_beer", "weight": 35 }, { "recipeId": "recipe_amber_ale", "weight": 14 }, { "recipeId": "recipe_malt_whisky", "weight": 28 }, { "recipeId": "recipe_smoked_whisky", "weight": 8 }
+      ]
+    },
+    {
+      "id": "ingredient_hops_common", "baseIngredientId": "hops", "displayName": "Chmiel", "rarityId": "rarity_common", "qualityBonus": 0.00, "enabled": true,
+      "outcomeWeights": [
+        { "recipeId": "recipe_table_beer", "weight": 30 }, { "recipeId": "recipe_amber_ale", "weight": 20 }, { "recipeId": "recipe_forest_stout", "weight": 8 }
+      ]
+    },
+    {
+      "id": "ingredient_honey_common", "baseIngredientId": "honey", "displayName": "Miód", "rarityId": "rarity_common", "qualityBonus": 0.02, "enabled": true,
+      "outcomeWeights": [
+        { "recipeId": "recipe_mead", "weight": 38 }, { "recipeId": "recipe_trojniak", "weight": 18 }, { "recipeId": "recipe_royal_mead", "weight": 5 }
+      ]
+    },
+    {
+      "id": "ingredient_plum_common", "baseIngredientId": "plum", "displayName": "Śliwka", "rarityId": "rarity_common", "qualityBonus": 0.00, "enabled": true,
+      "outcomeWeights": [
+        { "recipeId": "recipe_plum_brandy", "weight": 36 }, { "recipeId": "recipe_spiced_plum", "weight": 16 }, { "recipeId": "recipe_trojniak", "weight": 5 }
+      ]
+    },
+    {
+      "id": "ingredient_juniper_rare", "baseIngredientId": "juniper", "displayName": "Jałowiec", "rarityId": "rarity_rare", "qualityBonus": 0.08, "enabled": true,
+      "outcomeWeights": [
+        { "recipeId": "recipe_juniper_spirit", "weight": 32 }, { "recipeId": "recipe_ghost_gin", "weight": 12 }, { "recipeId": "recipe_forest_stout", "weight": 7 }
+      ]
+    },
+    {
+      "id": "ingredient_peat_rare", "baseIngredientId": "peat", "displayName": "Torf", "rarityId": "rarity_rare", "qualityBonus": 0.10, "enabled": true,
+      "outcomeWeights": [
+        { "recipeId": "recipe_smoked_whisky", "weight": 30 }, { "recipeId": "recipe_amber_whisky", "weight": 9 }, { "recipeId": "recipe_malt_whisky", "weight": 8 }
+      ]
+    },
+    {
+      "id": "ingredient_amber_epic", "baseIngredientId": "amber", "displayName": "Bursztyn", "rarityId": "rarity_epic", "qualityBonus": 0.18, "enabled": true,
+      "outcomeWeights": [
+        { "recipeId": "recipe_amber_ale", "weight": 20 }, { "recipeId": "recipe_amber_whisky", "weight": 24 }, { "recipeId": "recipe_royal_mead", "weight": 12 }, { "recipeId": "recipe_winged_barrel", "weight": 4 }
+      ]
+    },
+    {
+      "id": "ingredient_ghost_mushroom_epic", "baseIngredientId": "ghost_mushroom", "displayName": "Widmowy Grzyb", "rarityId": "rarity_epic", "qualityBonus": 0.22, "enabled": true,
+      "outcomeWeights": [
+        { "recipeId": "recipe_ghost_gin", "weight": 28 }, { "recipeId": "recipe_moon_elixir", "weight": 18 }, { "recipeId": "recipe_winged_barrel", "weight": 7 }
+      ]
+    }
+  ]
+}
+

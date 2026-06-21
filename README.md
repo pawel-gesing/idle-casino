@@ -23,13 +23,15 @@ Gracz wybiera dokładnie 3 składniki. Uruchomienie eksperymentu lub produkcji n
 
 Po upływie czasu zadanie zmienia stan z `running` na `completed`, także podczas nieobecności. Gracz odbiera je ręcznie. Dopiero wtedy losowany jest wynik, aktualizowane są książka receptur, mistrzostwo i kontrakty oraz otwierane jest podsumowanie nagrody. Produkcja zawsze zwraca wybraną, wcześniej odkrytą recepturę.
 
+Pula eksperymentu zawiera wyłącznie receptury, których wszystkie obowiązkowe klauzule spełnia wybrana trójka. Wynikowa waga to dodatnia waga bazowa receptury plus opcjonalne premie składnika lub grupy, naliczane najwyżej raz. Podgląd i końcowe losowanie używają tego samego czystego algorytmu; pusty wybór jest odrzucany przed zużyciem składników.
+
 ### Dostawy czasowe
 
 Darmowa dostawa odnawia się cyklicznie. Ekran dostawy pokazuje liczbę gotowych odbiorów i czas do następnego. Odbiór zużywa jeden zapisany odbiór. Podczas nieobecności dostawy kumulują się do `maxStoredFreeDeliveries`; nadmiar przepada.
 
 ### Produkcja i mistrzostwo
 
-Produkcja zaczyna się od kafelkowej listy odkrytych receptur. Po wyborze wyświetlane są wyłącznie składniki mające dodatni wpływ na tę recepturę. Gracz rezerwuje dowolną poprawną konfigurację 3 składników. Receptura wyniku jest gwarantowana, a rzadkość zależy od składników, laboratorium i mistrzostwa receptury.
+Produkcja zaczyna się od kafelkowej listy odkrytych receptur. Każda receptura pokazuje obowiązkowe klauzule: konkretny składnik, grupę, różne składniki z grupy albo zestaw `any_of`. Gracz rezerwuje dokładnie 3 składniki; dodatkowe neutralne składniki i duplikaty są dozwolone, o ile klauzule są spełnione. Receptura wyniku jest gwarantowana, a rzadkość zależy od składników, laboratorium i mistrzostwa receptury.
 
 Każdy produkt uzyskany z eksperymentu lub produkcji zwiększa licznik danej receptury. Progi mistrzostwa są konfigurowalne: Czeladnik (1), Rzemieślnik (10), Mistrz (30) i Arcymistrz (100). Poziomy dają odpowiednio 0%, 5%, 10% i 20% bonusu do wag wyższych rzadkości; nie zwiększają ceny sprzedaży i nie gwarantują najwyższej jakości. Książka receptur pokazuje licznik, poziom i brakującą liczbę wytworzeń albo informację o poziomie maksymalnym.
 
@@ -41,13 +43,9 @@ Ekran laboratorium udostępnia również **Collect All**. Akcja rozlicza wszystk
 
 ### Kontrakty
 
-Jednocześnie aktywne są 3 różne kontrakty losowane z puli. Mogą wymagać:
+Jednocześnie aktywne są 3 kontrakty generowane z szablonów: `basic`, `specialist` i `prestige`. Cele obejmują recepturę, kategorię, tag, jakość produktu, użycie składnika lub grupy, odkrycia, różne receptury, minimalną jakość konkretnej receptury, poprawę rekordu i źródło produktu.
 
-- konkretnej receptury,
-- konkretnej rzadkości,
-- produktu z określonej kategorii.
-
-Eksperyment i produkcja zwiększają postęp. Jeżeli wynik ukończy jeden lub kilka kontraktów, wszystkie są pokazane w podsumowaniu i wypłacane wspólnym przyciskiem **Odbierz**. Nagroda obejmuje złoto oraz skonfigurowane składniki w losowej ilości min–max; ekran odbioru pokazuje faktycznie otrzymane ilości. Kontrakty są głównym źródłem rzadkich składników — ich częstotliwość w zwykłych dostawach nie została zwiększona. Następnie ukończone kontrakty są automatycznie zastępowane, bez duplikatów w aktywnej trójce.
+Eksperyment i produkcja emitują identyczne pełne zdarzenie zawierające recepturę, jakość, kategorię, tagi, składniki, grupy, źródło, odkrycie i poprawę rekordu. Jeżeli wynik ukończy jeden lub kilka kontraktów, wszystkie są pokazane w podsumowaniu i wypłacane przy **Odbierz**. Nagrody obejmują złoto i ważone składniki wybierane bezpośrednio, według grupy lub rzadkości. Ukończone kontrakty są zastępowane bez duplikatów; dostępny jest jeden darmowy reroll na cykl i bezpieczny odświeżający cykl 24 h.
 
 ### Laboratorium
 
@@ -77,12 +75,13 @@ Koło zębate na górnej wstążce otwiera modal ustawień z zapisem, wczytywani
 Konfiguracja znajduje się w `Assets/Resources/GameData/`:
 
 - `rarities.json` — rzadkości i mnożniki ceny,
-- `ingredients.json` — składniki i wpływy na receptury,
-- `recipes.json` — receptury i wartości bazowe,
+- `ingredient_groups.json` — 5 grup składników,
+- `ingredients.json` — 22 składniki, rzadkości, grupy i źródła,
+- `recipes.json` — 175 receptur, wymagania, bazowe wagi, bonusy, kategorie, tagi i wartości,
 - `categories.json` — kategorie receptur,
 - `economy.json` — wszystkie czasy, rozmiar i limit dostaw, liczba slotów oraz pozostałe parametry ekonomii,
 - `laboratories.json` — poziomy, koszty, bonusy jakości, sloty eksperymentów/produkcji i ich mnożniki czasu,
-- `contracts.json` — wymagania i nagrody kontraktów,
+- `contracts.json` — 36 szablonów kontraktów v2 i ważone nagrody,
 - `mastery.json` — progi mistrzostwa receptur i bonusy rzadkości,
 - `localization.json` — polskie oraz angielskie teksty UI i contentu.
 
@@ -90,7 +89,7 @@ Konfiguracja jest walidowana przy starcie, łącznie z dodatnimi czasami, koszta
 
 ## Zapis stanu
 
-Zapis wersji `7` przechowuje złoto, składniki, produkty, książkę receptur, poziom laboratorium, kontrakty, nieodebrany wynik, czas ostatniego zapisu, timestamp dostaw, liczbę gotowych dostaw i zadania laboratoryjne wraz z wejściem oraz czasami UTC. Poziom mistrzostwa jest wyliczany z zapisanego licznika i konfiguracji.
+Zapis wersji `8` przechowuje złoto, poprawne składniki, produkty, książkę receptur, poziom laboratorium, wygenerowane cele i role kontraktów, zbiory różnych receptur, stan rerolla/odświeżenia, nieodebrany wynik, dostawy i zadania laboratoryjne wraz z wejściem oraz czasami UTC. Zapisy v7 są migrowane: zachowany zostaje poprawny postęp, a nieaktualne kontrakty są bezpiecznie generowane ponownie.
 
 Starsze zapisy są migrowane automatycznie. Brakujące pola czasu są inicjalizowane od chwili wczytania bez zmiany złota, magazynu, receptur ani mistrzostwa.
 

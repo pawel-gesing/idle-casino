@@ -1,10 +1,32 @@
 {
   "categories": [
-    { "id": "beer", "displayName": "Piwa" },
-    { "id": "whisky", "displayName": "Whisky" },
-    { "id": "mead", "displayName": "Miody" },
-    { "id": "fruit", "displayName": "Trunki owocowe" },
-    { "id": "spirit", "displayName": "Destylaty" },
-    { "id": "elixir", "displayName": "Eliksiry" }
+    {
+      "id": "beer",
+      "displayName": "Beer"
+    },
+    {
+      "id": "grain_spirit",
+      "displayName": "Grain Spirits"
+    },
+    {
+      "id": "mead_sugar",
+      "displayName": "Mead & Sugar Spirits"
+    },
+    {
+      "id": "fruit_wine",
+      "displayName": "Fruit Wines & Ciders"
+    },
+    {
+      "id": "fruit_spirit",
+      "displayName": "Fruit Spirits & Liqueurs"
+    },
+    {
+      "id": "gin_herbal",
+      "displayName": "Gin, Anise & Herbal"
+    },
+    {
+      "id": "special",
+      "displayName": "Special"
+    }
   ]
 }

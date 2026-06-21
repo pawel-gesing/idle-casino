@@ -1,159 +1,1989 @@
 {
   "entries": [
-    { "key": "rarity.rarity_common", "pl": "Pospolity", "en": "Common" },
-    { "key": "rarity.rarity_rare", "pl": "Rzadki", "en": "Rare" },
-    { "key": "rarity.rarity_epic", "pl": "Epicki", "en": "Epic" },
-    { "key": "rarity.rarity_legendary", "pl": "Legendarny", "en": "Legendary" },
-    { "key": "rarity.rarity_mythic", "pl": "Mityczny", "en": "Mythic" },
-
-    { "key": "ingredient.ingredient_malt_common", "pl": "Słód", "en": "Malt" },
-    { "key": "ingredient.ingredient_hops_common", "pl": "Chmiel", "en": "Hops" },
-    { "key": "ingredient.ingredient_honey_common", "pl": "Miód", "en": "Honey" },
-    { "key": "ingredient.ingredient_plum_common", "pl": "Śliwka", "en": "Plum" },
-    { "key": "ingredient.ingredient_juniper_rare", "pl": "Jałowiec", "en": "Juniper" },
-    { "key": "ingredient.ingredient_peat_rare", "pl": "Torf", "en": "Peat" },
-    { "key": "ingredient.ingredient_amber_epic", "pl": "Bursztyn", "en": "Amber" },
-    { "key": "ingredient.ingredient_ghost_mushroom_epic", "pl": "Widmowy Grzyb", "en": "Ghost Mushroom" },
-
-    { "key": "recipe.recipe_table_beer", "pl": "Piwo Stołowe", "en": "Table Beer" },
-    { "key": "recipe.recipe_amber_ale", "pl": "Bursztynowe Ale", "en": "Amber Ale" },
-    { "key": "recipe.recipe_forest_stout", "pl": "Leśny Stout", "en": "Forest Stout" },
-    { "key": "recipe.recipe_malt_whisky", "pl": "Whisky Słodowa", "en": "Malt Whisky" },
-    { "key": "recipe.recipe_smoked_whisky", "pl": "Whisky Dymna", "en": "Smoked Whisky" },
-    { "key": "recipe.recipe_amber_whisky", "pl": "Whisky Bursztynowa", "en": "Amber Whisky" },
-    { "key": "recipe.recipe_mead", "pl": "Miód Pitny", "en": "Mead" },
-    { "key": "recipe.recipe_trojniak", "pl": "Trójniak Koronny", "en": "Crown Triple Mead" },
-    { "key": "recipe.recipe_royal_mead", "pl": "Miód Królewski", "en": "Royal Mead" },
-    { "key": "recipe.recipe_plum_brandy", "pl": "Śliwowica", "en": "Plum Brandy" },
-    { "key": "recipe.recipe_spiced_plum", "pl": "Śliwka Korzenna", "en": "Spiced Plum" },
-    { "key": "recipe.recipe_juniper_spirit", "pl": "Jałowcówka", "en": "Juniper Spirit" },
-    { "key": "recipe.recipe_ghost_gin", "pl": "Widmowy Gin", "en": "Ghost Gin" },
-    { "key": "recipe.recipe_moon_elixir", "pl": "Eliksir Księżycowy", "en": "Moon Elixir" },
-    { "key": "recipe.recipe_winged_barrel", "pl": "Destylat Skrzydlatej Beczki", "en": "Winged Barrel Distillate" },
-
-    { "key": "category.beer", "pl": "Piwa", "en": "Beers" },
-    { "key": "category.whisky", "pl": "Whisky", "en": "Whisky" },
-    { "key": "category.mead", "pl": "Miody", "en": "Meads" },
-    { "key": "category.fruit", "pl": "Trunki owocowe", "en": "Fruit Spirits" },
-    { "key": "category.spirit", "pl": "Destylaty", "en": "Spirits" },
-    { "key": "category.elixir", "pl": "Eliksiry", "en": "Elixirs" },
-
-    { "key": "contract.contract_table_beer", "pl": "Dostawa do gospody", "en": "Tavern Supply" },
-    { "key": "contract.contract_epic", "pl": "Kolekcjoner osobliwości", "en": "Curiosity Collector" },
-    { "key": "contract.contract_mead", "pl": "Uczta miodowa", "en": "Mead Feast" },
-    { "key": "contract.contract_smoked_whisky", "pl": "Zapasy gorzelni", "en": "Distillery Supplies" },
-    { "key": "contract.contract_rare", "pl": "Rzadkie zamówienie", "en": "Rare Order" },
-    { "key": "contract.contract_beer", "pl": "Święto piwa", "en": "Beer Festival" },
-
-    { "key": "mastery.apprentice", "pl": "Czeladnik", "en": "Apprentice" },
-    { "key": "mastery.craftsman", "pl": "Rzemieślnik", "en": "Craftsman" },
-    { "key": "mastery.master", "pl": "Mistrz", "en": "Master" },
-    { "key": "mastery.grandmaster", "pl": "Arcymistrz", "en": "Grandmaster" },
-
-    { "key": "ui.nav.state", "pl": "STAN", "en": "STATE" },
-    { "key": "ui.nav.ingredients", "pl": "SKŁADNIKI", "en": "INGREDIENTS" },
-    { "key": "ui.nav.recipes", "pl": "RECEPTURY", "en": "RECIPES" },
-    { "key": "ui.nav.experiment", "pl": "EKSPERYMENT", "en": "EXPERIMENT" },
-    { "key": "ui.nav.production", "pl": "PRODUKCJA", "en": "PRODUCTION" },
-    { "key": "ui.nav.contracts", "pl": "KONTRAKTY", "en": "CONTRACTS" },
-    { "key": "ui.nav.delivery", "pl": "DOSTAWA", "en": "DELIVERY" },
-    { "key": "ui.nav.laboratory", "pl": "LABORATORIUM", "en": "LABORATORY" },
-    { "key": "ui.settings.title", "pl": "USTAWIENIA", "en": "SETTINGS" },
-    { "key": "ui.settings.save", "pl": "ZAPISZ", "en": "SAVE" },
-    { "key": "ui.settings.load", "pl": "WCZYTAJ", "en": "LOAD" },
-    { "key": "ui.settings.reset", "pl": "RESET", "en": "RESET" },
-    { "key": "ui.settings.language", "pl": "JĘZYK: POLSKI", "en": "LANGUAGE: ENGLISH" },
-    { "key": "ui.settings.exit", "pl": "WYJDŹ", "en": "EXIT" },
-    { "key": "ui.header.gold", "pl": "ZŁOTO", "en": "GOLD" },
-    { "key": "ui.header.recipes", "pl": "RECEPTURY", "en": "RECIPES" },
-    { "key": "ui.header.ingredients", "pl": "SKŁADNIKI", "en": "INGREDIENTS" },
-
-    { "key": "ui.action.clear", "pl": "WYCZYŚĆ", "en": "CLEAR" },
-    { "key": "ui.action.run_experiment", "pl": "URUCHOM EKSPERYMENT", "en": "RUN EXPERIMENT" },
-    { "key": "ui.action.produce", "pl": "WYPRODUKUJ", "en": "PRODUCE" },
-    { "key": "ui.action.claim", "pl": "ODBIERZ NAGRODĘ", "en": "CLAIM REWARD" },
-    { "key": "ui.action.upgrade", "pl": "ULEPSZ LABORATORIUM", "en": "UPGRADE LABORATORY" },
-
-    { "key": "ui.heading.state", "pl": "STAN GRACZA", "en": "PLAYER STATE" },
-    { "key": "ui.heading.delivery", "pl": "NOWA DOSTAWA", "en": "NEW DELIVERY" },
-    { "key": "ui.heading.ingredients", "pl": "SKŁADNIKI", "en": "INGREDIENTS" },
-    { "key": "ui.heading.experiment", "pl": "EKSPERYMENT", "en": "EXPERIMENT" },
-    { "key": "ui.heading.production", "pl": "PRODUKCJA", "en": "PRODUCTION" },
-    { "key": "ui.heading.contracts", "pl": "AKTYWNE KONTRAKTY", "en": "ACTIVE CONTRACTS" },
-    { "key": "ui.heading.laboratory", "pl": "LABORATORIUM", "en": "LABORATORY" },
-    { "key": "ui.heading.recipe_book", "pl": "KSIĄŻKA RECEPTUR", "en": "RECIPE BOOK" },
-    { "key": "ui.heading.outcomes", "pl": "MOŻLIWE WYNIKI", "en": "POSSIBLE OUTCOMES" },
-    { "key": "ui.heading.experiment_result", "pl": "WYNIK EKSPERYMENTU", "en": "EXPERIMENT RESULT" },
-    { "key": "ui.heading.production_result", "pl": "PRODUKCJA ZAKOŃCZONA", "en": "PRODUCTION COMPLETE" },
-
-    { "key": "ui.label.gold", "pl": "Złoto", "en": "Gold" },
-    { "key": "ui.label.gold_lower", "pl": "złota", "en": "gold" },
-    { "key": "ui.label.laboratory", "pl": "Laboratorium", "en": "Laboratory" },
-    { "key": "ui.label.level", "pl": "poziom", "en": "level" },
-    { "key": "ui.label.experiments", "pl": "Eksperymenty", "en": "Experiments" },
-    { "key": "ui.label.productions", "pl": "Produkcje", "en": "Productions" },
-    { "key": "ui.label.ingredients", "pl": "Składniki", "en": "Ingredients" },
-    { "key": "ui.label.recipes", "pl": "Odkryte receptury", "en": "Discovered recipes" },
-    { "key": "ui.label.contracts", "pl": "Aktywne kontrakty", "en": "Active contracts" },
-    { "key": "ui.label.valid_ingredients", "pl": "Poprawne składniki", "en": "Valid ingredients" },
-    { "key": "ui.label.progress", "pl": "Postęp", "en": "Progress" },
-    { "key": "ui.label.reward", "pl": "Nagroda", "en": "Reward" },
-    { "key": "ui.label.rarity_bonus", "pl": "Bonus wyższej rzadkości", "en": "Higher rarity bonus" },
-    { "key": "ui.label.next_level", "pl": "Następny poziom", "en": "Next level" },
-    { "key": "ui.label.new_bonus", "pl": "Nowy bonus", "en": "New bonus" },
-    { "key": "ui.label.cost", "pl": "Koszt", "en": "Cost" },
-    { "key": "ui.label.record", "pl": "Rekord", "en": "Record" },
-    { "key": "ui.label.created", "pl": "Wytworzenia", "en": "Created" },
-    { "key": "ui.label.mastery", "pl": "Mistrzostwo", "en": "Mastery" },
-    { "key": "ui.label.discovered_ingredients", "pl": "Odkryte składniki", "en": "Discovered ingredients" },
-    { "key": "ui.label.selected", "pl": "Wybrane", "en": "Selected" },
-    { "key": "ui.label.created_product", "pl": "Produkt", "en": "Product" },
-    { "key": "ui.label.quality", "pl": "Rzadkość", "en": "Rarity" },
-    { "key": "ui.label.auto_sale", "pl": "Automatyczna sprzedaż", "en": "Automatic sale" },
-
-    { "key": "ui.status.ready", "pl": "Laboratorium gotowe. Odbierz dostawę, aby zacząć.", "en": "Ready. Receive a delivery to begin." },
-    { "key": "ui.status.state", "pl": "Aktualny stan gracza", "en": "Current player state" },
-    { "key": "ui.status.delivery", "pl": "Dostawa odebrana", "en": "Delivery received" },
-    { "key": "ui.status.ingredients", "pl": "Magazyn składników", "en": "Ingredient storage" },
-    { "key": "ui.status.select_three", "pl": "Wybierz dokładnie trzy składniki", "en": "Select exactly three ingredients" },
-    { "key": "ui.status.discover_first", "pl": "Najpierw odkryj recepturę", "en": "Discover a recipe first" },
-    { "key": "ui.status.production_cycle", "pl": "Naciśnij PRODUKCJA ponownie, aby wybrać następną recepturę", "en": "Press PRODUCTION again to select the next recipe" },
-    { "key": "ui.status.contracts", "pl": "Jednocześnie aktywne są trzy kontrakty", "en": "Three contracts are active at once" },
-    { "key": "ui.status.laboratory", "pl": "Laboratorium poprawia rzadkość produktów", "en": "Laboratory improves product rarity" },
-    { "key": "ui.status.recipe_book", "pl": "Książka receptur — ukończono {0:0.#}%", "en": "Recipe book — {0:0.#}% complete" },
-    { "key": "ui.status.preview", "pl": "Podgląd gotowy", "en": "Preview ready" },
-    { "key": "ui.status.contract_claimed", "pl": "Odebrano nagrodę: +{0} złota", "en": "Reward claimed: +{0} gold" },
-    { "key": "ui.status.language_changed", "pl": "Zmieniono język", "en": "Language changed" },
-    { "key": "ui.status.saved", "pl": "Gra zapisana lokalnie", "en": "Game saved locally" },
-    { "key": "ui.status.loaded", "pl": "Wczytano lokalny zapis", "en": "Local save loaded" },
-    { "key": "ui.status.reset", "pl": "Zapis usunięty, stan gry zresetowany", "en": "Save deleted and game reset" },
-    { "key": "ui.status.choose_ingredient_tiles", "pl": "Klikaj kafelki, aby zarezerwować dokładnie trzy składniki", "en": "Tap ingredient tiles to reserve exactly three" },
-    { "key": "ui.status.choose_recipe_tile", "pl": "Wybierz odkrytą recepturę", "en": "Choose a discovered recipe" },
-    { "key": "ui.status.chosen_recipe", "pl": "Receptura: {0}. Wybierz trzy składniki.", "en": "Recipe: {0}. Select three ingredients." },
-    { "key": "ui.status.reward_claimed", "pl": "Odebrano {0} złota", "en": "Claimed {0} gold" },
-
-    { "key": "ui.production.none", "pl": "Brak odkrytych receptur.", "en": "No discovered recipes." },
-    { "key": "ui.production.help", "pl": "Wybierz dokładnie 3 składniki wpływające na recepturę. Duplikaty są dozwolone.", "en": "Choose exactly 3 contributing ingredients. Duplicates are allowed." },
-    { "key": "ui.laboratory.max", "pl": "Osiągnięto maksymalny poziom.", "en": "Maximum level reached." },
-    { "key": "ui.recipe.undiscovered", "pl": "Nieodkryta receptura", "en": "Undiscovered recipe" },
-    { "key": "ui.mastery.maximum", "pl": "Osiągnięto maksymalny poziom", "en": "Maximum level reached" },
-    { "key": "ui.mastery.to_next", "pl": "Do następnego poziomu: {0}", "en": "To next level: {0}" },
-    { "key": "ui.contract.ready", "pl": "GOTOWY DO ODBIORU", "en": "READY TO CLAIM" },
-    { "key": "ui.contract.recipe", "pl": "Wytwórz {0} × {1}", "en": "Create {0} × {1}" },
-    { "key": "ui.contract.rarity", "pl": "Wytwórz {0} × produkt: {1}", "en": "Create {0} × {1} product" },
-    { "key": "ui.contract.category", "pl": "Wytwórz {0} × {1}", "en": "Create {0} × {1}" },
-    { "key": "ui.result.discovered", "pl": "ODKRYTO NOWĄ RECEPTURĘ!", "en": "NEW RECIPE DISCOVERED!" },
-    { "key": "ui.result.record", "pl": "NOWY REKORD RZADKOŚCI!", "en": "NEW RARITY RECORD!" },
-    { "key": "ui.result.known", "pl": "Znana receptura — rekord bez zmian.", "en": "Known recipe — record unchanged." },
-
-    { "key": "ui.error.select_mode", "pl": "Składniki wybiera się w eksperymencie lub produkcji.", "en": "Ingredients are selected in experiment or production mode." },
-    { "key": "ui.error.selection_full", "pl": "Wybrano już wymaganą liczbę składników.", "en": "The required number of ingredients is already selected." },
-    { "key": "ui.error.no_ingredient", "pl": "Brak kolejnej sztuki tego składnika.", "en": "No more of this ingredient." },
-    { "key": "ui.error.choose_recipe", "pl": "Wybierz odkrytą recepturę.", "en": "Choose a discovered recipe." },
-    { "key": "ui.error.no_completed_contract", "pl": "Brak ukończonego kontraktu do odbioru.", "en": "No completed contract to claim." }
-    ,{ "key": "ui.pending.contract_progress", "pl": "POSTĘP KONTRAKTÓW", "en": "CONTRACT PROGRESS" }
-    ,{ "key": "ui.pending.no_progress", "pl": "Brak postępu kontraktów.", "en": "No contract progress." }
-    ,{ "key": "ui.pending.contract_bonus", "pl": "Bonus kontraktów", "en": "Contract bonus" }
-    ,{ "key": "ui.pending.total_reward", "pl": "ŁĄCZNA NAGRODA", "en": "TOTAL REWARD" }
+    {
+      "key": "rarity.rarity_common",
+      "pl": "Pospolity",
+      "en": "Common"
+    },
+    {
+      "key": "rarity.rarity_rare",
+      "pl": "Rzadki",
+      "en": "Rare"
+    },
+    {
+      "key": "rarity.rarity_epic",
+      "pl": "Epicki",
+      "en": "Epic"
+    },
+    {
+      "key": "rarity.rarity_legendary",
+      "pl": "Legendarny",
+      "en": "Legendary"
+    },
+    {
+      "key": "rarity.rarity_mythic",
+      "pl": "Mityczny",
+      "en": "Mythic"
+    },
+    {
+      "key": "mastery.apprentice",
+      "pl": "Czeladnik",
+      "en": "Apprentice"
+    },
+    {
+      "key": "mastery.craftsman",
+      "pl": "Rzemieślnik",
+      "en": "Craftsman"
+    },
+    {
+      "key": "mastery.master",
+      "pl": "Mistrz",
+      "en": "Master"
+    },
+    {
+      "key": "mastery.grandmaster",
+      "pl": "Arcymistrz",
+      "en": "Grandmaster"
+    },
+    {
+      "key": "ui.nav.state",
+      "pl": "STAN",
+      "en": "STATE"
+    },
+    {
+      "key": "ui.nav.ingredients",
+      "pl": "SKŁADNIKI",
+      "en": "INGREDIENTS"
+    },
+    {
+      "key": "ui.nav.recipes",
+      "pl": "RECEPTURY",
+      "en": "RECIPES"
+    },
+    {
+      "key": "ui.nav.experiment",
+      "pl": "EKSPERYMENT",
+      "en": "EXPERIMENT"
+    },
+    {
+      "key": "ui.nav.production",
+      "pl": "PRODUKCJA",
+      "en": "PRODUCTION"
+    },
+    {
+      "key": "ui.nav.contracts",
+      "pl": "KONTRAKTY",
+      "en": "CONTRACTS"
+    },
+    {
+      "key": "ui.nav.delivery",
+      "pl": "DOSTAWA",
+      "en": "DELIVERY"
+    },
+    {
+      "key": "ui.nav.laboratory",
+      "pl": "LABORATORIUM",
+      "en": "LABORATORY"
+    },
+    {
+      "key": "ui.settings.title",
+      "pl": "USTAWIENIA",
+      "en": "SETTINGS"
+    },
+    {
+      "key": "ui.settings.save",
+      "pl": "ZAPISZ",
+      "en": "SAVE"
+    },
+    {
+      "key": "ui.settings.load",
+      "pl": "WCZYTAJ",
+      "en": "LOAD"
+    },
+    {
+      "key": "ui.settings.reset",
+      "pl": "RESET",
+      "en": "RESET"
+    },
+    {
+      "key": "ui.settings.language",
+      "pl": "JĘZYK: POLSKI",
+      "en": "LANGUAGE: ENGLISH"
+    },
+    {
+      "key": "ui.settings.exit",
+      "pl": "WYJDŹ",
+      "en": "EXIT"
+    },
+    {
+      "key": "ui.header.gold",
+      "pl": "ZŁOTO",
+      "en": "GOLD"
+    },
+    {
+      "key": "ui.header.recipes",
+      "pl": "RECEPTURY",
+      "en": "RECIPES"
+    },
+    {
+      "key": "ui.header.ingredients",
+      "pl": "SKŁADNIKI",
+      "en": "INGREDIENTS"
+    },
+    {
+      "key": "ui.action.clear",
+      "pl": "WYCZYŚĆ",
+      "en": "CLEAR"
+    },
+    {
+      "key": "ui.action.run_experiment",
+      "pl": "URUCHOM EKSPERYMENT",
+      "en": "RUN EXPERIMENT"
+    },
+    {
+      "key": "ui.action.produce",
+      "pl": "WYPRODUKUJ",
+      "en": "PRODUCE"
+    },
+    {
+      "key": "ui.action.claim",
+      "pl": "ODBIERZ NAGRODĘ",
+      "en": "CLAIM REWARD"
+    },
+    {
+      "key": "ui.action.upgrade",
+      "pl": "ULEPSZ LABORATORIUM",
+      "en": "UPGRADE LABORATORY"
+    },
+    {
+      "key": "ui.heading.state",
+      "pl": "STAN GRACZA",
+      "en": "PLAYER STATE"
+    },
+    {
+      "key": "ui.heading.delivery",
+      "pl": "NOWA DOSTAWA",
+      "en": "NEW DELIVERY"
+    },
+    {
+      "key": "ui.heading.ingredients",
+      "pl": "SKŁADNIKI",
+      "en": "INGREDIENTS"
+    },
+    {
+      "key": "ui.heading.experiment",
+      "pl": "EKSPERYMENT",
+      "en": "EXPERIMENT"
+    },
+    {
+      "key": "ui.heading.production",
+      "pl": "PRODUKCJA",
+      "en": "PRODUCTION"
+    },
+    {
+      "key": "ui.heading.contracts",
+      "pl": "AKTYWNE KONTRAKTY",
+      "en": "ACTIVE CONTRACTS"
+    },
+    {
+      "key": "ui.heading.laboratory",
+      "pl": "LABORATORIUM",
+      "en": "LABORATORY"
+    },
+    {
+      "key": "ui.heading.recipe_book",
+      "pl": "KSIĄŻKA RECEPTUR",
+      "en": "RECIPE BOOK"
+    },
+    {
+      "key": "ui.heading.outcomes",
+      "pl": "MOŻLIWE WYNIKI",
+      "en": "POSSIBLE OUTCOMES"
+    },
+    {
+      "key": "ui.heading.experiment_result",
+      "pl": "WYNIK EKSPERYMENTU",
+      "en": "EXPERIMENT RESULT"
+    },
+    {
+      "key": "ui.heading.production_result",
+      "pl": "PRODUKCJA ZAKOŃCZONA",
+      "en": "PRODUCTION COMPLETE"
+    },
+    {
+      "key": "ui.label.gold",
+      "pl": "Złoto",
+      "en": "Gold"
+    },
+    {
+      "key": "ui.label.gold_lower",
+      "pl": "złota",
+      "en": "gold"
+    },
+    {
+      "key": "ui.label.laboratory",
+      "pl": "Laboratorium",
+      "en": "Laboratory"
+    },
+    {
+      "key": "ui.label.level",
+      "pl": "poziom",
+      "en": "level"
+    },
+    {
+      "key": "ui.label.experiments",
+      "pl": "Eksperymenty",
+      "en": "Experiments"
+    },
+    {
+      "key": "ui.label.productions",
+      "pl": "Produkcje",
+      "en": "Productions"
+    },
+    {
+      "key": "ui.label.ingredients",
+      "pl": "Składniki",
+      "en": "Ingredients"
+    },
+    {
+      "key": "ui.label.recipes",
+      "pl": "Odkryte receptury",
+      "en": "Discovered recipes"
+    },
+    {
+      "key": "ui.label.contracts",
+      "pl": "Aktywne kontrakty",
+      "en": "Active contracts"
+    },
+    {
+      "key": "ui.label.valid_ingredients",
+      "pl": "Poprawne składniki",
+      "en": "Valid ingredients"
+    },
+    {
+      "key": "ui.label.progress",
+      "pl": "Postęp",
+      "en": "Progress"
+    },
+    {
+      "key": "ui.label.reward",
+      "pl": "Nagroda",
+      "en": "Reward"
+    },
+    {
+      "key": "ui.label.rarity_bonus",
+      "pl": "Bonus wyższej rzadkości",
+      "en": "Higher rarity bonus"
+    },
+    {
+      "key": "ui.label.next_level",
+      "pl": "Następny poziom",
+      "en": "Next level"
+    },
+    {
+      "key": "ui.label.new_bonus",
+      "pl": "Nowy bonus",
+      "en": "New bonus"
+    },
+    {
+      "key": "ui.label.cost",
+      "pl": "Koszt",
+      "en": "Cost"
+    },
+    {
+      "key": "ui.label.record",
+      "pl": "Rekord",
+      "en": "Record"
+    },
+    {
+      "key": "ui.label.created",
+      "pl": "Wytworzenia",
+      "en": "Created"
+    },
+    {
+      "key": "ui.label.mastery",
+      "pl": "Mistrzostwo",
+      "en": "Mastery"
+    },
+    {
+      "key": "ui.label.discovered_ingredients",
+      "pl": "Odkryte składniki",
+      "en": "Discovered ingredients"
+    },
+    {
+      "key": "ui.label.selected",
+      "pl": "Wybrane",
+      "en": "Selected"
+    },
+    {
+      "key": "ui.label.created_product",
+      "pl": "Produkt",
+      "en": "Product"
+    },
+    {
+      "key": "ui.label.quality",
+      "pl": "Rzadkość",
+      "en": "Rarity"
+    },
+    {
+      "key": "ui.label.auto_sale",
+      "pl": "Automatyczna sprzedaż",
+      "en": "Automatic sale"
+    },
+    {
+      "key": "ui.status.ready",
+      "pl": "Laboratorium gotowe. Odbierz dostawę, aby zacząć.",
+      "en": "Ready. Receive a delivery to begin."
+    },
+    {
+      "key": "ui.status.state",
+      "pl": "Aktualny stan gracza",
+      "en": "Current player state"
+    },
+    {
+      "key": "ui.status.delivery",
+      "pl": "Dostawa odebrana",
+      "en": "Delivery received"
+    },
+    {
+      "key": "ui.status.ingredients",
+      "pl": "Magazyn składników",
+      "en": "Ingredient storage"
+    },
+    {
+      "key": "ui.status.select_three",
+      "pl": "Wybierz dokładnie trzy składniki",
+      "en": "Select exactly three ingredients"
+    },
+    {
+      "key": "ui.status.discover_first",
+      "pl": "Najpierw odkryj recepturę",
+      "en": "Discover a recipe first"
+    },
+    {
+      "key": "ui.status.production_cycle",
+      "pl": "Naciśnij PRODUKCJA ponownie, aby wybrać następną recepturę",
+      "en": "Press PRODUCTION again to select the next recipe"
+    },
+    {
+      "key": "ui.status.contracts",
+      "pl": "Jednocześnie aktywne są trzy kontrakty",
+      "en": "Three contracts are active at once"
+    },
+    {
+      "key": "ui.status.laboratory",
+      "pl": "Laboratorium poprawia rzadkość produktów",
+      "en": "Laboratory improves product rarity"
+    },
+    {
+      "key": "ui.status.recipe_book",
+      "pl": "Książka receptur — ukończono {0:0.#}%",
+      "en": "Recipe book — {0:0.#}% complete"
+    },
+    {
+      "key": "ui.status.preview",
+      "pl": "Podgląd gotowy",
+      "en": "Preview ready"
+    },
+    {
+      "key": "ui.status.contract_claimed",
+      "pl": "Odebrano nagrodę: +{0} złota",
+      "en": "Reward claimed: +{0} gold"
+    },
+    {
+      "key": "ui.status.language_changed",
+      "pl": "Zmieniono język",
+      "en": "Language changed"
+    },
+    {
+      "key": "ui.status.saved",
+      "pl": "Gra zapisana lokalnie",
+      "en": "Game saved locally"
+    },
+    {
+      "key": "ui.status.loaded",
+      "pl": "Wczytano lokalny zapis",
+      "en": "Local save loaded"
+    },
+    {
+      "key": "ui.status.reset",
+      "pl": "Zapis usunięty, stan gry zresetowany",
+      "en": "Save deleted and game reset"
+    },
+    {
+      "key": "ui.status.choose_ingredient_tiles",
+      "pl": "Klikaj kafelki, aby zarezerwować dokładnie trzy składniki",
+      "en": "Tap ingredient tiles to reserve exactly three"
+    },
+    {
+      "key": "ui.status.choose_recipe_tile",
+      "pl": "Wybierz odkrytą recepturę",
+      "en": "Choose a discovered recipe"
+    },
+    {
+      "key": "ui.status.chosen_recipe",
+      "pl": "Receptura: {0}. Wybierz trzy składniki.",
+      "en": "Recipe: {0}. Select three ingredients."
+    },
+    {
+      "key": "ui.status.reward_claimed",
+      "pl": "Odebrano {0} złota",
+      "en": "Claimed {0} gold"
+    },
+    {
+      "key": "ui.production.none",
+      "pl": "Brak odkrytych receptur.",
+      "en": "No discovered recipes."
+    },
+    {
+      "key": "ui.production.help",
+      "pl": "Wybierz dokładnie 3 składniki spełniające wymagania receptury. Składniki neutralne i duplikaty są dozwolone.",
+      "en": "Choose exactly 3 ingredients satisfying the recipe requirements. Neutral ingredients and duplicates are allowed."
+    },
+    {
+      "key": "ui.laboratory.max",
+      "pl": "Osiągnięto maksymalny poziom.",
+      "en": "Maximum level reached."
+    },
+    {
+      "key": "ui.recipe.undiscovered",
+      "pl": "Nieodkryta receptura",
+      "en": "Undiscovered recipe"
+    },
+    {
+      "key": "ui.mastery.maximum",
+      "pl": "Osiągnięto maksymalny poziom",
+      "en": "Maximum level reached"
+    },
+    {
+      "key": "ui.mastery.to_next",
+      "pl": "Do następnego poziomu: {0}",
+      "en": "To next level: {0}"
+    },
+    {
+      "key": "ui.contract.ready",
+      "pl": "GOTOWY DO ODBIORU",
+      "en": "READY TO CLAIM"
+    },
+    {
+      "key": "ui.contract.recipe",
+      "pl": "Wytwórz {0} × {1}",
+      "en": "Create {0} × {1}"
+    },
+    {
+      "key": "ui.contract.rarity",
+      "pl": "Wytwórz {0} × produkt: {1}",
+      "en": "Create {0} × {1} product"
+    },
+    {
+      "key": "ui.contract.category",
+      "pl": "Wytwórz {0} × {1}",
+      "en": "Create {0} × {1}"
+    },
+    {
+      "key": "ui.result.discovered",
+      "pl": "ODKRYTO NOWĄ RECEPTURĘ!",
+      "en": "NEW RECIPE DISCOVERED!"
+    },
+    {
+      "key": "ui.result.record",
+      "pl": "NOWY REKORD RZADKOŚCI!",
+      "en": "NEW RARITY RECORD!"
+    },
+    {
+      "key": "ui.result.known",
+      "pl": "Znana receptura — rekord bez zmian.",
+      "en": "Known recipe — record unchanged."
+    },
+    {
+      "key": "ui.error.select_mode",
+      "pl": "Składniki wybiera się w eksperymencie lub produkcji.",
+      "en": "Ingredients are selected in experiment or production mode."
+    },
+    {
+      "key": "ui.error.selection_full",
+      "pl": "Wybrano już wymaganą liczbę składników.",
+      "en": "The required number of ingredients is already selected."
+    },
+    {
+      "key": "ui.error.no_ingredient",
+      "pl": "Brak kolejnej sztuki tego składnika.",
+      "en": "No more of this ingredient."
+    },
+    {
+      "key": "ui.error.choose_recipe",
+      "pl": "Wybierz odkrytą recepturę.",
+      "en": "Choose a discovered recipe."
+    },
+    {
+      "key": "ui.error.no_completed_contract",
+      "pl": "Brak ukończonego kontraktu do odbioru.",
+      "en": "No completed contract to claim."
+    },
+    {
+      "key": "ui.pending.contract_progress",
+      "pl": "POSTĘP KONTRAKTÓW",
+      "en": "CONTRACT PROGRESS"
+    },
+    {
+      "key": "ui.pending.no_progress",
+      "pl": "Brak postępu kontraktów.",
+      "en": "No contract progress."
+    },
+    {
+      "key": "ui.pending.contract_bonus",
+      "pl": "Bonus kontraktów",
+      "en": "Contract bonus"
+    },
+    {
+      "key": "ui.pending.total_reward",
+      "pl": "ŁĄCZNA NAGRODA",
+      "en": "TOTAL REWARD"
+    },
+    {
+      "key": "recipe.recipe_001_table_beer",
+      "pl": "Piwo stołowe",
+      "en": "Table Beer"
+    },
+    {
+      "key": "recipe.recipe_002_barley_beer",
+      "pl": "Piwo jęczmienne",
+      "en": "Barley Beer"
+    },
+    {
+      "key": "recipe.recipe_003_wheat_beer",
+      "pl": "Piwo pszeniczne",
+      "en": "Wheat Beer"
+    },
+    {
+      "key": "recipe.recipe_004_rye_beer",
+      "pl": "Piwo żytnie",
+      "en": "Rye Beer"
+    },
+    {
+      "key": "recipe.recipe_005_pale_ale",
+      "pl": "Jasne ale",
+      "en": "Pale Ale"
+    },
+    {
+      "key": "recipe.recipe_006_bitter_ale",
+      "pl": "Gorzkie ale",
+      "en": "Bitter Ale"
+    },
+    {
+      "key": "recipe.recipe_007_amber_ale",
+      "pl": "Bursztynowe ale",
+      "en": "Amber Ale"
+    },
+    {
+      "key": "recipe.recipe_008_red_ale",
+      "pl": "Czerwone ale",
+      "en": "Red Ale"
+    },
+    {
+      "key": "recipe.recipe_009_brown_ale",
+      "pl": "Brązowe ale",
+      "en": "Brown Ale"
+    },
+    {
+      "key": "recipe.recipe_010_mild_ale",
+      "pl": "Łagodne ale",
+      "en": "Mild Ale"
+    },
+    {
+      "key": "recipe.recipe_011_strong_ale",
+      "pl": "Mocne ale",
+      "en": "Strong Ale"
+    },
+    {
+      "key": "recipe.recipe_012_ipa",
+      "pl": "IPA",
+      "en": "IPA"
+    },
+    {
+      "key": "recipe.recipe_013_double_ipa",
+      "pl": "Podwójne IPA",
+      "en": "Double IPA"
+    },
+    {
+      "key": "recipe.recipe_014_wheat_ipa",
+      "pl": "Pszeniczne IPA",
+      "en": "Wheat IPA"
+    },
+    {
+      "key": "recipe.recipe_015_rye_ipa",
+      "pl": "Żytnie IPA",
+      "en": "Rye IPA"
+    },
+    {
+      "key": "recipe.recipe_016_porter",
+      "pl": "Porter",
+      "en": "Porter"
+    },
+    {
+      "key": "recipe.recipe_017_baltic_porter",
+      "pl": "Porter bałtycki",
+      "en": "Baltic Porter"
+    },
+    {
+      "key": "recipe.recipe_018_stout",
+      "pl": "Stout",
+      "en": "Stout"
+    },
+    {
+      "key": "recipe.recipe_019_honey_stout",
+      "pl": "Stout miodowy",
+      "en": "Honey Stout"
+    },
+    {
+      "key": "recipe.recipe_020_peated_stout",
+      "pl": "Stout torfowy",
+      "en": "Peated Stout"
+    },
+    {
+      "key": "recipe.recipe_021_fruit_beer",
+      "pl": "Piwo owocowe",
+      "en": "Fruit Beer"
+    },
+    {
+      "key": "recipe.recipe_022_plum_ale",
+      "pl": "Ale śliwkowe",
+      "en": "Plum Ale"
+    },
+    {
+      "key": "recipe.recipe_023_apple_ale",
+      "pl": "Ale jabłkowe",
+      "en": "Apple Ale"
+    },
+    {
+      "key": "recipe.recipe_024_grape_ale",
+      "pl": "Ale winogronowe",
+      "en": "Grape Ale"
+    },
+    {
+      "key": "recipe.recipe_025_orange_wheat_beer",
+      "pl": "Pszeniczne z pomarańczą",
+      "en": "Orange Wheat Beer"
+    },
+    {
+      "key": "recipe.recipe_026_herbal_saison",
+      "pl": "Saison ziołowy",
+      "en": "Herbal Saison"
+    },
+    {
+      "key": "recipe.recipe_027_spiced_saison",
+      "pl": "Saison korzenny",
+      "en": "Spiced Saison"
+    },
+    {
+      "key": "recipe.recipe_028_braggot",
+      "pl": "Braggot",
+      "en": "Braggot"
+    },
+    {
+      "key": "recipe.recipe_029_rye_kvass",
+      "pl": "Kwas żytni",
+      "en": "Rye Kvass"
+    },
+    {
+      "key": "recipe.recipe_030_oak_ale",
+      "pl": "Ale dębowe",
+      "en": "Oak Ale"
+    },
+    {
+      "key": "recipe.recipe_031_grain_wash",
+      "pl": "Surówka zbożowa",
+      "en": "Grain Wash"
+    },
+    {
+      "key": "recipe.recipe_032_barley_spirit",
+      "pl": "Destylat jęczmienny",
+      "en": "Barley Spirit"
+    },
+    {
+      "key": "recipe.recipe_033_wheat_spirit",
+      "pl": "Destylat pszeniczny",
+      "en": "Wheat Spirit"
+    },
+    {
+      "key": "recipe.recipe_034_rye_spirit",
+      "pl": "Destylat żytni",
+      "en": "Rye Spirit"
+    },
+    {
+      "key": "recipe.recipe_035_multi_grain_spirit",
+      "pl": "Destylat wielozbożowy",
+      "en": "Multi-Grain Spirit"
+    },
+    {
+      "key": "recipe.recipe_036_young_malt_whisky",
+      "pl": "Młoda whisky słodowa",
+      "en": "Young Malt Whisky"
+    },
+    {
+      "key": "recipe.recipe_037_wheat_whisky",
+      "pl": "Whisky pszeniczna",
+      "en": "Wheat Whisky"
+    },
+    {
+      "key": "recipe.recipe_038_rye_whisky",
+      "pl": "Whisky żytnia",
+      "en": "Rye Whisky"
+    },
+    {
+      "key": "recipe.recipe_039_blended_whisky",
+      "pl": "Whisky mieszana",
+      "en": "Blended Whisky"
+    },
+    {
+      "key": "recipe.recipe_040_malt_whisky",
+      "pl": "Whisky słodowa",
+      "en": "Malt Whisky"
+    },
+    {
+      "key": "recipe.recipe_041_double_oak_whisky",
+      "pl": "Whisky podwójnie dębowa",
+      "en": "Double Oak Whisky"
+    },
+    {
+      "key": "recipe.recipe_042_honey_whisky",
+      "pl": "Whisky miodowa",
+      "en": "Honey Whisky"
+    },
+    {
+      "key": "recipe.recipe_043_grape_whisky",
+      "pl": "Whisky winogronowa",
+      "en": "Grape Whisky"
+    },
+    {
+      "key": "recipe.recipe_044_orange_whisky",
+      "pl": "Whisky pomarańczowa",
+      "en": "Orange Whisky"
+    },
+    {
+      "key": "recipe.recipe_045_peated_whisky",
+      "pl": "Whisky torfowa",
+      "en": "Peated Whisky"
+    },
+    {
+      "key": "recipe.recipe_046_heavy_peated_whisky",
+      "pl": "Ciężka whisky torfowa",
+      "en": "Heavy Peated Whisky"
+    },
+    {
+      "key": "recipe.recipe_047_peated_rye_whisky",
+      "pl": "Torfowa whisky żytnia",
+      "en": "Peated Rye Whisky"
+    },
+    {
+      "key": "recipe.recipe_048_smoked_wheat_whisky",
+      "pl": "Dymna whisky pszeniczna",
+      "en": "Smoked Wheat Whisky"
+    },
+    {
+      "key": "recipe.recipe_049_grain_vodka",
+      "pl": "Wódka zbożowa",
+      "en": "Grain Vodka"
+    },
+    {
+      "key": "recipe.recipe_050_wheat_vodka",
+      "pl": "Wódka pszeniczna",
+      "en": "Wheat Vodka"
+    },
+    {
+      "key": "recipe.recipe_051_rye_vodka",
+      "pl": "Wódka żytnia",
+      "en": "Rye Vodka"
+    },
+    {
+      "key": "recipe.recipe_052_honey_vodka",
+      "pl": "Wódka miodowa",
+      "en": "Honey Vodka"
+    },
+    {
+      "key": "recipe.recipe_053_pepper_vodka",
+      "pl": "Pieprzówka",
+      "en": "Pepper Vodka"
+    },
+    {
+      "key": "recipe.recipe_054_orange_vodka",
+      "pl": "Wódka pomarańczowa",
+      "en": "Orange Vodka"
+    },
+    {
+      "key": "recipe.recipe_055_plum_vodka",
+      "pl": "Wódka śliwkowa",
+      "en": "Plum Vodka"
+    },
+    {
+      "key": "recipe.recipe_056_grain_anise_spirit",
+      "pl": "Anyżówka zbożowa",
+      "en": "Grain Anise Spirit"
+    },
+    {
+      "key": "recipe.recipe_057_oak_vodka",
+      "pl": "Wódka dębowa",
+      "en": "Oak Vodka"
+    },
+    {
+      "key": "recipe.recipe_058_herbal_grain_spirit",
+      "pl": "Destylat ziołowy",
+      "en": "Herbal Grain Spirit"
+    },
+    {
+      "key": "recipe.recipe_059_spiced_grain_spirit",
+      "pl": "Destylat korzenny",
+      "en": "Spiced Grain Spirit"
+    },
+    {
+      "key": "recipe.recipe_060_aged_grain_spirit",
+      "pl": "Stary destylat zbożowy",
+      "en": "Aged Grain Spirit"
+    },
+    {
+      "key": "recipe.recipe_061_mead",
+      "pl": "Miód pitny",
+      "en": "Mead"
+    },
+    {
+      "key": "recipe.recipe_062_dry_mead",
+      "pl": "Miód wytrawny",
+      "en": "Dry Mead"
+    },
+    {
+      "key": "recipe.recipe_063_sweet_mead",
+      "pl": "Miód słodki",
+      "en": "Sweet Mead"
+    },
+    {
+      "key": "recipe.recipe_064_heavy_mead",
+      "pl": "Miód ciężki",
+      "en": "Heavy Mead"
+    },
+    {
+      "key": "recipe.recipe_065_apple_mead",
+      "pl": "Miód jabłkowy",
+      "en": "Apple Mead"
+    },
+    {
+      "key": "recipe.recipe_066_plum_mead",
+      "pl": "Miód śliwkowy",
+      "en": "Plum Mead"
+    },
+    {
+      "key": "recipe.recipe_067_grape_mead",
+      "pl": "Miód winogronowy",
+      "en": "Grape Mead"
+    },
+    {
+      "key": "recipe.recipe_068_orange_mead",
+      "pl": "Miód pomarańczowy",
+      "en": "Orange Mead"
+    },
+    {
+      "key": "recipe.recipe_069_hopped_mead",
+      "pl": "Miód chmielony",
+      "en": "Hopped Mead"
+    },
+    {
+      "key": "recipe.recipe_070_juniper_mead",
+      "pl": "Miód jałowcowy",
+      "en": "Juniper Mead"
+    },
+    {
+      "key": "recipe.recipe_071_wormwood_mead",
+      "pl": "Miód piołunowy",
+      "en": "Wormwood Mead"
+    },
+    {
+      "key": "recipe.recipe_072_spiced_mead",
+      "pl": "Miód korzenny",
+      "en": "Spiced Mead"
+    },
+    {
+      "key": "recipe.recipe_073_anise_mead",
+      "pl": "Miód anyżowy",
+      "en": "Anise Mead"
+    },
+    {
+      "key": "recipe.recipe_074_pepper_mead",
+      "pl": "Miód pieprzowy",
+      "en": "Pepper Mead"
+    },
+    {
+      "key": "recipe.recipe_075_oak_mead",
+      "pl": "Miód dębowy",
+      "en": "Oak Mead"
+    },
+    {
+      "key": "recipe.recipe_076_peated_mead",
+      "pl": "Miód torfowy",
+      "en": "Peated Mead"
+    },
+    {
+      "key": "recipe.recipe_077_cane_wine",
+      "pl": "Wino trzcinowe",
+      "en": "Cane Wine"
+    },
+    {
+      "key": "recipe.recipe_078_molasses_wine",
+      "pl": "Wino melasowe",
+      "en": "Molasses Wine"
+    },
+    {
+      "key": "recipe.recipe_079_light_rum",
+      "pl": "Jasny rum",
+      "en": "Light Rum"
+    },
+    {
+      "key": "recipe.recipe_080_dark_rum",
+      "pl": "Ciemny rum",
+      "en": "Dark Rum"
+    },
+    {
+      "key": "recipe.recipe_081_oak_rum",
+      "pl": "Rum dębowy",
+      "en": "Oak Rum"
+    },
+    {
+      "key": "recipe.recipe_082_spiced_rum",
+      "pl": "Rum korzenny",
+      "en": "Spiced Rum"
+    },
+    {
+      "key": "recipe.recipe_083_orange_rum",
+      "pl": "Rum pomarańczowy",
+      "en": "Orange Rum"
+    },
+    {
+      "key": "recipe.recipe_084_honey_rum",
+      "pl": "Rum miodowy",
+      "en": "Honey Rum"
+    },
+    {
+      "key": "recipe.recipe_085_peated_rum",
+      "pl": "Rum torfowy",
+      "en": "Peated Rum"
+    },
+    {
+      "key": "recipe.recipe_086_fruit_wine",
+      "pl": "Wino owocowe",
+      "en": "Fruit Wine"
+    },
+    {
+      "key": "recipe.recipe_087_apple_cider",
+      "pl": "Cydr jabłkowy",
+      "en": "Apple Cider"
+    },
+    {
+      "key": "recipe.recipe_088_dry_cider",
+      "pl": "Cydr wytrawny",
+      "en": "Dry Cider"
+    },
+    {
+      "key": "recipe.recipe_089_sweet_cider",
+      "pl": "Cydr słodki",
+      "en": "Sweet Cider"
+    },
+    {
+      "key": "recipe.recipe_090_hopped_cider",
+      "pl": "Cydr chmielony",
+      "en": "Hopped Cider"
+    },
+    {
+      "key": "recipe.recipe_091_spiced_cider",
+      "pl": "Cydr korzenny",
+      "en": "Spiced Cider"
+    },
+    {
+      "key": "recipe.recipe_092_oak_cider",
+      "pl": "Cydr dębowy",
+      "en": "Oak Cider"
+    },
+    {
+      "key": "recipe.recipe_093_plum_wine",
+      "pl": "Wino śliwkowe",
+      "en": "Plum Wine"
+    },
+    {
+      "key": "recipe.recipe_094_sweet_plum_wine",
+      "pl": "Słodkie wino śliwkowe",
+      "en": "Sweet Plum Wine"
+    },
+    {
+      "key": "recipe.recipe_095_spiced_plum_wine",
+      "pl": "Korzenne wino śliwkowe",
+      "en": "Spiced Plum Wine"
+    },
+    {
+      "key": "recipe.recipe_096_smoked_plum_wine",
+      "pl": "Dymne wino śliwkowe",
+      "en": "Smoked Plum Wine"
+    },
+    {
+      "key": "recipe.recipe_097_grape_wine",
+      "pl": "Wino gronowe",
+      "en": "Grape Wine"
+    },
+    {
+      "key": "recipe.recipe_098_dry_grape_wine",
+      "pl": "Wytrawne wino gronowe",
+      "en": "Dry Grape Wine"
+    },
+    {
+      "key": "recipe.recipe_099_dessert_wine",
+      "pl": "Wino deserowe",
+      "en": "Dessert Wine"
+    },
+    {
+      "key": "recipe.recipe_100_honey_wine",
+      "pl": "Wino miodowe",
+      "en": "Honey Wine"
+    },
+    {
+      "key": "recipe.recipe_101_herbal_vermouth",
+      "pl": "Wermut ziołowy",
+      "en": "Herbal Vermouth"
+    },
+    {
+      "key": "recipe.recipe_102_spiced_vermouth",
+      "pl": "Wermut korzenny",
+      "en": "Spiced Vermouth"
+    },
+    {
+      "key": "recipe.recipe_103_oak_wine",
+      "pl": "Wino dębowe",
+      "en": "Oak Wine"
+    },
+    {
+      "key": "recipe.recipe_104_grape_orange_wine",
+      "pl": "Wino gronowo-pomarańczowe",
+      "en": "Grape-Orange Wine"
+    },
+    {
+      "key": "recipe.recipe_105_orange_ferment",
+      "pl": "Ferment pomarańczowy",
+      "en": "Orange Ferment"
+    },
+    {
+      "key": "recipe.recipe_106_bitter_orange_wine",
+      "pl": "Gorzkie wino pomarańczowe",
+      "en": "Bitter Orange Wine"
+    },
+    {
+      "key": "recipe.recipe_107_honey_orange_wine",
+      "pl": "Wino miodowo-pomarańczowe",
+      "en": "Honey-Orange Wine"
+    },
+    {
+      "key": "recipe.recipe_108_orchard_wine",
+      "pl": "Wino sadownicze",
+      "en": "Orchard Wine"
+    },
+    {
+      "key": "recipe.recipe_109_fruit_cuvee",
+      "pl": "Owocowe cuvée",
+      "en": "Fruit Cuvée"
+    },
+    {
+      "key": "recipe.recipe_110_fortified_fruit_wine",
+      "pl": "Wzmocnione wino owocowe",
+      "en": "Fortified Fruit Wine"
+    },
+    {
+      "key": "recipe.recipe_111_fruit_spirit",
+      "pl": "Destylat owocowy",
+      "en": "Fruit Spirit"
+    },
+    {
+      "key": "recipe.recipe_112_plum_brandy",
+      "pl": "Śliwowica",
+      "en": "Plum Brandy"
+    },
+    {
+      "key": "recipe.recipe_113_aged_plum_brandy",
+      "pl": "Stara śliwowica",
+      "en": "Aged Plum Brandy"
+    },
+    {
+      "key": "recipe.recipe_114_peated_plum_brandy",
+      "pl": "Śliwowica torfowa",
+      "en": "Peated Plum Brandy"
+    },
+    {
+      "key": "recipe.recipe_115_plum_honey_liqueur",
+      "pl": "Likier śliwkowo-miodowy",
+      "en": "Plum-Honey Liqueur"
+    },
+    {
+      "key": "recipe.recipe_116_spiced_plum_liqueur",
+      "pl": "Likier śliwkowy korzenny",
+      "en": "Spiced Plum Liqueur"
+    },
+    {
+      "key": "recipe.recipe_117_apple_spirit",
+      "pl": "Destylat jabłkowy",
+      "en": "Apple Spirit"
+    },
+    {
+      "key": "recipe.recipe_118_aged_apple_spirit",
+      "pl": "Stary destylat jabłkowy",
+      "en": "Aged Apple Spirit"
+    },
+    {
+      "key": "recipe.recipe_119_apple_honey_liqueur",
+      "pl": "Likier jabłkowo-miodowy",
+      "en": "Apple-Honey Liqueur"
+    },
+    {
+      "key": "recipe.recipe_120_peppered_apple_spirit",
+      "pl": "Pieprzny destylat jabłkowy",
+      "en": "Peppered Apple Spirit"
+    },
+    {
+      "key": "recipe.recipe_121_grape_brandy",
+      "pl": "Brandy winogronowa",
+      "en": "Grape Brandy"
+    },
+    {
+      "key": "recipe.recipe_122_aged_brandy",
+      "pl": "Stara brandy",
+      "en": "Aged Brandy"
+    },
+    {
+      "key": "recipe.recipe_123_grape_honey_liqueur",
+      "pl": "Likier winogronowo-miodowy",
+      "en": "Grape-Honey Liqueur"
+    },
+    {
+      "key": "recipe.recipe_124_herbal_pomace_brandy",
+      "pl": "Ziołowa brandy wytłokowa",
+      "en": "Herbal Pomace Brandy"
+    },
+    {
+      "key": "recipe.recipe_125_orange_spirit",
+      "pl": "Destylat pomarańczowy",
+      "en": "Orange Spirit"
+    },
+    {
+      "key": "recipe.recipe_126_orange_liqueur",
+      "pl": "Likier pomarańczowy",
+      "en": "Orange Liqueur"
+    },
+    {
+      "key": "recipe.recipe_127_bitter_orange_liqueur",
+      "pl": "Gorzki likier pomarańczowy",
+      "en": "Bitter Orange Liqueur"
+    },
+    {
+      "key": "recipe.recipe_128_orange_anise_liqueur",
+      "pl": "Likier pomarańczowo-anyżowy",
+      "en": "Orange-Anise Liqueur"
+    },
+    {
+      "key": "recipe.recipe_129_fruit_ratafia",
+      "pl": "Ratafia owocowa",
+      "en": "Fruit Ratafia"
+    },
+    {
+      "key": "recipe.recipe_130_plum_apple_brandy",
+      "pl": "Brandy śliwkowo-jabłkowa",
+      "en": "Plum-Apple Brandy"
+    },
+    {
+      "key": "recipe.recipe_131_grape_orange_aperitif",
+      "pl": "Aperitif winogronowo-pomarańczowy",
+      "en": "Grape-Orange Aperitif"
+    },
+    {
+      "key": "recipe.recipe_132_orchard_spirit",
+      "pl": "Destylat sadowniczy",
+      "en": "Orchard Spirit"
+    },
+    {
+      "key": "recipe.recipe_133_grain_fruit_spirit",
+      "pl": "Destylat zbożowo-owocowy",
+      "en": "Grain-Fruit Spirit"
+    },
+    {
+      "key": "recipe.recipe_134_honey_fruit_cordial",
+      "pl": "Owocowy kordiał miodowy",
+      "en": "Honey Fruit Cordial"
+    },
+    {
+      "key": "recipe.recipe_135_smoked_fruit_brandy",
+      "pl": "Dymna brandy owocowa",
+      "en": "Smoked Fruit Brandy"
+    },
+    {
+      "key": "recipe.recipe_136_grain_gin",
+      "pl": "Gin zbożowy",
+      "en": "Grain Gin"
+    },
+    {
+      "key": "recipe.recipe_137_dry_gin",
+      "pl": "Gin wytrawny",
+      "en": "Dry Gin"
+    },
+    {
+      "key": "recipe.recipe_138_sweetened_gin",
+      "pl": "Gin słodzony",
+      "en": "Sweetened Gin"
+    },
+    {
+      "key": "recipe.recipe_139_orange_gin",
+      "pl": "Gin pomarańczowy",
+      "en": "Orange Gin"
+    },
+    {
+      "key": "recipe.recipe_140_plum_gin",
+      "pl": "Gin śliwkowy",
+      "en": "Plum Gin"
+    },
+    {
+      "key": "recipe.recipe_141_grape_gin",
+      "pl": "Gin winogronowy",
+      "en": "Grape Gin"
+    },
+    {
+      "key": "recipe.recipe_142_honey_gin",
+      "pl": "Gin miodowy",
+      "en": "Honey Gin"
+    },
+    {
+      "key": "recipe.recipe_143_hopped_gin",
+      "pl": "Gin chmielowy",
+      "en": "Hopped Gin"
+    },
+    {
+      "key": "recipe.recipe_144_oak_gin",
+      "pl": "Gin dębowy",
+      "en": "Oak Gin"
+    },
+    {
+      "key": "recipe.recipe_145_peated_gin",
+      "pl": "Gin torfowy",
+      "en": "Peated Gin"
+    },
+    {
+      "key": "recipe.recipe_146_wormwood_spirit",
+      "pl": "Destylat piołunowy",
+      "en": "Wormwood Spirit"
+    },
+    {
+      "key": "recipe.recipe_147_absinthe",
+      "pl": "Absynt",
+      "en": "Absinthe"
+    },
+    {
+      "key": "recipe.recipe_148_honey_absinthe",
+      "pl": "Absynt miodowy",
+      "en": "Honey Absinthe"
+    },
+    {
+      "key": "recipe.recipe_149_orange_bitter",
+      "pl": "Bitter pomarańczowy",
+      "en": "Orange Bitter"
+    },
+    {
+      "key": "recipe.recipe_150_herbal_bitter",
+      "pl": "Bitter ziołowy",
+      "en": "Herbal Bitter"
+    },
+    {
+      "key": "recipe.recipe_151_pepper_bitter",
+      "pl": "Bitter pieprzowy",
+      "en": "Pepper Bitter"
+    },
+    {
+      "key": "recipe.recipe_152_herbal_liqueur",
+      "pl": "Likier ziołowy",
+      "en": "Herbal Liqueur"
+    },
+    {
+      "key": "recipe.recipe_153_grain_herbal_liqueur",
+      "pl": "Zbożowy likier ziołowy",
+      "en": "Grain Herbal Liqueur"
+    },
+    {
+      "key": "recipe.recipe_154_fruit_herbal_liqueur",
+      "pl": "Owocowy likier ziołowy",
+      "en": "Fruit Herbal Liqueur"
+    },
+    {
+      "key": "recipe.recipe_155_anise_liqueur",
+      "pl": "Likier anyżowy",
+      "en": "Anise Liqueur"
+    },
+    {
+      "key": "recipe.recipe_156_anise_spirit",
+      "pl": "Destylat anyżowy",
+      "en": "Anise Spirit"
+    },
+    {
+      "key": "recipe.recipe_157_pepper_liqueur",
+      "pl": "Likier pieprzowy",
+      "en": "Pepper Liqueur"
+    },
+    {
+      "key": "recipe.recipe_158_pepper_spirit",
+      "pl": "Destylat pieprzowy",
+      "en": "Pepper Spirit"
+    },
+    {
+      "key": "recipe.recipe_159_spiced_liqueur",
+      "pl": "Likier korzenny",
+      "en": "Spiced Liqueur"
+    },
+    {
+      "key": "recipe.recipe_160_spiced_fruit_cordial",
+      "pl": "Owocowy kordiał korzenny",
+      "en": "Spiced Fruit Cordial"
+    },
+    {
+      "key": "recipe.recipe_161_vanilla_liqueur",
+      "pl": "Likier waniliowy",
+      "en": "Vanilla Liqueur"
+    },
+    {
+      "key": "recipe.recipe_162_vanilla_mead",
+      "pl": "Miód waniliowy",
+      "en": "Vanilla Mead"
+    },
+    {
+      "key": "recipe.recipe_163_vanilla_orange_cordial",
+      "pl": "Kordiał waniliowo-pomarańczowy",
+      "en": "Vanilla-Orange Cordial"
+    },
+    {
+      "key": "recipe.recipe_164_tonka_liqueur",
+      "pl": "Likier tonka",
+      "en": "Tonka Liqueur"
+    },
+    {
+      "key": "recipe.recipe_165_dark_tonka_rum",
+      "pl": "Ciemny rum tonka",
+      "en": "Dark Tonka Rum"
+    },
+    {
+      "key": "recipe.recipe_166_oak_tonka_spirit",
+      "pl": "Dębowy destylat tonka",
+      "en": "Oak Tonka Spirit"
+    },
+    {
+      "key": "recipe.recipe_167_angelica_gin",
+      "pl": "Gin arcydzięglowy",
+      "en": "Angelica Gin"
+    },
+    {
+      "key": "recipe.recipe_168_angelica_liqueur",
+      "pl": "Likier arcydzięglowy",
+      "en": "Angelica Liqueur"
+    },
+    {
+      "key": "recipe.recipe_169_angelica_vermouth",
+      "pl": "Wermut arcydzięglowy",
+      "en": "Angelica Vermouth"
+    },
+    {
+      "key": "recipe.recipe_170_amber_tincture",
+      "pl": "Nalewka bursztynowa",
+      "en": "Amber Tincture"
+    },
+    {
+      "key": "recipe.recipe_171_amber_mead",
+      "pl": "Miód bursztynowy",
+      "en": "Amber Mead"
+    },
+    {
+      "key": "recipe.recipe_172_amber_oak_spirit",
+      "pl": "Bursztynowy destylat dębowy",
+      "en": "Amber Oak Spirit"
+    },
+    {
+      "key": "recipe.recipe_173_mastic_liqueur",
+      "pl": "Likier mastyksowy",
+      "en": "Mastic Liqueur"
+    },
+    {
+      "key": "recipe.recipe_174_grape_mastic_spirit",
+      "pl": "Winogronowy destylat mastyksowy",
+      "en": "Grape Mastic Spirit"
+    },
+    {
+      "key": "recipe.recipe_175_mastic_orange_cordial",
+      "pl": "Kordiał mastyksowo-pomarańczowy",
+      "en": "Mastic-Orange Cordial"
+    },
+    {
+      "key": "ingredient.ingredient_barley_common",
+      "pl": "Jęczmień",
+      "en": "Barley"
+    },
+    {
+      "key": "ingredient.ingredient_wheat_common",
+      "pl": "Pszenica",
+      "en": "Wheat"
+    },
+    {
+      "key": "ingredient.ingredient_rye_common",
+      "pl": "Żyto",
+      "en": "Rye"
+    },
+    {
+      "key": "ingredient.ingredient_honey_common",
+      "pl": "Miód",
+      "en": "Honey"
+    },
+    {
+      "key": "ingredient.ingredient_cane_sugar_common",
+      "pl": "Cukier trzcinowy",
+      "en": "Cane Sugar"
+    },
+    {
+      "key": "ingredient.ingredient_molasses_common",
+      "pl": "Melasa",
+      "en": "Molasses"
+    },
+    {
+      "key": "ingredient.ingredient_plum_common",
+      "pl": "Śliwka",
+      "en": "Plum"
+    },
+    {
+      "key": "ingredient.ingredient_apple_common",
+      "pl": "Jabłko",
+      "en": "Apple"
+    },
+    {
+      "key": "ingredient.ingredient_grape_common",
+      "pl": "Winogrona",
+      "en": "Grapes"
+    },
+    {
+      "key": "ingredient.ingredient_orange_common",
+      "pl": "Pomarańcza",
+      "en": "Orange"
+    },
+    {
+      "key": "ingredient.ingredient_juniper_rare",
+      "pl": "Jałowiec",
+      "en": "Juniper"
+    },
+    {
+      "key": "ingredient.ingredient_wormwood_rare",
+      "pl": "Piołun",
+      "en": "Wormwood"
+    },
+    {
+      "key": "ingredient.ingredient_anise_rare",
+      "pl": "Anyż",
+      "en": "Anise"
+    },
+    {
+      "key": "ingredient.ingredient_pepper_rare",
+      "pl": "Pieprz",
+      "en": "Pepper"
+    },
+    {
+      "key": "ingredient.ingredient_hops_rare",
+      "pl": "Chmiel",
+      "en": "Hops"
+    },
+    {
+      "key": "ingredient.ingredient_peat_rare",
+      "pl": "Torf",
+      "en": "Peat"
+    },
+    {
+      "key": "ingredient.ingredient_oak_rare",
+      "pl": "Dębina",
+      "en": "Oak"
+    },
+    {
+      "key": "ingredient.ingredient_angelica_epic",
+      "pl": "Arcydzięgiel",
+      "en": "Angelica"
+    },
+    {
+      "key": "ingredient.ingredient_vanilla_epic",
+      "pl": "Wanilia",
+      "en": "Vanilla"
+    },
+    {
+      "key": "ingredient.ingredient_tonka_epic",
+      "pl": "Tonka",
+      "en": "Tonka Bean"
+    },
+    {
+      "key": "ingredient.ingredient_amber_legendary",
+      "pl": "Bursztyn",
+      "en": "Amber"
+    },
+    {
+      "key": "ingredient.ingredient_mastic_legendary",
+      "pl": "Mastyks",
+      "en": "Mastic"
+    },
+    {
+      "key": "group.grain",
+      "pl": "Zboża",
+      "en": "Grains"
+    },
+    {
+      "key": "group.sweetener",
+      "pl": "Słodziwa",
+      "en": "Sweeteners"
+    },
+    {
+      "key": "group.fruit",
+      "pl": "Owoce",
+      "en": "Fruit"
+    },
+    {
+      "key": "group.herb",
+      "pl": "Zioła",
+      "en": "Herbs"
+    },
+    {
+      "key": "group.spice",
+      "pl": "Przyprawy",
+      "en": "Spices"
+    },
+    {
+      "key": "category.beer",
+      "pl": "Piwa",
+      "en": "Beer"
+    },
+    {
+      "key": "category.grain_spirit",
+      "pl": "Destylaty zbożowe",
+      "en": "Grain Spirits"
+    },
+    {
+      "key": "category.mead_sugar",
+      "pl": "Miody i destylaty cukrowe",
+      "en": "Mead & Sugar Spirits"
+    },
+    {
+      "key": "category.fruit_wine",
+      "pl": "Wina owocowe i cydry",
+      "en": "Fruit Wines & Ciders"
+    },
+    {
+      "key": "category.fruit_spirit",
+      "pl": "Destylaty i likiery owocowe",
+      "en": "Fruit Spirits & Liqueurs"
+    },
+    {
+      "key": "category.gin_herbal",
+      "pl": "Giny i trunki ziołowe",
+      "en": "Gin, Anise & Herbal"
+    },
+    {
+      "key": "category.special",
+      "pl": "Trunki specjalne",
+      "en": "Special"
+    },
+    {
+      "key": "tag.amber",
+      "pl": "bursztynowy",
+      "en": "Amber"
+    },
+    {
+      "key": "tag.angelica",
+      "pl": "arcydzięglowy",
+      "en": "Angelica"
+    },
+    {
+      "key": "tag.anise",
+      "pl": "anyżowy",
+      "en": "Anise"
+    },
+    {
+      "key": "tag.apple",
+      "pl": "jabłkowy",
+      "en": "Apple"
+    },
+    {
+      "key": "tag.barley",
+      "pl": "jęczmienny",
+      "en": "Barley"
+    },
+    {
+      "key": "tag.beer",
+      "pl": "piwo",
+      "en": "Beer"
+    },
+    {
+      "key": "tag.cane-sugar",
+      "pl": "trzcinowy",
+      "en": "Cane Sugar"
+    },
+    {
+      "key": "tag.fruit",
+      "pl": "owocowy",
+      "en": "Fruit"
+    },
+    {
+      "key": "tag.fruit-spirit",
+      "pl": "destylat owocowy",
+      "en": "Fruit Spirit"
+    },
+    {
+      "key": "tag.fruit-wine",
+      "pl": "wino owocowe",
+      "en": "Fruit Wine"
+    },
+    {
+      "key": "tag.gin",
+      "pl": "gin",
+      "en": "Gin"
+    },
+    {
+      "key": "tag.gin-herbal",
+      "pl": "gin i zioła",
+      "en": "Gin Herbal"
+    },
+    {
+      "key": "tag.grain",
+      "pl": "zbożowy",
+      "en": "Grain"
+    },
+    {
+      "key": "tag.grain-spirit",
+      "pl": "destylat zbożowy",
+      "en": "Grain Spirit"
+    },
+    {
+      "key": "tag.grape",
+      "pl": "winogronowy",
+      "en": "Grape"
+    },
+    {
+      "key": "tag.herb",
+      "pl": "zioła",
+      "en": "Herb"
+    },
+    {
+      "key": "tag.herbal",
+      "pl": "ziołowy",
+      "en": "Herbal"
+    },
+    {
+      "key": "tag.honey",
+      "pl": "miodowy",
+      "en": "Honey"
+    },
+    {
+      "key": "tag.hoppy",
+      "pl": "chmielony",
+      "en": "Hoppy"
+    },
+    {
+      "key": "tag.hops",
+      "pl": "chmiel",
+      "en": "Hops"
+    },
+    {
+      "key": "tag.juniper",
+      "pl": "jałowiec",
+      "en": "Juniper"
+    },
+    {
+      "key": "tag.mastic",
+      "pl": "mastyksowy",
+      "en": "Mastic"
+    },
+    {
+      "key": "tag.mead",
+      "pl": "miód pitny",
+      "en": "Mead"
+    },
+    {
+      "key": "tag.mead-sugar",
+      "pl": "miód i cukier",
+      "en": "Mead Sugar"
+    },
+    {
+      "key": "tag.molasses",
+      "pl": "melasowy",
+      "en": "Molasses"
+    },
+    {
+      "key": "tag.oak",
+      "pl": "dębowy",
+      "en": "Oak"
+    },
+    {
+      "key": "tag.oak-aged",
+      "pl": "starzony w dębie",
+      "en": "Oak Aged"
+    },
+    {
+      "key": "tag.orange",
+      "pl": "pomarańczowy",
+      "en": "Orange"
+    },
+    {
+      "key": "tag.peat",
+      "pl": "torf",
+      "en": "Peat"
+    },
+    {
+      "key": "tag.pepper",
+      "pl": "pieprzny",
+      "en": "Pepper"
+    },
+    {
+      "key": "tag.plum",
+      "pl": "śliwkowy",
+      "en": "Plum"
+    },
+    {
+      "key": "tag.prestige",
+      "pl": "prestiżowy",
+      "en": "Prestige"
+    },
+    {
+      "key": "tag.rum",
+      "pl": "rum",
+      "en": "Rum"
+    },
+    {
+      "key": "tag.rye",
+      "pl": "żytni",
+      "en": "Rye"
+    },
+    {
+      "key": "tag.smoky",
+      "pl": "dymny",
+      "en": "Smoky"
+    },
+    {
+      "key": "tag.special",
+      "pl": "specjalny",
+      "en": "Special"
+    },
+    {
+      "key": "tag.spice",
+      "pl": "przyprawy",
+      "en": "Spice"
+    },
+    {
+      "key": "tag.spiced",
+      "pl": "korzenny",
+      "en": "Spiced"
+    },
+    {
+      "key": "tag.sweetener",
+      "pl": "słodzony",
+      "en": "Sweetener"
+    },
+    {
+      "key": "tag.tonka",
+      "pl": "tonka",
+      "en": "Tonka"
+    },
+    {
+      "key": "tag.vanilla",
+      "pl": "waniliowy",
+      "en": "Vanilla"
+    },
+    {
+      "key": "tag.wheat",
+      "pl": "pszeniczny",
+      "en": "Wheat"
+    },
+    {
+      "key": "tag.whisky",
+      "pl": "whisky",
+      "en": "Whisky"
+    },
+    {
+      "key": "tag.wormwood",
+      "pl": "piołun",
+      "en": "Wormwood"
+    },
+    {
+      "key": "contract.contract_basic_category_a",
+      "pl": "Zamówienie regionalne",
+      "en": "Regional Order"
+    },
+    {
+      "key": "contract.contract_basic_category_b",
+      "pl": "Mała partia",
+      "en": "Small Batch"
+    },
+    {
+      "key": "contract.contract_basic_tag_a",
+      "pl": "Popularny styl",
+      "en": "Popular Style"
+    },
+    {
+      "key": "contract.contract_basic_tag_b",
+      "pl": "Próba smaku",
+      "en": "Taste Trial"
+    },
+    {
+      "key": "contract.contract_basic_source_experiment",
+      "pl": "Praca badawcza",
+      "en": "Research Work"
+    },
+    {
+      "key": "contract.contract_basic_source_production",
+      "pl": "Pewna dostawa",
+      "en": "Reliable Supply"
+    },
+    {
+      "key": "contract.contract_basic_common",
+      "pl": "Codzienna jakość",
+      "en": "Everyday Quality"
+    },
+    {
+      "key": "contract.contract_basic_rare",
+      "pl": "Lepsza partia",
+      "en": "Better Batch"
+    },
+    {
+      "key": "contract.contract_basic_group_a",
+      "pl": "Podstawowe surowce",
+      "en": "Core Materials"
+    },
+    {
+      "key": "contract.contract_basic_group_b",
+      "pl": "Dobór składników",
+      "en": "Ingredient Choice"
+    },
+    {
+      "key": "contract.contract_basic_ingredient_a",
+      "pl": "Stały składnik",
+      "en": "Staple Ingredient"
+    },
+    {
+      "key": "contract.contract_basic_discover",
+      "pl": "Pierwsze odkrycie",
+      "en": "First Discovery"
+    },
+    {
+      "key": "contract.contract_specialist_recipe_a",
+      "pl": "Specjalność zakładu",
+      "en": "House Specialty"
+    },
+    {
+      "key": "contract.contract_specialist_recipe_b",
+      "pl": "Powtórka mistrza",
+      "en": "Master's Repeat"
+    },
+    {
+      "key": "contract.contract_specialist_category_a",
+      "pl": "Kontrakt branżowy",
+      "en": "Trade Contract"
+    },
+    {
+      "key": "contract.contract_specialist_category_b",
+      "pl": "Wybrana kategoria",
+      "en": "Selected Category"
+    },
+    {
+      "key": "contract.contract_specialist_tag_a",
+      "pl": "Profil smakowy",
+      "en": "Flavor Profile"
+    },
+    {
+      "key": "contract.contract_specialist_tag_b",
+      "pl": "Styl destylarni",
+      "en": "Distillery Style"
+    },
+    {
+      "key": "contract.contract_specialist_ingredient_a",
+      "pl": "Ekspertyza surowcowa",
+      "en": "Ingredient Expertise"
+    },
+    {
+      "key": "contract.contract_specialist_ingredient_b",
+      "pl": "Wybrany surowiec",
+      "en": "Chosen Material"
+    },
+    {
+      "key": "contract.contract_specialist_group_a",
+      "pl": "Rodzina składników",
+      "en": "Ingredient Family"
+    },
+    {
+      "key": "contract.contract_specialist_group_b",
+      "pl": "Specjalizacja grupowa",
+      "en": "Group Specialty"
+    },
+    {
+      "key": "contract.contract_specialist_experiment",
+      "pl": "Seria eksperymentów",
+      "en": "Experiment Series"
+    },
+    {
+      "key": "contract.contract_specialist_production",
+      "pl": "Seria produkcyjna",
+      "en": "Production Run"
+    },
+    {
+      "key": "contract.contract_prestige_epic",
+      "pl": "Epicka jakość",
+      "en": "Epic Quality"
+    },
+    {
+      "key": "contract.contract_prestige_legendary",
+      "pl": "Legendarne zamówienie",
+      "en": "Legendary Order"
+    },
+    {
+      "key": "contract.contract_prestige_recipe_rare",
+      "pl": "Receptura wyborna",
+      "en": "Fine Recipe"
+    },
+    {
+      "key": "contract.contract_prestige_recipe_epic",
+      "pl": "Receptura epicka",
+      "en": "Epic Recipe"
+    },
+    {
+      "key": "contract.contract_prestige_distinct_a",
+      "pl": "Kolekcja kategorii",
+      "en": "Category Collection"
+    },
+    {
+      "key": "contract.contract_prestige_distinct_b",
+      "pl": "Kolekcja stylu",
+      "en": "Style Collection"
+    },
+    {
+      "key": "contract.contract_prestige_discover_a",
+      "pl": "Wielkie odkrycia",
+      "en": "Great Discoveries"
+    },
+    {
+      "key": "contract.contract_prestige_discover_target",
+      "pl": "Poszukiwana receptura",
+      "en": "Sought Recipe"
+    },
+    {
+      "key": "contract.contract_prestige_record_a",
+      "pl": "Pobicie rekordu",
+      "en": "Record Breaker"
+    },
+    {
+      "key": "contract.contract_prestige_record_b",
+      "pl": "Seria rekordów",
+      "en": "Record Streak"
+    },
+    {
+      "key": "contract.contract_prestige_epic_ingredient",
+      "pl": "Epicki surowiec",
+      "en": "Epic Material"
+    },
+    {
+      "key": "contract.contract_prestige_prestige_tag",
+      "pl": "Prestiżowa partia",
+      "en": "Prestige Batch"
+    }
   ]
 }

@@ -1,0 +1,24 @@
+{
+  "groups": [
+    {
+      "id": "grain",
+      "displayName": "Grains"
+    },
+    {
+      "id": "sweetener",
+      "displayName": "Sweeteners"
+    },
+    {
+      "id": "fruit",
+      "displayName": "Fruit"
+    },
+    {
+      "id": "herb",
+      "displayName": "Herbs"
+    },
+    {
+      "id": "spice",
+      "displayName": "Spices"
+    }
+  ]
+}

@@ -224,7 +224,8 @@ namespace DistilleryDiscovery
             game.UpdateTime(); PrepareTextView(FooterMode.Delivery);
             var remaining = game.TimeUntilNextFreeDelivery;
             var timer = game.State.availableFreeDeliveries >= game.Config.Economy.maxStoredFreeDeliveries ? "MAX" : FormatDuration(remaining);
-            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.delivery", "FREE DELIVERY")}</b></color>\n\nAvailable: <b>{game.State.availableFreeDeliveries}/{game.Config.Economy.maxStoredFreeDeliveries}</b>\nNext: <b>{timer}</b>\nItems per delivery: <b>{game.Config.Economy.freeDeliveryMinItems}–{game.Config.Economy.freeDeliveryMaxItems}</b>";
+            var rolls = game.Config.Economy.deliveryPools.FirstOrDefault()?.rolls ?? 0;
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.delivery", "FREE DELIVERY")}</b></color>\n\nAvailable: <b>{game.State.availableFreeDeliveries}/{game.Config.Economy.maxStoredFreeDeliveries}</b>\nNext: <b>{timer}</b>\nRolls per delivery: <b>{rolls}</b>";
             SetStatus(game.State.availableFreeDeliveries > 0 ? "Free delivery ready to claim" : "Waiting for the next free delivery");
         }
 
@@ -254,7 +255,7 @@ namespace DistilleryDiscovery
                     var mastery = game.MasteryLevel(recipe.id);
                     var next = game.Config.NextMasteryLevel(state.timesCreated);
                     var progress = next == null ? T("ui.mastery.maximum", "Maximum level reached") : F("ui.mastery.to_next", "To next level: {0}", next.requiredProductionCount - state.timesCreated);
-                    sb.Append($"◆  <b>{RecipeName(recipe.id)}</b>\n    {T("ui.label.record", "Record")}: <color={rarity.colorHex}>{RarityName(rarity.id)}</color>\n    {T("ui.label.created", "Created")}: {state.timesCreated}\n    {T("ui.label.mastery", "Mastery")}: <b>{MasteryName(mastery)}</b>\n    {progress}\n    {T("ui.label.discovered_ingredients", "Discovered ingredients")}: {string.Join(", ", state.revealedIngredientIds.Select(IngredientName))}\n\n");
+                    sb.Append($"◆  <b>{RecipeName(recipe.id)}</b>\n    {CategoryName(recipe.categoryId)} · {DescribeRecipeRequirements(recipe)}\n    {T("ui.label.record", "Record")}: <color={rarity.colorHex}>{RarityName(rarity.id)}</color>\n    {T("ui.label.created", "Created")}: {state.timesCreated}\n    {T("ui.label.mastery", "Mastery")}: <b>{MasteryName(mastery)}</b>\n    {progress}\n    {T("ui.label.discovered_ingredients", "Discovered ingredients")}: {string.Join(", ", state.revealedIngredientIds.Select(IngredientName))}\n\n");
                 }
             }
             contentText.text = sb.ToString();
@@ -278,8 +279,8 @@ namespace DistilleryDiscovery
         private void SelectProductionRecipe(string recipeId)
         {
             selectedProductionRecipeId = recipeId; selection.Clear(); UpdateSelection();
-            SetStatus(F("ui.status.chosen_recipe", "Recipe: {0}. Select three ingredients.", RecipeName(recipeId)));
-            ShowIngredientTiles(game.Config.Ingredients.Where(i => i.outcomeWeights.Any(x => x.recipeId == recipeId && x.weight > 0)));
+            SetStatus(F("ui.status.chosen_recipe", "Recipe: {0}. Select three ingredients.", RecipeName(recipeId)) + " " + DescribeRecipeRequirements(game.Config.Recipe(recipeId)));
+            ShowIngredientTiles(game.Config.Ingredients.Where(i => i.enabled));
         }
 
         private void ShowIngredientTiles(IEnumerable<IngredientDefinition> ingredients)
@@ -314,7 +315,7 @@ namespace DistilleryDiscovery
             if (game.State.AmountOf(ingredientId) <= selection.Count(x => x == ingredientId)) { SetStatus(T("ui.error.no_ingredient", "No more of this ingredient.")); return; }
             selection.Add(ingredientId); UpdateSelection();
             if (footerMode == FooterMode.Experiment) ShowIngredientTiles(game.Config.Ingredients);
-            else ShowIngredientTiles(game.Config.Ingredients.Where(i => i.outcomeWeights.Any(x => x.recipeId == selectedProductionRecipeId && x.weight > 0)));
+            else ShowIngredientTiles(game.Config.Ingredients.Where(i => i.enabled));
         }
 
         private void ShowContracts()
@@ -323,8 +324,10 @@ namespace DistilleryDiscovery
             var sb = new StringBuilder($"<color=#F2AD2E><b>{T("ui.heading.contracts", "ACTIVE CONTRACTS")}</b></color>\n\n");
             foreach (var state in game.State.activeContracts)
             {
-                var contract = game.Config.Contract(state.contractId);
-                sb.Append($"<b>{ContractName(contract.id)}</b>\n{DescribeRequirement(contract)}\n{T("ui.label.progress", "Progress")}: <b>{state.progress}/{contract.amount}</b> · {T("ui.label.reward", "Reward")}: <b>{ContractRewardDescription(contract)}</b>\n\n");
+                var template = game.Config.ContractTemplate(state.templateId);
+                sb.Append($"<b>[{state.role.ToUpperInvariant()}] {ContractName(state.templateId)}</b>\n{DescribeRequirement(state)}\n{T("ui.label.progress", "Progress")}: <b>{state.progress}/{state.amount}</b>");
+                if (state.objectiveType == ContractObjectiveType.DistinctRecipes) sb.Append($" ({state.seenRecipeIds.Count} distinct)");
+                sb.Append($" · {T("ui.label.reward", "Reward")}: <b>{ContractRewardDescription(state, template)}</b>\n\n");
             }
             contentText.text = sb.ToString();
         }
@@ -373,7 +376,7 @@ namespace DistilleryDiscovery
         {
             var pending = game.State.pendingResult; if (pending == null) return;
             var completed = pending.contractProgress.Where(x => x.completed).ToList();
-            var contractGold = completed.Sum(x => game.Config.Contract(x.contractId)?.goldReward ?? 0);
+            var contractGold = completed.Sum(x => game.State.ContractState(x.contractId)?.goldReward ?? 0);
             var sb = new StringBuilder();
             sb.Append($"<color=#F2AD2E><b>{(pending.source == "experiment" ? T("ui.heading.experiment_result", "EXPERIMENT RESULT") : T("ui.heading.production_result", "PRODUCTION COMPLETE"))}</b></color>\n\n");
             sb.Append($"{T("ui.label.created_product", "Product")}: <b>{RecipeName(pending.recipeId)}</b>\n{T("ui.label.quality", "Rarity")}: <b>{RarityName(pending.rarityId)}</b>\n{T("ui.label.reward", "Reward")}: <b>{pending.saleValue} {T("ui.label.gold_lower", "gold")}</b>\n");
@@ -383,9 +386,9 @@ namespace DistilleryDiscovery
             if (pending.contractProgress.Count == 0) sb.Append(T("ui.pending.no_progress", "No contract progress.") + "\n");
             foreach (var change in pending.contractProgress)
             {
-                var contract = game.Config.Contract(change.contractId);
-                sb.Append($"{ContractName(change.contractId)}: <b>{change.currentProgress}/{contract.amount}</b>");
-                if (change.completed) sb.Append($"  <color=#63D889><b>+{ContractRewardDescription(contract)}</b></color>");
+                var contract = game.State.ContractState(change.contractId);
+                sb.Append($"{ContractName(contract?.templateId)}: <b>{change.currentProgress}/{contract?.amount}</b>");
+                if (change.completed) sb.Append($"  <color=#63D889><b>+{ContractRewardDescription(contract, game.Config.ContractTemplate(contract?.templateId))}</b></color>");
                 sb.Append("\n");
             }
             if (completed.Count > 0) sb.Append($"\n<b>{T("ui.pending.contract_bonus", "Contract bonus")}: +{contractGold} {T("ui.label.gold_lower", "gold")}</b>\n");
@@ -435,7 +438,7 @@ namespace DistilleryDiscovery
         {
             selection.Clear(); UpdateSelection();
             if (footerMode == FooterMode.Experiment) ShowIngredientTiles(game.Config.Ingredients);
-            else if (footerMode == FooterMode.Production && !string.IsNullOrEmpty(selectedProductionRecipeId)) ShowIngredientTiles(game.Config.Ingredients.Where(i => i.outcomeWeights.Any(x => x.recipeId == selectedProductionRecipeId && x.weight > 0)));
+            else if (footerMode == FooterMode.Production && !string.IsNullOrEmpty(selectedProductionRecipeId)) ShowIngredientTiles(game.Config.Ingredients.Where(i => i.enabled));
         }
 
         private void DispatchSecondary()
@@ -478,13 +481,35 @@ namespace DistilleryDiscovery
             UpdateSelection();
         }
 
-        private string DescribeRequirement(ContractDefinition contract) => contract.requirementType switch
+        private string DescribeRequirement(ActiveContractState contract)
         {
-            ContractRequirementType.Recipe => F("ui.contract.recipe", "Create {0} × {1}", contract.amount, RecipeName(contract.targetId)),
-            ContractRequirementType.Rarity => F("ui.contract.rarity", "Create {0} × {1} product", contract.amount, RarityName(contract.targetId)),
-            ContractRequirementType.Category => F("ui.contract.category", "Create {0} × {1}", contract.amount, CategoryName(contract.targetId)),
-            _ => contract.targetId
-        };
+            var target = contract.objectiveType switch
+            {
+                ContractObjectiveType.Recipe or ContractObjectiveType.RecipeMinRarity => RecipeName(contract.targetId),
+                ContractObjectiveType.Category => CategoryName(contract.targetId),
+                ContractObjectiveType.Rarity => RarityName(contract.targetId),
+                ContractObjectiveType.Ingredient => IngredientName(contract.targetId),
+                ContractObjectiveType.Group => GroupName(contract.targetId),
+                ContractObjectiveType.Tag => TagName(contract.targetId),
+                ContractObjectiveType.DistinctRecipes => string.IsNullOrEmpty(contract.targetId) ? "any" : game.Config.Category(contract.targetId) != null ? CategoryName(contract.targetId) : TagName(contract.targetId),
+                ContractObjectiveType.Source => contract.targetId,
+                ContractObjectiveType.Discover => string.IsNullOrEmpty(contract.targetId) ? "new recipes" : RecipeName(contract.targetId),
+                ContractObjectiveType.ImproveRecord => string.IsNullOrEmpty(contract.targetId) ? "any recipe" : RecipeName(contract.targetId),
+                _ => contract.targetId
+            };
+            var quality = string.IsNullOrEmpty(contract.minRarityId) ? "" : $" · min {RarityName(contract.minRarityId)}";
+            var source = string.IsNullOrEmpty(contract.source) ? "" : $" · {contract.source}";
+            return $"{contract.objectiveType}: {target} × {contract.amount}{quality}{source}";
+        }
+
+        private string DescribeRecipeRequirements(RecipeDefinition recipe) => string.Join(" + ", recipe.requirements.Select(x => x.type switch
+        {
+            RecipeRequirementType.Ingredient => $"{x.count}× {IngredientName(x.ingredientId)}",
+            RecipeRequirementType.Group => $"{x.count}× {GroupName(x.groupId)}",
+            RecipeRequirementType.DistinctGroup => $"{x.count} distinct {GroupName(x.groupId)}",
+            RecipeRequirementType.AnyOf => $"{x.count}× ({string.Join(" / ", x.ingredientIds.Select(IngredientName))})",
+            _ => x.type
+        }));
 
         private void RefreshHeaderCounters()
         {
@@ -511,10 +536,11 @@ namespace DistilleryDiscovery
         private static string FormatDuration(TimeSpan duration) { if (duration < TimeSpan.Zero) duration = TimeSpan.Zero; return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}:{duration.Seconds:00}"; }
 
         private string MasteryName(MasteryLevelDefinition level) => level == null ? "—" : game.Config.Text($"mastery.{level.id}", Language, level.displayName);
-        private string ContractRewardDescription(ContractDefinition contract)
+        private string ContractRewardDescription(ActiveContractState contract, ContractTemplateDefinition template)
         {
+            if (contract == null) return "—";
             var rewards = new List<string> { $"{contract.goldReward} {T("ui.label.gold_lower", "gold")}" };
-            rewards.AddRange((contract.ingredientRewards ?? new List<IngredientRewardDefinition>()).Select(x => $"{x.minAmount}–{x.maxAmount} {IngredientName(x.ingredientId)}"));
+            if (template?.ingredientRewards?.Count > 0) rewards.Add("weighted ingredients");
             return string.Join(" + ", rewards);
         }
 
@@ -524,7 +550,9 @@ namespace DistilleryDiscovery
         private string RecipeName(string id) => game.Config.Text($"recipe.{id}", Language, game.Config.Recipe(id)?.displayName ?? id);
         private string RarityName(string id) => game.Config.Text($"rarity.{id}", Language, game.Config.Rarity(id)?.displayName ?? id);
         private string CategoryName(string id) => game.Config.Text($"category.{id}", Language, game.Config.Category(id)?.displayName ?? id);
-        private string ContractName(string id) => game.Config.Text($"contract.{id}", Language, game.Config.Contract(id)?.displayName ?? id);
+        private string GroupName(string id) => game.Config.Text($"group.{id}", Language, game.Config.Group(id)?.displayName ?? id);
+        private string TagName(string id) => game.Config.Text($"tag.{id}", Language, id);
+        private string ContractName(string id) => game.Config.Text($"contract.{id}", Language, game.Config.ContractTemplate(id)?.displayName ?? id);
         private void UpdateSelection() { if (selectionText != null) selectionText.text = T("ui.label.selected", "Selected") + ": " + (selection.Count == 0 ? "—" : string.Join(" + ", selection.Select(IngredientName))) + $"  ({selection.Count}/3)"; }
         private float Completion() => game.Config.Recipes.Count == 0 ? 0 : 100f * game.State.recipes.Count / game.Config.Recipes.Count;
         private void SetStatus(string value) => statusText.text = value;

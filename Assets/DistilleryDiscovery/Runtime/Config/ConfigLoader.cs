@@ -8,6 +8,7 @@ namespace DistilleryDiscovery
         {
             var rarities = Load<RarityFile>("GameData/rarities");
             var ingredients = Load<IngredientFile>("GameData/ingredients");
+            var groups = Load<IngredientGroupFile>("GameData/ingredient_groups");
             var recipes = Load<RecipeFile>("GameData/recipes");
             var economy = Load<EconomyDefinition>("GameData/economy");
             var categories = Load<RecipeCategoryFile>("GameData/categories");
@@ -16,7 +17,7 @@ namespace DistilleryDiscovery
             var localization = Load<LocalizationFile>("GameData/localization");
             var mastery = Load<MasteryFile>("GameData/mastery");
             var config = new GameConfig(rarities.rarities, ingredients.ingredients, recipes.recipes, economy,
-                categories.categories, laboratories.levels, contracts.contracts, localization.entries, mastery.levels);
+                categories.categories, laboratories.levels, contracts.templates, localization.entries, mastery.levels, groups.groups);
             ConfigValidator.ValidateOrThrow(config);
             return config;
         }

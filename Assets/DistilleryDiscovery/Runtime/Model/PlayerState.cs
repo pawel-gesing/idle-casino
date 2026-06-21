@@ -15,8 +15,18 @@ namespace DistilleryDiscovery
 
     [Serializable] public sealed class ActiveContractState
     {
-        public string contractId;
+        public string instanceId;
+        public string templateId;
+        public string role;
+        public string objectiveType;
+        public string targetId;
+        public string minRarityId;
+        public string source;
+        public int amount;
         public int progress;
+        public int goldReward;
+        public List<string> seenRecipeIds = new();
+        public string generatedAtUtc;
     }
 
     [Serializable] public sealed class PendingContractProgress
@@ -36,6 +46,7 @@ namespace DistilleryDiscovery
         public bool wasDiscovered;
         public bool rarityImproved;
         public List<PendingContractProgress> contractProgress = new();
+        public List<string> ingredientIds = new();
     }
 
     [Serializable] public sealed class PlayerRecipeState
@@ -63,7 +74,7 @@ namespace DistilleryDiscovery
 
     [Serializable] public sealed class PlayerState
     {
-        public int version = 7;
+        public int version = 8;
         public int gold;
         public int experimentsCompleted;
         public int productionsCompleted;
@@ -77,6 +88,8 @@ namespace DistilleryDiscovery
         public int availableFreeDeliveries;
         public List<LaboratoryJobState> laboratoryJobs = new();
         public string lastSavedAtUtc;
+        public int freeContractRerollsRemaining;
+        public string contractRefreshUtc;
 
         public List<ProductEntry> products = new();
         // Legacy version 2 field. It is emptied when GameService normalizes the save.
@@ -84,7 +97,7 @@ namespace DistilleryDiscovery
 
         public int AmountOf(string id) => inventory.Find(x => x.ingredientId == id)?.amount ?? 0;
         public PlayerRecipeState RecipeState(string id) => recipes.Find(x => x.recipeId == id);
-        public ActiveContractState ContractState(string id) => activeContracts.Find(x => x.contractId == id);
+        public ActiveContractState ContractState(string id) => activeContracts.Find(x => x.instanceId == id);
         public int ProductAmount(string recipeId, string rarityId) =>
             products.Find(x => x.recipeId == recipeId && x.rarityId == rarityId)?.amount ?? 0;
 
@@ -104,6 +117,29 @@ namespace DistilleryDiscovery
     }
 
     public sealed class OutcomeChance { public string RecipeId; public int Weight; public float Probability; }
+    public sealed class ProductionEvent
+    {
+        public string RecipeId { get; }
+        public string RarityId { get; }
+        public string CategoryId { get; }
+        public IReadOnlyList<string> Tags { get; }
+        public IReadOnlyList<string> IngredientIds { get; }
+        public IReadOnlyList<string> GroupIds { get; }
+        public string Source { get; }
+        public bool WasDiscovered { get; }
+        public bool RarityImproved { get; }
+
+        public ProductionEvent(string recipeId, string rarityId, string categoryId, IReadOnlyList<string> tags,
+            IReadOnlyList<string> ingredientIds, IReadOnlyList<string> groupIds, string source,
+            bool wasDiscovered, bool rarityImproved)
+        {
+            RecipeId = recipeId; RarityId = rarityId; CategoryId = categoryId;
+            Tags = tags == null ? Array.Empty<string>() : new List<string>(tags).AsReadOnly();
+            IngredientIds = ingredientIds == null ? Array.Empty<string>() : new List<string>(ingredientIds).AsReadOnly();
+            GroupIds = groupIds == null ? Array.Empty<string>() : new List<string>(groupIds).AsReadOnly();
+            Source = source; WasDiscovered = wasDiscovered; RarityImproved = rarityImproved;
+        }
+    }
     public sealed class DeliveryResult { public readonly Dictionary<string, int> Items = new(); }
     public class ProductResult { public string RecipeId; public string RarityId; public int SaleValue; }
     public sealed class ExperimentResult : ProductResult { public bool WasDiscovered; public bool RarityImproved; }

@@ -139,7 +139,7 @@ namespace DistilleryDiscovery.Tests
             var config = MinimalConfig(); var clock = new ManualTime();
             var old = new PlayerState { version = 5, gold = 777 }; old.AddIngredient("ingredient_test", 9); Discover(old);
             var game = new GameService(config, old, new MinRandom(), clock);
-            Assert.That(game.State.version, Is.EqualTo(7));
+            Assert.That(game.State.version, Is.EqualTo(8));
             Assert.That(game.State.gold, Is.EqualTo(777));
             Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(9));
             Assert.That(game.State.RecipeState("recipe_test"), Is.Not.Null);
@@ -183,6 +183,17 @@ namespace DistilleryDiscovery.Tests
             var (game, clock) = CreateGame(3); game.StartExperiment(Three()); clock.AdvanceSeconds(30); var result = game.CollectAll();
             Assert.That(result.ProductsAdded, Is.EqualTo(1));
             Assert.That(game.State.products.Sum(x => x.amount), Is.EqualTo(1));
+        }
+
+        [Test] public void CollectAll_UsesTheSameProgressAndRewardFlowAsIndividualClaim()
+        {
+            var (single, singleClock) = CreateGame(3); var singleJob = single.StartExperiment(Three()); singleClock.AdvanceSeconds(30);
+            single.ClaimLaboratoryJob(singleJob.id); var singleReward = single.ClaimPendingResult();
+            var (batch, batchClock) = CreateGame(3); batch.StartExperiment(Three()); batchClock.AdvanceSeconds(30); var batchResult = batch.CollectAll();
+            Assert.That(batchResult.GoldGained, Is.EqualTo(singleReward.TotalGold));
+            Assert.That(batch.State.experimentsCompleted, Is.EqualTo(single.State.experimentsCompleted));
+            Assert.That(batch.State.RecipeState("recipe_test").timesCreated, Is.EqualTo(single.State.RecipeState("recipe_test").timesCreated));
+            Assert.That(batch.State.products.Sum(x => x.amount), Is.EqualTo(single.State.products.Sum(x => x.amount)));
         }
 
         [Test] public void OfflineSummary_ReportsAccumulatedDeliveries()
@@ -249,7 +260,7 @@ namespace DistilleryDiscovery.Tests
         [Test] public void Preview_SumsWeightsWithoutConsumingInventory()
         {
             var (game, _) = CreateGame(3); var preview = game.Preview(Three());
-            Assert.That(preview.Single().Weight, Is.EqualTo(30));
+            Assert.That(preview.Single().Weight, Is.EqualTo(10));
             Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(3));
         }
 
@@ -259,7 +270,7 @@ namespace DistilleryDiscovery.Tests
             Assert.Throws<InvalidOperationException>(() => game.StartProduction("recipe_test", Three()));
         }
 
-        [Test] public void Production_RejectsNonContributingIngredientWithoutConsumingAny()
+        [Test] public void Production_RejectsSelectionMissingRequiredCountWithoutConsumingAny()
         {
             var (game, _) = CreateGame(2); Discover(game); game.State.AddIngredient("ingredient_invalid", 1);
             Assert.Throws<InvalidOperationException>(() => game.StartProduction("recipe_test", new[] { "ingredient_test", "ingredient_test", "ingredient_invalid" }));
@@ -296,7 +307,7 @@ namespace DistilleryDiscovery.Tests
 
         [Test] public void CompletedContract_IsPaidWithProductReward()
         {
-            var (game, clock) = CreateGame(3); game.State.activeContracts.Add(new ActiveContractState { contractId = "contract_recipe" });
+            var (game, clock) = CreateGame(3); game.State.activeContracts.Add(new ActiveContractState { instanceId = "contract_recipe", templateId = "contract_recipe", role = ContractRole.Basic, objectiveType = ContractObjectiveType.Recipe, targetId = "recipe_test", amount = 1, goldReward = 40 });
             var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id); var claim = game.ClaimPendingResult();
             Assert.That(claim.ContractGold, Is.EqualTo(40));
             Assert.That(claim.CompletedContractIds, Does.Contain("contract_recipe"));
@@ -323,16 +334,16 @@ namespace DistilleryDiscovery.Tests
         {
             var rarities = new List<RarityDefinition> { new() { id = "rarity_common", rank = 1, valueMultiplier = 1f }, new() { id = "rarity_rare", rank = 2, valueMultiplier = 2f } };
             var ingredients = new List<IngredientDefinition> {
-                new() { id = "ingredient_test", displayName = "Test", rarityId = "rarity_common", outcomeWeights = new List<OutcomeWeight> { new() { recipeId = "recipe_test", weight = 10 } } },
+                new() { id = "ingredient_test", displayName = "Test", rarityId = "rarity_common", groupId = "group_test" },
                 new() { id = "ingredient_invalid", displayName = "Invalid", rarityId = "rarity_common" }
             };
-            var recipes = new List<RecipeDefinition> { new() { id = "recipe_test", categoryId = "category_test", collectionRarityId = "rarity_common", baseValue = 10 } };
+            var recipes = new List<RecipeDefinition> { new() { id = "recipe_test", categoryId = "category_test", collectionRarityId = "rarity_common", baseValue = 10, baseWeight = 10, tags = new List<string> { "test" }, requirements = new List<RecipeRequirementClause> { new() { type = RecipeRequirementType.Ingredient, ingredientId = "ingredient_test", count = 3 } } } };
             var economy = new EconomyDefinition {
                 ingredientsPerExperiment = 3, ingredientsPerProduction = 3, activeContractCount = 0,
-                freeDeliveryIntervalSeconds = 60, freeDeliveryMinItems = 2, freeDeliveryMaxItems = 2, maxStoredFreeDeliveries = 3,
+                freeDeliveryIntervalSeconds = 60, maxStoredFreeDeliveries = 3, contractRefreshSeconds = 86400,
                 experimentDurationSeconds = 30, productionDurationSeconds = 20,
                 productRarityWeights = new List<WeightedRarity> { new() { rarityId = "rarity_common", weight = 100 }, new() { rarityId = "rarity_rare", weight = 100 } },
-                deliveryPools = new List<DeliveryPool> { new() { id = "pool_base", rolls = 99, entries = new List<DeliveryEntry> { new() { ingredientId = "ingredient_test", weight = 1, minAmount = 1, maxAmount = 1 } } } }
+                deliveryPools = new List<DeliveryPool> { new() { id = "pool_base", rolls = 2, entries = new List<DeliveryEntry> { new() { ingredientId = "ingredient_test", weight = 1, minAmount = 1, maxAmount = 1 } } } }
             };
             return new GameConfig(rarities, ingredients, recipes, economy,
                 new List<RecipeCategoryDefinition> { new() { id = "category_test" } },
@@ -341,8 +352,9 @@ namespace DistilleryDiscovery.Tests
                     new() { level = 2, upgradeCost = 10, experimentSlots = 2, productionSlots = 1, experimentTimeMultiplier = .9f, productionTimeMultiplier = 1f },
                     new() { level = 3, upgradeCost = 20, experimentSlots = 2, productionSlots = 2, experimentTimeMultiplier = .8f, productionTimeMultiplier = .75f }
                 },
-                new List<ContractDefinition> { new() { id = "contract_recipe", requirementType = ContractRequirementType.Recipe, targetId = "recipe_test", amount = 1, goldReward = 40 } },
-                masteryLevels: new List<MasteryLevelDefinition> { new() { id = "first", requiredProductionCount = 1 }, new() { id = "second", requiredProductionCount = 2, rarityBonus = .2f } });
+                new List<ContractTemplateDefinition> { new() { id = "contract_recipe", role = ContractRole.Basic, objectiveType = ContractObjectiveType.Recipe, targetSelector = ContractTargetSelector.DiscoveredRecipe, selectionWeight = 1, minAmount = 1, maxAmount = 1, minGoldReward = 40, maxGoldReward = 40 } },
+                masteryLevels: new List<MasteryLevelDefinition> { new() { id = "first", requiredProductionCount = 1 }, new() { id = "second", requiredProductionCount = 2, rarityBonus = .2f } },
+                groups: new List<IngredientGroupDefinition> { new() { id = "group_test" } });
         }
 
         private sealed class ManualTime : ITimeProvider

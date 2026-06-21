@@ -1,20 +1,5881 @@
 {
   "recipes": [
-    { "id": "recipe_table_beer", "displayName": "Piwo Stołowe", "categoryId": "beer", "baseValue": 18, "collectionRarityId": "rarity_common", "enabled": true },
-    { "id": "recipe_amber_ale", "displayName": "Bursztynowe Ale", "categoryId": "beer", "baseValue": 42, "collectionRarityId": "rarity_rare", "enabled": true },
-    { "id": "recipe_forest_stout", "displayName": "Leśny Stout", "categoryId": "beer", "baseValue": 66, "collectionRarityId": "rarity_epic", "enabled": true },
-    { "id": "recipe_malt_whisky", "displayName": "Whisky Słodowa", "categoryId": "whisky", "baseValue": 55, "collectionRarityId": "rarity_common", "enabled": true },
-    { "id": "recipe_smoked_whisky", "displayName": "Whisky Dymna", "categoryId": "whisky", "baseValue": 95, "collectionRarityId": "rarity_rare", "enabled": true },
-    { "id": "recipe_amber_whisky", "displayName": "Whisky Bursztynowa", "categoryId": "whisky", "baseValue": 155, "collectionRarityId": "rarity_epic", "enabled": true },
-    { "id": "recipe_mead", "displayName": "Miód Pitny", "categoryId": "mead", "baseValue": 45, "collectionRarityId": "rarity_common", "enabled": true },
-    { "id": "recipe_trojniak", "displayName": "Trójniak Koronny", "categoryId": "mead", "baseValue": 105, "collectionRarityId": "rarity_rare", "enabled": true },
-    { "id": "recipe_royal_mead", "displayName": "Miód Królewski", "categoryId": "mead", "baseValue": 190, "collectionRarityId": "rarity_epic", "enabled": true },
-    { "id": "recipe_plum_brandy", "displayName": "Śliwowica", "categoryId": "fruit", "baseValue": 48, "collectionRarityId": "rarity_common", "enabled": true },
-    { "id": "recipe_spiced_plum", "displayName": "Śliwka Korzenna", "categoryId": "fruit", "baseValue": 90, "collectionRarityId": "rarity_rare", "enabled": true },
-    { "id": "recipe_juniper_spirit", "displayName": "Jałowcówka", "categoryId": "spirit", "baseValue": 62, "collectionRarityId": "rarity_rare", "enabled": true },
-    { "id": "recipe_ghost_gin", "displayName": "Widmowy Gin", "categoryId": "spirit", "baseValue": 145, "collectionRarityId": "rarity_epic", "enabled": true },
-    { "id": "recipe_moon_elixir", "displayName": "Eliksir Księżycowy", "categoryId": "elixir", "baseValue": 240, "collectionRarityId": "rarity_legendary", "enabled": true },
-    { "id": "recipe_winged_barrel", "displayName": "Destylat Skrzydlatej Beczki", "categoryId": "elixir", "baseValue": 400, "collectionRarityId": "rarity_legendary", "enabled": true }
+    {
+      "id": "recipe_001_table_beer",
+      "displayName": "Table Beer",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "grain",
+        "hoppy",
+        "hops"
+      ],
+      "baseValue": 29,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 100,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_barley_common",
+          "weight": 20
+        },
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_002_barley_beer",
+      "displayName": "Barley Beer",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops"
+      ],
+      "baseValue": 32,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 75,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 20
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_003_wheat_beer",
+      "displayName": "Wheat Beer",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "hoppy",
+        "hops",
+        "orange",
+        "wheat"
+      ],
+      "baseValue": 32,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 72,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wheat_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 15
+        },
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_004_rye_beer",
+      "displayName": "Rye Beer",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "honey",
+        "hoppy",
+        "hops",
+        "rye"
+      ],
+      "baseValue": 32,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 68,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_rye_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 15
+        },
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_005_pale_ale",
+      "displayName": "Pale Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 60,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 25
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_006_bitter_ale",
+      "displayName": "Bitter Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops",
+        "wormwood"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 48,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_wormwood_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_007_amber_ale",
+      "displayName": "Amber Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "honey",
+        "hoppy",
+        "hops",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 118,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 42,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 10
+        },
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_008_red_ale",
+      "displayName": "Red Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops",
+        "rye"
+      ],
+      "baseValue": 113,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 44,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_rye_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 18
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_009_brown_ale",
+      "displayName": "Brown Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "molasses",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 35,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 48,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_molasses_common",
+          "weight": 18
+        },
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_010_mild_ale",
+      "displayName": "Mild Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "honey"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 58,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_011_strong_ale",
+      "displayName": "Strong Ale",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "grain",
+        "hoppy",
+        "hops",
+        "sweetener"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 35,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_012_ipa",
+      "displayName": "IPA",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops",
+        "orange"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 42,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_barley_common",
+          "weight": 20
+        },
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_013_double_ipa",
+      "displayName": "Double IPA",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops",
+        "pepper",
+        "sweetener"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 20,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_barley_common",
+          "weight": 15
+        },
+        {
+          "ingredientId": "ingredient_pepper_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_014_wheat_ipa",
+      "displayName": "Wheat IPA",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "hoppy",
+        "hops",
+        "orange",
+        "wheat"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 32,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wheat_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_015_rye_ipa",
+      "displayName": "Rye IPA",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "hoppy",
+        "hops",
+        "pepper",
+        "rye"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_rye_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_pepper_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_016_porter",
+      "displayName": "Porter",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops",
+        "molasses"
+      ],
+      "baseValue": 35,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 45,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_molasses_common",
+          "weight": 22
+        },
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_017_baltic_porter",
+      "displayName": "Baltic Porter",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops",
+        "molasses",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 25,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 15
+        },
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_018_stout",
+      "displayName": "Stout",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "hoppy",
+        "hops",
+        "molasses"
+      ],
+      "baseValue": 35,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 44,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_molasses_common",
+          "weight": 15
+        },
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_019_honey_stout",
+      "displayName": "Honey Stout",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "honey",
+        "hoppy",
+        "hops"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_020_peated_stout",
+      "displayName": "Peated Stout",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "molasses",
+        "peat",
+        "smoky"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 17,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_molasses_common",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_021_fruit_beer",
+      "displayName": "Fruit Beer",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "fruit",
+        "grain",
+        "hoppy",
+        "hops"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 42,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_022_plum_ale",
+      "displayName": "Plum Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "fruit",
+        "honey",
+        "plum"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 32,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_023_apple_ale",
+      "displayName": "Apple Ale",
+      "categoryId": "beer",
+      "tags": [
+        "apple",
+        "barley",
+        "beer",
+        "fruit",
+        "hoppy",
+        "hops"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 34,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_024_grape_ale",
+      "displayName": "Grape Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "fruit",
+        "grape",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 26,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_025_orange_wheat_beer",
+      "displayName": "Orange Wheat Beer",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "fruit",
+        "hoppy",
+        "hops",
+        "orange",
+        "wheat"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 32,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wheat_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_026_herbal_saison",
+      "displayName": "Herbal Saison",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "grain",
+        "herb",
+        "herbal",
+        "hoppy",
+        "hops"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 25,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "herb",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_027_spiced_saison",
+      "displayName": "Spiced Saison",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "grain",
+        "honey",
+        "spice",
+        "spiced"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 23,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_028_braggot",
+      "displayName": "Braggot",
+      "categoryId": "beer",
+      "tags": [
+        "beer",
+        "grain",
+        "honey",
+        "hoppy",
+        "hops",
+        "mead"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_029_rye_kvass",
+      "displayName": "Rye Kvass",
+      "categoryId": "beer",
+      "tags": [
+        "apple",
+        "beer",
+        "honey",
+        "rye"
+      ],
+      "baseValue": 34,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 55,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_rye_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 12
+        },
+        {
+          "ingredientId": "ingredient_apple_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_030_oak_ale",
+      "displayName": "Oak Ale",
+      "categoryId": "beer",
+      "tags": [
+        "barley",
+        "beer",
+        "honey",
+        "hoppy",
+        "hops",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 18,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 12
+        },
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_031_grain_wash",
+      "displayName": "Grain Wash",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "cane-sugar",
+        "grain",
+        "grain-spirit"
+      ],
+      "baseValue": 29,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 100,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_032_barley_spirit",
+      "displayName": "Barley Spirit",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "grain-spirit",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 32,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 72,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_033_wheat_spirit",
+      "displayName": "Wheat Spirit",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain-spirit",
+        "honey",
+        "wheat"
+      ],
+      "baseValue": 32,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 72,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wheat_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_034_rye_spirit",
+      "displayName": "Rye Spirit",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain-spirit",
+        "pepper",
+        "rye"
+      ],
+      "baseValue": 32,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 68,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_rye_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_pepper_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_035_multi_grain_spirit",
+      "displayName": "Multi-Grain Spirit",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain",
+        "grain-spirit",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 112,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 52,
+      "requirements": [
+        {
+          "type": "distinct_group",
+          "groupId": "grain",
+          "count": 2
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_036_young_malt_whisky",
+      "displayName": "Young Malt Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "whisky"
+      ],
+      "baseValue": 35,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 48,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 25
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_037_wheat_whisky",
+      "displayName": "Wheat Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "wheat",
+        "whisky"
+      ],
+      "baseValue": 35,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 42,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wheat_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 25
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_038_rye_whisky",
+      "displayName": "Rye Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "rye",
+        "whisky"
+      ],
+      "baseValue": 35,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 40,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_rye_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 25
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_039_blended_whisky",
+      "displayName": "Blended Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain",
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "whisky"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 34,
+      "requirements": [
+        {
+          "type": "distinct_group",
+          "groupId": "grain",
+          "count": 2
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 22
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_040_malt_whisky",
+      "displayName": "Malt Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "peat",
+        "smoky",
+        "whisky"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 27,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_peat_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_041_double_oak_whisky",
+      "displayName": "Double Oak Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "grain-spirit",
+        "honey",
+        "oak",
+        "oak-aged",
+        "whisky"
+      ],
+      "baseValue": 123,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 14,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_042_honey_whisky",
+      "displayName": "Honey Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "grain-spirit",
+        "honey",
+        "oak",
+        "oak-aged",
+        "whisky"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 24,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 18
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_043_grape_whisky",
+      "displayName": "Grape Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "fruit",
+        "grain-spirit",
+        "grape",
+        "oak",
+        "oak-aged",
+        "whisky"
+      ],
+      "baseValue": 118,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 20,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 18
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_044_orange_whisky",
+      "displayName": "Orange Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "fruit",
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "orange",
+        "whisky"
+      ],
+      "baseValue": 118,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 18,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_045_peated_whisky",
+      "displayName": "Peated Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "peat",
+        "smoky",
+        "whisky"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 22,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 18
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_046_heavy_peated_whisky",
+      "displayName": "Heavy Peated Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "barley",
+        "grain-spirit",
+        "molasses",
+        "oak",
+        "oak-aged",
+        "peat",
+        "prestige",
+        "smoky",
+        "whisky"
+      ],
+      "baseValue": 290,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 10,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 25
+        },
+        {
+          "ingredientId": "ingredient_molasses_common",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_047_peated_rye_whisky",
+      "displayName": "Peated Rye Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "peat",
+        "rye",
+        "smoky",
+        "whisky"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 17,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_rye_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 18
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_048_smoked_wheat_whisky",
+      "displayName": "Smoked Wheat Whisky",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain-spirit",
+        "oak",
+        "oak-aged",
+        "peat",
+        "smoky",
+        "wheat",
+        "whisky"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 18,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wheat_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_049_grain_vodka",
+      "displayName": "Grain Vodka",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "cane-sugar",
+        "grain",
+        "grain-spirit"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 62,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_050_wheat_vodka",
+      "displayName": "Wheat Vodka",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain-spirit",
+        "honey",
+        "wheat"
+      ],
+      "baseValue": 34,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 52,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wheat_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_051_rye_vodka",
+      "displayName": "Rye Vodka",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain-spirit",
+        "pepper",
+        "rye"
+      ],
+      "baseValue": 34,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 50,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_rye_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_pepper_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_052_honey_vodka",
+      "displayName": "Honey Vodka",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain",
+        "grain-spirit",
+        "honey",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_053_pepper_vodka",
+      "displayName": "Pepper Vodka",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain",
+        "grain-spirit",
+        "honey",
+        "pepper",
+        "spiced"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 27,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_pepper_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_054_orange_vodka",
+      "displayName": "Orange Vodka",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "cane-sugar",
+        "fruit",
+        "grain",
+        "grain-spirit",
+        "orange"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_055_plum_vodka",
+      "displayName": "Plum Vodka",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "fruit",
+        "grain",
+        "grain-spirit",
+        "honey",
+        "plum"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 27,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_056_grain_anise_spirit",
+      "displayName": "Grain Anise Spirit",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "anise",
+        "cane-sugar",
+        "grain",
+        "grain-spirit",
+        "spiced"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 24,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_anise_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_057_oak_vodka",
+      "displayName": "Oak Vodka",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain",
+        "grain-spirit",
+        "honey",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 18,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_058_herbal_grain_spirit",
+      "displayName": "Herbal Grain Spirit",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain",
+        "grain-spirit",
+        "herb",
+        "herbal",
+        "honey"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 26,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "herb",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_059_spiced_grain_spirit",
+      "displayName": "Spiced Grain Spirit",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain",
+        "grain-spirit",
+        "molasses",
+        "spice",
+        "spiced"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 24,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_molasses_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_060_aged_grain_spirit",
+      "displayName": "Aged Grain Spirit",
+      "categoryId": "grain_spirit",
+      "tags": [
+        "grain",
+        "grain-spirit",
+        "honey",
+        "oak",
+        "oak-aged",
+        "peat",
+        "smoky"
+      ],
+      "baseValue": 123,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 12,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_peat_rare",
+          "weight": 10
+        },
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_061_mead",
+      "displayName": "Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "grape",
+        "honey",
+        "mead",
+        "mead-sugar"
+      ],
+      "baseValue": 30,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 90,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_grape_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_062_dry_mead",
+      "displayName": "Dry Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "honey",
+        "mead",
+        "mead-sugar",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 62,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_063_sweet_mead",
+      "displayName": "Sweet Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "cane-sugar",
+        "honey",
+        "mead",
+        "mead-sugar"
+      ],
+      "baseValue": 112,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 52,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_cane_sugar_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    },
+    {
+      "id": "recipe_064_heavy_mead",
+      "displayName": "Heavy Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "honey",
+        "mead",
+        "mead-sugar",
+        "molasses",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_065_apple_mead",
+      "displayName": "Apple Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "apple",
+        "fruit",
+        "honey",
+        "mead",
+        "mead-sugar",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 113,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 44,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_066_plum_mead",
+      "displayName": "Plum Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "fruit",
+        "honey",
+        "mead",
+        "mead-sugar",
+        "pepper",
+        "plum"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 40,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_pepper_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_067_grape_mead",
+      "displayName": "Grape Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "fruit",
+        "grape",
+        "honey",
+        "mead",
+        "mead-sugar",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 38,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_068_orange_mead",
+      "displayName": "Orange Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "anise",
+        "fruit",
+        "honey",
+        "mead",
+        "mead-sugar",
+        "orange"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 42,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_anise_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_069_hopped_mead",
+      "displayName": "Hopped Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "barley",
+        "honey",
+        "hoppy",
+        "hops",
+        "mead",
+        "mead-sugar"
+      ],
+      "baseValue": 119,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 34,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_barley_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_070_juniper_mead",
+      "displayName": "Juniper Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "honey",
+        "juniper",
+        "mead",
+        "mead-sugar",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 26,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_071_wormwood_mead",
+      "displayName": "Wormwood Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "herbal",
+        "honey",
+        "mead",
+        "mead-sugar",
+        "orange",
+        "wormwood"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 18,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_072_spiced_mead",
+      "displayName": "Spiced Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "honey",
+        "mead",
+        "mead-sugar",
+        "orange",
+        "spice",
+        "spiced"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_073_anise_mead",
+      "displayName": "Anise Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "anise",
+        "honey",
+        "mead",
+        "mead-sugar",
+        "orange",
+        "spiced"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 22,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_anise_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_074_pepper_mead",
+      "displayName": "Pepper Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "honey",
+        "mead",
+        "mead-sugar",
+        "oak",
+        "oak-aged",
+        "pepper",
+        "spiced"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 18,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_pepper_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_075_oak_mead",
+      "displayName": "Oak Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "grape",
+        "honey",
+        "mead",
+        "mead-sugar",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 20,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_grape_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_076_peated_mead",
+      "displayName": "Peated Mead",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "honey",
+        "mead",
+        "mead-sugar",
+        "oak",
+        "oak-aged",
+        "peat",
+        "smoky"
+      ],
+      "baseValue": 123,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 12,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_077_cane_wine",
+      "displayName": "Cane Wine",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "cane-sugar",
+        "fruit",
+        "mead-sugar",
+        "orange"
+      ],
+      "baseValue": 32,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 72,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_cane_sugar_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_078_molasses_wine",
+      "displayName": "Molasses Wine",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "fruit",
+        "mead-sugar",
+        "molasses",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 58,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_079_light_rum",
+      "displayName": "Light Rum",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "cane-sugar",
+        "mead-sugar",
+        "oak",
+        "oak-aged",
+        "rum"
+      ],
+      "baseValue": 34,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 52,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_cane_sugar_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_080_dark_rum",
+      "displayName": "Dark Rum",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "mead-sugar",
+        "molasses",
+        "oak",
+        "oak-aged",
+        "rum"
+      ],
+      "baseValue": 35,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 48,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 18
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_081_oak_rum",
+      "displayName": "Oak Rum",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "mead-sugar",
+        "molasses",
+        "oak",
+        "oak-aged",
+        "orange",
+        "rum"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_082_spiced_rum",
+      "displayName": "Spiced Rum",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "mead-sugar",
+        "molasses",
+        "orange",
+        "rum",
+        "spice",
+        "spiced"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_083_orange_rum",
+      "displayName": "Orange Rum",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "fruit",
+        "mead-sugar",
+        "molasses",
+        "oak",
+        "oak-aged",
+        "orange",
+        "rum"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 34,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_084_honey_rum",
+      "displayName": "Honey Rum",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "honey",
+        "mead-sugar",
+        "molasses",
+        "oak",
+        "oak-aged",
+        "rum"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_085_peated_rum",
+      "displayName": "Peated Rum",
+      "categoryId": "mead_sugar",
+      "tags": [
+        "mead-sugar",
+        "molasses",
+        "oak",
+        "oak-aged",
+        "peat",
+        "rum",
+        "smoky"
+      ],
+      "baseValue": 123,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 15,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_086_fruit_wine",
+      "displayName": "Fruit Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "sweetener"
+      ],
+      "baseValue": 31,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 82,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "groupId": "sweetener",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_087_apple_cider",
+      "displayName": "Apple Cider",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-wine",
+        "honey"
+      ],
+      "baseValue": 31,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 78,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_088_dry_cider",
+      "displayName": "Dry Cider",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-wine",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 58,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_089_sweet_cider",
+      "displayName": "Sweet Cider",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-wine",
+        "orange",
+        "sweetener"
+      ],
+      "baseValue": 113,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 46,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_090_hopped_cider",
+      "displayName": "Hopped Cider",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-wine",
+        "honey",
+        "hoppy",
+        "hops"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_091_spiced_cider",
+      "displayName": "Spiced Cider",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-wine",
+        "honey",
+        "spice",
+        "spiced"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_092_oak_cider",
+      "displayName": "Oak Cider",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-wine",
+        "honey",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 22,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_093_plum_wine",
+      "displayName": "Plum Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "honey",
+        "plum"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 65,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_094_sweet_plum_wine",
+      "displayName": "Sweet Plum Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "oak",
+        "oak-aged",
+        "plum",
+        "sweetener"
+      ],
+      "baseValue": 113,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 44,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_095_spiced_plum_wine",
+      "displayName": "Spiced Plum Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "honey",
+        "plum",
+        "spice",
+        "spiced"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 26,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_096_smoked_plum_wine",
+      "displayName": "Smoked Plum Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "oak",
+        "oak-aged",
+        "peat",
+        "plum",
+        "smoky"
+      ],
+      "baseValue": 123,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 14,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_097_grape_wine",
+      "displayName": "Grape Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "grape",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 31,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 78,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_098_dry_grape_wine",
+      "displayName": "Dry Grape Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "grape",
+        "wormwood"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 58,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_wormwood_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_099_dessert_wine",
+      "displayName": "Dessert Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "grape",
+        "oak",
+        "oak-aged",
+        "sweetener"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 38,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_100_honey_wine",
+      "displayName": "Honey Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "grape",
+        "honey",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 40,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_101_herbal_vermouth",
+      "displayName": "Herbal Vermouth",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit-wine",
+        "grape",
+        "herb",
+        "herbal",
+        "orange"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "herb",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_102_spiced_vermouth",
+      "displayName": "Spiced Vermouth",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit-wine",
+        "grape",
+        "herbal",
+        "spice",
+        "spiced",
+        "wormwood"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_wormwood_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_103_oak_wine",
+      "displayName": "Oak Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "grape",
+        "honey",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 25,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_104_grape_orange_wine",
+      "displayName": "Grape-Orange Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "grape",
+        "honey",
+        "orange"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 32,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_105_orange_ferment",
+      "displayName": "Orange Ferment",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "grape",
+        "orange",
+        "sweetener"
+      ],
+      "baseValue": 112,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 50,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_grape_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_106_bitter_orange_wine",
+      "displayName": "Bitter Orange Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "honey",
+        "orange",
+        "wormwood"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 24,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_107_honey_orange_wine",
+      "displayName": "Honey-Orange Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "anise",
+        "fruit",
+        "fruit-wine",
+        "honey",
+        "orange"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 36,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_anise_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_108_orchard_wine",
+      "displayName": "Orchard Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-wine",
+        "honey",
+        "plum"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 34,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_109_fruit_cuvee",
+      "displayName": "Fruit Cuvée",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "distinct_group",
+          "groupId": "fruit",
+          "count": 2
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_110_fortified_fruit_wine",
+      "displayName": "Fortified Fruit Wine",
+      "categoryId": "fruit_wine",
+      "tags": [
+        "fruit",
+        "fruit-wine",
+        "oak",
+        "oak-aged",
+        "sweetener"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 25,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_111_fruit_spirit",
+      "displayName": "Fruit Spirit",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 32,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 68,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_112_plum_brandy",
+      "displayName": "Plum Brandy",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "oak",
+        "oak-aged",
+        "plum"
+      ],
+      "baseValue": 33,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 58,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_113_aged_plum_brandy",
+      "displayName": "Aged Plum Brandy",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "honey",
+        "oak",
+        "oak-aged",
+        "plum"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_114_peated_plum_brandy",
+      "displayName": "Peated Plum Brandy",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "oak",
+        "oak-aged",
+        "peat",
+        "plum",
+        "smoky"
+      ],
+      "baseValue": 123,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 16,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_115_plum_honey_liqueur",
+      "displayName": "Plum-Honey Liqueur",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "anise",
+        "fruit",
+        "fruit-spirit",
+        "honey",
+        "plum"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 38,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_anise_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_116_spiced_plum_liqueur",
+      "displayName": "Spiced Plum Liqueur",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "honey",
+        "plum",
+        "spice",
+        "spiced"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 26,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_117_apple_spirit",
+      "displayName": "Apple Spirit",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-spirit",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 34,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 56,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_118_aged_apple_spirit",
+      "displayName": "Aged Apple Spirit",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-spirit",
+        "honey",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 29,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_119_apple_honey_liqueur",
+      "displayName": "Apple-Honey Liqueur",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "anise",
+        "apple",
+        "fruit",
+        "fruit-spirit",
+        "honey"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 35,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_anise_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_120_peppered_apple_spirit",
+      "displayName": "Peppered Apple Spirit",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-spirit",
+        "honey",
+        "pepper",
+        "spiced"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 20,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_pepper_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_121_grape_brandy",
+      "displayName": "Grape Brandy",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "grape",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 34,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 54,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_122_aged_brandy",
+      "displayName": "Aged Brandy",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit-spirit",
+        "grape",
+        "honey",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_123_grape_honey_liqueur",
+      "displayName": "Grape-Honey Liqueur",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "grape",
+        "honey",
+        "wormwood"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 32,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_wormwood_rare",
+          "weight": 5
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_124_herbal_pomace_brandy",
+      "displayName": "Herbal Pomace Brandy",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit-spirit",
+        "grape",
+        "herb",
+        "herbal",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 24,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "herb",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_125_orange_spirit",
+      "displayName": "Orange Spirit",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "cane-sugar",
+        "fruit",
+        "fruit-spirit",
+        "orange"
+      ],
+      "baseValue": 34,
+      "collectionRarityId": "rarity_common",
+      "baseWeight": 50,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_126_orange_liqueur",
+      "displayName": "Orange Liqueur",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "oak",
+        "oak-aged",
+        "orange",
+        "sweetener"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 42,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_127_bitter_orange_liqueur",
+      "displayName": "Bitter Orange Liqueur",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "cane-sugar",
+        "fruit",
+        "fruit-spirit",
+        "orange",
+        "wormwood"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 26,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_128_orange_anise_liqueur",
+      "displayName": "Orange-Anise Liqueur",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "anise",
+        "fruit",
+        "fruit-spirit",
+        "honey",
+        "orange",
+        "spiced"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 24,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_anise_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_129_fruit_ratafia",
+      "displayName": "Fruit Ratafia",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "oak",
+        "oak-aged",
+        "sweetener"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "distinct_group",
+          "groupId": "fruit",
+          "count": 2
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_130_plum_apple_brandy",
+      "displayName": "Plum-Apple Brandy",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "apple",
+        "fruit",
+        "fruit-spirit",
+        "oak",
+        "oak-aged",
+        "plum"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_131_grape_orange_aperitif",
+      "displayName": "Grape-Orange Aperitif",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "grape",
+        "orange",
+        "wormwood"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_wormwood_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_132_orchard_spirit",
+      "displayName": "Orchard Spirit",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "apple",
+        "fruit-spirit",
+        "oak",
+        "oak-aged",
+        "plum"
+      ],
+      "baseValue": 118,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 20,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_apple_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 15
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_133_grain_fruit_spirit",
+      "displayName": "Grain-Fruit Spirit",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "grain",
+        "honey"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_134_honey_fruit_cordial",
+      "displayName": "Honey Fruit Cordial",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "honey",
+        "spice"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 36,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "groupId": "spice",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_135_smoked_fruit_brandy",
+      "displayName": "Smoked Fruit Brandy",
+      "categoryId": "fruit_spirit",
+      "tags": [
+        "fruit",
+        "fruit-spirit",
+        "oak",
+        "oak-aged",
+        "peat",
+        "smoky"
+      ],
+      "baseValue": 123,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 14,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_136_grain_gin",
+      "displayName": "Grain Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin",
+        "gin-herbal",
+        "grain",
+        "juniper",
+        "pepper"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 55,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_pepper_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_137_dry_gin",
+      "displayName": "Dry Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin",
+        "gin-herbal",
+        "grain",
+        "juniper",
+        "orange"
+      ],
+      "baseValue": 117,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 43,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_138_sweetened_gin",
+      "displayName": "Sweetened Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin",
+        "gin-herbal",
+        "grain",
+        "juniper",
+        "orange",
+        "sweetener"
+      ],
+      "baseValue": 124,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_139_orange_gin",
+      "displayName": "Orange Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "fruit",
+        "gin",
+        "gin-herbal",
+        "grain",
+        "juniper",
+        "orange"
+      ],
+      "baseValue": 119,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 35,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "groupId": "grain",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_140_plum_gin",
+      "displayName": "Plum Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "fruit",
+        "gin",
+        "gin-herbal",
+        "honey",
+        "juniper",
+        "plum"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_plum_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_141_grape_gin",
+      "displayName": "Grape Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "fruit",
+        "gin",
+        "gin-herbal",
+        "grape",
+        "juniper",
+        "oak",
+        "oak-aged"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 25,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_142_honey_gin",
+      "displayName": "Honey Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin",
+        "gin-herbal",
+        "honey",
+        "juniper",
+        "orange"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_143_hopped_gin",
+      "displayName": "Hopped Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin",
+        "gin-herbal",
+        "grain",
+        "hoppy",
+        "hops",
+        "juniper"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 22,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_hops_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "groupId": "grain",
+          "weight": 12
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_144_oak_gin",
+      "displayName": "Oak Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin",
+        "gin-herbal",
+        "juniper",
+        "oak",
+        "oak-aged",
+        "orange"
+      ],
+      "baseValue": 122,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 18,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_145_peated_gin",
+      "displayName": "Peated Gin",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin",
+        "gin-herbal",
+        "juniper",
+        "oak",
+        "oak-aged",
+        "peat",
+        "smoky"
+      ],
+      "baseValue": 123,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 12,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_peat_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_146_wormwood_spirit",
+      "displayName": "Wormwood Spirit",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin-herbal",
+        "grain",
+        "herbal",
+        "honey",
+        "wormwood"
+      ],
+      "baseValue": 119,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 35,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_147_absinthe",
+      "displayName": "Absinthe",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "anise",
+        "gin-herbal",
+        "grain",
+        "herbal",
+        "wormwood"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 26,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_anise_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "groupId": "grain",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_148_honey_absinthe",
+      "displayName": "Honey Absinthe",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "anise",
+        "gin-herbal",
+        "herbal",
+        "honey",
+        "wormwood"
+      ],
+      "baseValue": 126,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 15,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_anise_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    },
+    {
+      "id": "recipe_149_orange_bitter",
+      "displayName": "Orange Bitter",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "cane-sugar",
+        "fruit",
+        "gin-herbal",
+        "orange",
+        "wormwood"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 28,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_150_herbal_bitter",
+      "displayName": "Herbal Bitter",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin-herbal",
+        "herb",
+        "herbal",
+        "orange",
+        "sweetener"
+      ],
+      "baseValue": 115,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 35,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "herb",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_151_pepper_bitter",
+      "displayName": "Pepper Bitter",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin-herbal",
+        "honey",
+        "pepper",
+        "spiced",
+        "wormwood"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 24,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_pepper_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_152_herbal_liqueur",
+      "displayName": "Herbal Liqueur",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "fruit",
+        "gin-herbal",
+        "herb",
+        "herbal",
+        "sweetener"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 40,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "herb",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "groupId": "fruit",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_153_grain_herbal_liqueur",
+      "displayName": "Grain Herbal Liqueur",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin-herbal",
+        "grain",
+        "herb",
+        "herbal",
+        "honey"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 32,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "herb",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_154_fruit_herbal_liqueur",
+      "displayName": "Fruit Herbal Liqueur",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "fruit",
+        "gin-herbal",
+        "herb",
+        "herbal",
+        "honey"
+      ],
+      "baseValue": 116,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 30,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "herb",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 10
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_155_anise_liqueur",
+      "displayName": "Anise Liqueur",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "anise",
+        "gin-herbal",
+        "orange",
+        "spiced",
+        "sweetener"
+      ],
+      "baseValue": 118,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 38,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_anise_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_156_anise_spirit",
+      "displayName": "Anise Spirit",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "anise",
+        "cane-sugar",
+        "gin-herbal",
+        "grain",
+        "spiced"
+      ],
+      "baseValue": 120,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 32,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_anise_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_157_pepper_liqueur",
+      "displayName": "Pepper Liqueur",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin-herbal",
+        "orange",
+        "pepper",
+        "spiced",
+        "sweetener"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 25,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_pepper_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_158_pepper_spirit",
+      "displayName": "Pepper Spirit",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin-herbal",
+        "grain",
+        "honey",
+        "pepper",
+        "spiced"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 22,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_pepper_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_159_spiced_liqueur",
+      "displayName": "Spiced Liqueur",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "gin-herbal",
+        "orange",
+        "spice",
+        "spiced",
+        "sweetener"
+      ],
+      "baseValue": 114,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 42,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_160_spiced_fruit_cordial",
+      "displayName": "Spiced Fruit Cordial",
+      "categoryId": "gin_herbal",
+      "tags": [
+        "fruit",
+        "gin-herbal",
+        "spice",
+        "spiced",
+        "sweetener"
+      ],
+      "baseValue": 121,
+      "collectionRarityId": "rarity_rare",
+      "baseWeight": 24,
+      "requirements": [
+        {
+          "type": "group",
+          "groupId": "spice",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "fruit",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "sweetener",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    },
+    {
+      "id": "recipe_161_vanilla_liqueur",
+      "displayName": "Vanilla Liqueur",
+      "categoryId": "special",
+      "tags": [
+        "cane-sugar",
+        "oak",
+        "oak-aged",
+        "prestige",
+        "special",
+        "spiced",
+        "vanilla"
+      ],
+      "baseValue": 295,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 12,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_vanilla_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_cane_sugar_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_162_vanilla_mead",
+      "displayName": "Vanilla Mead",
+      "categoryId": "special",
+      "tags": [
+        "honey",
+        "mead",
+        "orange",
+        "prestige",
+        "special",
+        "spiced",
+        "vanilla"
+      ],
+      "baseValue": 296,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 10,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_vanilla_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 5
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_163_vanilla_orange_cordial",
+      "displayName": "Vanilla-Orange Cordial",
+      "categoryId": "special",
+      "tags": [
+        "cane-sugar",
+        "fruit",
+        "orange",
+        "prestige",
+        "special",
+        "spiced",
+        "vanilla"
+      ],
+      "baseValue": 302,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 8,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_vanilla_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_cane_sugar_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    },
+    {
+      "id": "recipe_164_tonka_liqueur",
+      "displayName": "Tonka Liqueur",
+      "categoryId": "special",
+      "tags": [
+        "cane-sugar",
+        "oak",
+        "oak-aged",
+        "prestige",
+        "special",
+        "spiced",
+        "tonka"
+      ],
+      "baseValue": 296,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 10,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_tonka_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_cane_sugar_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 6
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_165_dark_tonka_rum",
+      "displayName": "Dark Tonka Rum",
+      "categoryId": "special",
+      "tags": [
+        "molasses",
+        "oak",
+        "oak-aged",
+        "prestige",
+        "rum",
+        "special",
+        "spiced",
+        "tonka"
+      ],
+      "baseValue": 296,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 8,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_tonka_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_molasses_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 8
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_166_oak_tonka_spirit",
+      "displayName": "Oak Tonka Spirit",
+      "categoryId": "special",
+      "tags": [
+        "grain",
+        "oak",
+        "oak-aged",
+        "prestige",
+        "special",
+        "spiced",
+        "tonka"
+      ],
+      "baseValue": 302,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 5,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_tonka_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    },
+    {
+      "id": "recipe_167_angelica_gin",
+      "displayName": "Angelica Gin",
+      "categoryId": "special",
+      "tags": [
+        "angelica",
+        "gin",
+        "grain",
+        "juniper",
+        "prestige",
+        "special"
+      ],
+      "baseValue": 301,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 10,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_angelica_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_juniper_rare",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    },
+    {
+      "id": "recipe_168_angelica_liqueur",
+      "displayName": "Angelica Liqueur",
+      "categoryId": "special",
+      "tags": [
+        "angelica",
+        "honey",
+        "orange",
+        "prestige",
+        "special"
+      ],
+      "baseValue": 296,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 9,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_angelica_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 5
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_169_angelica_vermouth",
+      "displayName": "Angelica Vermouth",
+      "categoryId": "special",
+      "tags": [
+        "angelica",
+        "grape",
+        "herbal",
+        "prestige",
+        "special",
+        "wormwood"
+      ],
+      "baseValue": 302,
+      "collectionRarityId": "rarity_epic",
+      "baseWeight": 6,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_angelica_epic",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_wormwood_rare",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    },
+    {
+      "id": "recipe_170_amber_tincture",
+      "displayName": "Amber Tincture",
+      "categoryId": "special",
+      "tags": [
+        "amber",
+        "grain",
+        "honey",
+        "prestige",
+        "special"
+      ],
+      "baseValue": 614,
+      "collectionRarityId": "rarity_legendary",
+      "baseWeight": 4,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_amber_legendary",
+          "count": 1
+        },
+        {
+          "type": "group",
+          "groupId": "grain",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 4
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_171_amber_mead",
+      "displayName": "Amber Mead",
+      "categoryId": "special",
+      "tags": [
+        "amber",
+        "honey",
+        "mead",
+        "oak",
+        "oak-aged",
+        "prestige",
+        "special"
+      ],
+      "baseValue": 614,
+      "collectionRarityId": "rarity_legendary",
+      "baseWeight": 3,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_amber_legendary",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_honey_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 3
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_172_amber_oak_spirit",
+      "displayName": "Amber Oak Spirit",
+      "categoryId": "special",
+      "tags": [
+        "amber",
+        "barley",
+        "oak",
+        "oak-aged",
+        "prestige",
+        "special"
+      ],
+      "baseValue": 622,
+      "collectionRarityId": "rarity_legendary",
+      "baseWeight": 2,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_amber_legendary",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_oak_rare",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_barley_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    },
+    {
+      "id": "recipe_173_mastic_liqueur",
+      "displayName": "Mastic Liqueur",
+      "categoryId": "special",
+      "tags": [
+        "cane-sugar",
+        "mastic",
+        "orange",
+        "prestige",
+        "special"
+      ],
+      "baseValue": 614,
+      "collectionRarityId": "rarity_legendary",
+      "baseWeight": 4,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_mastic_legendary",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_cane_sugar_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 4
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_174_grape_mastic_spirit",
+      "displayName": "Grape Mastic Spirit",
+      "categoryId": "special",
+      "tags": [
+        "fruit",
+        "grape",
+        "mastic",
+        "oak",
+        "oak-aged",
+        "prestige",
+        "special"
+      ],
+      "baseValue": 614,
+      "collectionRarityId": "rarity_legendary",
+      "baseWeight": 3,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_mastic_legendary",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_grape_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 3
+        }
+      ],
+      "enabled": true
+    },
+    {
+      "id": "recipe_175_mastic_orange_cordial",
+      "displayName": "Mastic-Orange Cordial",
+      "categoryId": "special",
+      "tags": [
+        "cane-sugar",
+        "fruit",
+        "mastic",
+        "orange",
+        "prestige",
+        "special"
+      ],
+      "baseValue": 622,
+      "collectionRarityId": "rarity_legendary",
+      "baseWeight": 2,
+      "requirements": [
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_mastic_legendary",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_orange_common",
+          "count": 1
+        },
+        {
+          "type": "ingredient",
+          "ingredientId": "ingredient_cane_sugar_common",
+          "count": 1
+        }
+      ],
+      "weightBonuses": [],
+      "enabled": true
+    }
   ]
 }
-

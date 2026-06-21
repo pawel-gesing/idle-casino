@@ -1,10 +1,1220 @@
 {
-  "contracts": [
-    { "id": "contract_table_beer", "displayName": "Dostawa do gospody", "requirementType": "produce_recipe", "targetId": "recipe_table_beer", "amount": 2, "goldReward": 70, "ingredientRewards": [{ "ingredientId": "ingredient_juniper_rare", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
-    { "id": "contract_epic", "displayName": "Kolekcjoner osobliwości", "requirementType": "produce_rarity", "targetId": "rarity_epic", "amount": 1, "goldReward": 220, "ingredientRewards": [{ "ingredientId": "ingredient_ghost_mushroom_epic", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
-    { "id": "contract_mead", "displayName": "Uczta miodowa", "requirementType": "produce_category", "targetId": "mead", "amount": 3, "goldReward": 180, "ingredientRewards": [{ "ingredientId": "ingredient_amber_epic", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
-    { "id": "contract_smoked_whisky", "displayName": "Zapasy gorzelni", "requirementType": "produce_recipe", "targetId": "recipe_smoked_whisky", "amount": 2, "goldReward": 210, "ingredientRewards": [{ "ingredientId": "ingredient_peat_rare", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
-    { "id": "contract_rare", "displayName": "Rzadkie zamówienie", "requirementType": "produce_rarity", "targetId": "rarity_rare", "amount": 2, "goldReward": 140, "ingredientRewards": [{ "ingredientId": "ingredient_amber_epic", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
-    { "id": "contract_beer", "displayName": "Święto piwa", "requirementType": "produce_category", "targetId": "beer", "amount": 3, "goldReward": 125, "ingredientRewards": [{ "ingredientId": "ingredient_juniper_rare", "minAmount": 1, "maxAmount": 3 }], "enabled": true }
+  "templates": [
+    {
+      "id": "contract_basic_category_a",
+      "displayName": "Regional Order",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "produce_category",
+      "targetSelector": "category",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ]
+    },
+    {
+      "id": "contract_basic_category_b",
+      "displayName": "Small Batch",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "produce_category",
+      "targetSelector": "category",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ]
+    },
+    {
+      "id": "contract_basic_tag_a",
+      "displayName": "Popular Style",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "produce_tag",
+      "targetSelector": "tag",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ]
+    },
+    {
+      "id": "contract_basic_tag_b",
+      "displayName": "Taste Trial",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "produce_tag",
+      "targetSelector": "tag",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ]
+    },
+    {
+      "id": "contract_basic_source_experiment",
+      "displayName": "Research Work",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "produce_source",
+      "targetSelector": "source",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ],
+      "fixedTargetId": "experiment"
+    },
+    {
+      "id": "contract_basic_source_production",
+      "displayName": "Reliable Supply",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "produce_source",
+      "targetSelector": "source",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ],
+      "fixedTargetId": "production"
+    },
+    {
+      "id": "contract_basic_common",
+      "displayName": "Everyday Quality",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "produce_rarity",
+      "targetSelector": "rarity",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ],
+      "fixedTargetId": "rarity_common"
+    },
+    {
+      "id": "contract_basic_rare",
+      "displayName": "Better Batch",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "produce_rarity",
+      "targetSelector": "rarity",
+      "minAmount": 1,
+      "maxAmount": 1,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ],
+      "fixedTargetId": "rarity_rare"
+    },
+    {
+      "id": "contract_basic_group_a",
+      "displayName": "Core Materials",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "use_group",
+      "targetSelector": "group",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ]
+    },
+    {
+      "id": "contract_basic_group_b",
+      "displayName": "Ingredient Choice",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "use_group",
+      "targetSelector": "group",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ]
+    },
+    {
+      "id": "contract_basic_ingredient_a",
+      "displayName": "Staple Ingredient",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "use_ingredient",
+      "targetSelector": "ingredient",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 80,
+      "maxGoldReward": 120,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ]
+    },
+    {
+      "id": "contract_basic_discover",
+      "displayName": "First Discovery",
+      "role": "basic",
+      "tier": 1,
+      "selectionWeight": 10,
+      "objectiveType": "discover_recipes",
+      "targetSelector": "none",
+      "minAmount": 1,
+      "maxAmount": 1,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 100,
+      "maxGoldReward": 140,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_common",
+          "weight": 5,
+          "minAmount": 2,
+          "maxAmount": 4
+        },
+        {
+          "selectorType": "group",
+          "targetId": "grain",
+          "weight": 2,
+          "minAmount": 2,
+          "maxAmount": 3
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_recipe_a",
+      "displayName": "House Specialty",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "produce_recipe",
+      "targetSelector": "discovered_recipe",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 180,
+      "maxGoldReward": 260,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_recipe_b",
+      "displayName": "Master's Repeat",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "produce_recipe",
+      "targetSelector": "discovered_recipe",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 160,
+      "maxGoldReward": 230,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_category_a",
+      "displayName": "Trade Contract",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "produce_category",
+      "targetSelector": "category",
+      "minAmount": 3,
+      "maxAmount": 5,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 170,
+      "maxGoldReward": 250,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_category_b",
+      "displayName": "Selected Category",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "produce_category",
+      "targetSelector": "category",
+      "minAmount": 2,
+      "maxAmount": 4,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 160,
+      "maxGoldReward": 240,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_tag_a",
+      "displayName": "Flavor Profile",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "produce_tag",
+      "targetSelector": "tag",
+      "minAmount": 3,
+      "maxAmount": 4,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 180,
+      "maxGoldReward": 260,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_tag_b",
+      "displayName": "Distillery Style",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "produce_tag",
+      "targetSelector": "tag",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 170,
+      "maxGoldReward": 250,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_ingredient_a",
+      "displayName": "Ingredient Expertise",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "use_ingredient",
+      "targetSelector": "ingredient",
+      "minAmount": 2,
+      "maxAmount": 4,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 190,
+      "maxGoldReward": 270,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_ingredient_b",
+      "displayName": "Chosen Material",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "use_ingredient",
+      "targetSelector": "ingredient",
+      "minAmount": 1,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 180,
+      "maxGoldReward": 260,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_group_a",
+      "displayName": "Ingredient Family",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "use_group",
+      "targetSelector": "group",
+      "minAmount": 3,
+      "maxAmount": 5,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 180,
+      "maxGoldReward": 260,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_group_b",
+      "displayName": "Group Specialty",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "use_group",
+      "targetSelector": "group",
+      "minAmount": 2,
+      "maxAmount": 4,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 170,
+      "maxGoldReward": 250,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ]
+    },
+    {
+      "id": "contract_specialist_experiment",
+      "displayName": "Experiment Series",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "produce_source",
+      "targetSelector": "source",
+      "minAmount": 3,
+      "maxAmount": 5,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 180,
+      "maxGoldReward": 250,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ],
+      "fixedTargetId": "experiment"
+    },
+    {
+      "id": "contract_specialist_production",
+      "displayName": "Production Run",
+      "role": "specialist",
+      "tier": 2,
+      "selectionWeight": 10,
+      "objectiveType": "produce_source",
+      "targetSelector": "source",
+      "minAmount": 3,
+      "maxAmount": 5,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 180,
+      "maxGoldReward": 250,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_rare",
+          "weight": 4,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "group",
+          "targetId": "herb",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "selectorType": "ingredient",
+          "targetId": "ingredient_hops_rare",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 2
+        }
+      ],
+      "fixedTargetId": "production"
+    },
+    {
+      "id": "contract_prestige_epic",
+      "displayName": "Epic Quality",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "produce_rarity",
+      "targetSelector": "rarity",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 2,
+      "enabled": true,
+      "minGoldReward": 420,
+      "maxGoldReward": 600,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ],
+      "fixedTargetId": "rarity_epic"
+    },
+    {
+      "id": "contract_prestige_legendary",
+      "displayName": "Legendary Order",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "produce_rarity",
+      "targetSelector": "rarity",
+      "minAmount": 1,
+      "maxAmount": 1,
+      "minLaboratoryLevel": 3,
+      "enabled": true,
+      "minGoldReward": 650,
+      "maxGoldReward": 850,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ],
+      "fixedTargetId": "rarity_legendary"
+    },
+    {
+      "id": "contract_prestige_recipe_rare",
+      "displayName": "Fine Recipe",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "recipe_min_rarity",
+      "targetSelector": "discovered_recipe",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 2,
+      "enabled": true,
+      "minGoldReward": 450,
+      "maxGoldReward": 650,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ],
+      "minRarityId": "rarity_rare"
+    },
+    {
+      "id": "contract_prestige_recipe_epic",
+      "displayName": "Epic Recipe",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "recipe_min_rarity",
+      "targetSelector": "discovered_recipe",
+      "minAmount": 1,
+      "maxAmount": 1,
+      "minLaboratoryLevel": 2,
+      "enabled": true,
+      "minGoldReward": 550,
+      "maxGoldReward": 750,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ],
+      "minRarityId": "rarity_epic"
+    },
+    {
+      "id": "contract_prestige_distinct_a",
+      "displayName": "Category Collection",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "distinct_recipes",
+      "targetSelector": "category",
+      "minAmount": 3,
+      "maxAmount": 5,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 430,
+      "maxGoldReward": 620,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ]
+    },
+    {
+      "id": "contract_prestige_distinct_b",
+      "displayName": "Style Collection",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "distinct_recipes",
+      "targetSelector": "tag",
+      "minAmount": 3,
+      "maxAmount": 4,
+      "minLaboratoryLevel": 2,
+      "enabled": true,
+      "minGoldReward": 430,
+      "maxGoldReward": 620,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ]
+    },
+    {
+      "id": "contract_prestige_discover_a",
+      "displayName": "Great Discoveries",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "discover_recipes",
+      "targetSelector": "none",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 480,
+      "maxGoldReward": 680,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ]
+    },
+    {
+      "id": "contract_prestige_discover_target",
+      "displayName": "Sought Recipe",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "discover_recipes",
+      "targetSelector": "undiscovered_recipe",
+      "minAmount": 1,
+      "maxAmount": 1,
+      "minLaboratoryLevel": 1,
+      "enabled": true,
+      "minGoldReward": 520,
+      "maxGoldReward": 720,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ]
+    },
+    {
+      "id": "contract_prestige_record_a",
+      "displayName": "Record Breaker",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "improve_record",
+      "targetSelector": "discovered_recipe",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 2,
+      "enabled": true,
+      "minGoldReward": 460,
+      "maxGoldReward": 650,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ]
+    },
+    {
+      "id": "contract_prestige_record_b",
+      "displayName": "Record Streak",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "improve_record",
+      "targetSelector": "none",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 2,
+      "enabled": true,
+      "minGoldReward": 500,
+      "maxGoldReward": 700,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ]
+    },
+    {
+      "id": "contract_prestige_epic_ingredient",
+      "displayName": "Epic Material",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "use_ingredient",
+      "targetSelector": "ingredient",
+      "minAmount": 1,
+      "maxAmount": 2,
+      "minLaboratoryLevel": 2,
+      "enabled": true,
+      "minGoldReward": 480,
+      "maxGoldReward": 680,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ],
+      "allowedTargetIds": [
+        "ingredient_angelica_epic",
+        "ingredient_vanilla_epic",
+        "ingredient_tonka_epic"
+      ]
+    },
+    {
+      "id": "contract_prestige_prestige_tag",
+      "displayName": "Prestige Batch",
+      "role": "prestige",
+      "tier": 3,
+      "selectionWeight": 10,
+      "objectiveType": "produce_tag",
+      "targetSelector": "tag",
+      "minAmount": 2,
+      "maxAmount": 3,
+      "minLaboratoryLevel": 2,
+      "enabled": true,
+      "minGoldReward": 480,
+      "maxGoldReward": 680,
+      "ingredientRewards": [
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_epic",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "selectorType": "rarity",
+          "targetId": "rarity_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
+      ],
+      "fixedTargetId": "prestige"
+    }
   ]
 }

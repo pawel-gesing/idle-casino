@@ -1,36 +1,176 @@
 {
-  "startingGold": 100,
+  "startingGold": 150,
   "ingredientsPerExperiment": 3,
   "ingredientsPerProduction": 3,
   "activeContractCount": 3,
   "freeDeliveryIntervalSeconds": 7200,
-  "freeDeliveryMinItems": 6,
-  "freeDeliveryMaxItems": 6,
   "experimentDurationSeconds": 3600,
   "productionDurationSeconds": 1800,
   "maxStoredFreeDeliveries": 3,
   "maxOfflineProgressSeconds": 0,
+  "freeContractRerolls": 1,
+  "contractRefreshSeconds": 86400,
   "ingredientQualityInfluence": 1.0,
   "laboratoryQualityInfluence": 1.0,
   "productRarityWeights": [
-    { "rarityId": "rarity_common", "weight": 7000 },
-    { "rarityId": "rarity_rare", "weight": 2200 },
-    { "rarityId": "rarity_epic", "weight": 700 },
-    { "rarityId": "rarity_legendary", "weight": 95 },
-    { "rarityId": "rarity_mythic", "weight": 5 }
+    {
+      "rarityId": "rarity_common",
+      "weight": 7000
+    },
+    {
+      "rarityId": "rarity_rare",
+      "weight": 2200
+    },
+    {
+      "rarityId": "rarity_epic",
+      "weight": 700
+    },
+    {
+      "rarityId": "rarity_legendary",
+      "weight": 95
+    },
+    {
+      "rarityId": "rarity_mythic",
+      "weight": 5
+    }
   ],
   "deliveryPools": [
     {
-      "id": "pool_base", "rolls": 6,
+      "id": "pool_base",
+      "rolls": 8,
       "entries": [
-        { "ingredientId": "ingredient_malt_common", "weight": 100, "minAmount": 1, "maxAmount": 3 },
-        { "ingredientId": "ingredient_hops_common", "weight": 90, "minAmount": 1, "maxAmount": 3 },
-        { "ingredientId": "ingredient_honey_common", "weight": 70, "minAmount": 1, "maxAmount": 2 },
-        { "ingredientId": "ingredient_plum_common", "weight": 70, "minAmount": 1, "maxAmount": 2 },
-        { "ingredientId": "ingredient_juniper_rare", "weight": 30, "minAmount": 1, "maxAmount": 2 },
-        { "ingredientId": "ingredient_peat_rare", "weight": 25, "minAmount": 1, "maxAmount": 1 },
-        { "ingredientId": "ingredient_amber_epic", "weight": 8, "minAmount": 1, "maxAmount": 1 },
-        { "ingredientId": "ingredient_ghost_mushroom_epic", "weight": 5, "minAmount": 1, "maxAmount": 1 }
+        {
+          "ingredientId": "ingredient_barley_common",
+          "weight": 100,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_wheat_common",
+          "weight": 99,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_rye_common",
+          "weight": 98,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_honey_common",
+          "weight": 97,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_cane_sugar_common",
+          "weight": 96,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_molasses_common",
+          "weight": 95,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_plum_common",
+          "weight": 94,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_apple_common",
+          "weight": 93,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_grape_common",
+          "weight": 92,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_orange_common",
+          "weight": 91,
+          "minAmount": 1,
+          "maxAmount": 2
+        },
+        {
+          "ingredientId": "ingredient_juniper_rare",
+          "weight": 24,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_wormwood_rare",
+          "weight": 23,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_anise_rare",
+          "weight": 22,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_pepper_rare",
+          "weight": 21,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_hops_rare",
+          "weight": 20,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_peat_rare",
+          "weight": 19,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_oak_rare",
+          "weight": 18,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_angelica_epic",
+          "weight": 3,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_vanilla_epic",
+          "weight": 2,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_tonka_epic",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_amber_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        },
+        {
+          "ingredientId": "ingredient_mastic_legendary",
+          "weight": 1,
+          "minAmount": 1,
+          "maxAmount": 1
+        }
       ]
     }
   ]

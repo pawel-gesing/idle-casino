@@ -17,9 +17,15 @@ Interfejs działa w orientacji pionowej, skaluje się do szerokości urządzenia
 
 ## Rozgrywka
 
-### Eksperyment
+### Eksperyment, produkcja i czas
 
-Gracz wybiera dokładnie 3 składniki z kafelków pokazujących dostępne ilości. Kliknięcie rezerwuje sztukę, a **Wyczyść** zwraca całą rezerwację. Składniki są faktycznie zużywane dopiero przy uruchomieniu. Receptura i rzadkość są losowane, książka receptur zostaje zaktualizowana, a produkt trafia do podsumowania z nagrodą w złocie.
+Gracz wybiera dokładnie 3 składniki. Uruchomienie eksperymentu lub produkcji natychmiast zużywa składniki i tworzy zapisywane zadanie w slocie laboratorium. Zadanie trwa przez czas z `economy.json`; receptura eksperymentu i rzadkość produktu nie są losowane przed końcem.
+
+Po upływie czasu zadanie zmienia stan z `running` na `completed`, także podczas nieobecności. Gracz odbiera je ręcznie. Dopiero wtedy losowany jest wynik, aktualizowane są książka receptur, mistrzostwo i kontrakty oraz otwierane jest podsumowanie nagrody. Produkcja zawsze zwraca wybraną, wcześniej odkrytą recepturę.
+
+### Dostawy czasowe
+
+Darmowa dostawa odnawia się cyklicznie. Ekran dostawy pokazuje liczbę gotowych odbiorów i czas do następnego. Odbiór zużywa jeden zapisany odbiór. Podczas nieobecności dostawy kumulują się do `maxStoredFreeDeliveries`; nadmiar przepada.
 
 ### Produkcja i mistrzostwo
 
@@ -43,7 +49,13 @@ Eksperyment i produkcja zwiększają postęp. Jeżeli wynik ukończy jeden lub k
 
 ### Laboratorium
 
-Jedno laboratorium ma 5 konfigurowalnych poziomów z bonusami rzadkości 0–20%. Koszty wejścia na poziomy 2–5 wynoszą odpowiednio 1500, 4000, 9000 i 18000 złota.
+Ekran laboratorium pokazuje wolne, aktywne i zakończone sloty oraz pozostały czas. Liczba początkowych slotów jest konfigurowalna. Ulepszenia nadal zwiększają jakość produktu; opcjonalny `laboratoryLevelTimeReduction` skraca czas za każdy poziom powyżej pierwszego.
+
+### Offline progress i zegar debugowy
+
+Wszystkie timestampy są zapisywane i porównywane w UTC. Po uruchomieniu lub wczytaniu gra nalicza dostawy, oznacza zakończone zadania i pokazuje krótkie podsumowanie zdarzeń offline. Wyniki zadań nigdy nie są automatycznie odbierane.
+
+W ustawieniach są wyraźnie oznaczone przyciski prototypowe **DEBUG: +15 MIN** i **DEBUG: +1 H**. Przesuwają zegar dostarczany przez `AdjustableTimeProvider`, więc nie zmieniają zegara systemowego. Można je usunąć wraz z dwoma przyciskami w `PrototypeUI`; logika gry zależy wyłącznie od `ITimeProvider`.
 
 ## Interfejs i ustawienia
 
@@ -64,19 +76,19 @@ Konfiguracja znajduje się w `Assets/Resources/GameData/`:
 - `ingredients.json` — składniki i wpływy na receptury,
 - `recipes.json` — receptury i wartości bazowe,
 - `categories.json` — kategorie receptur,
-- `economy.json` — parametry eksperymentu, produkcji i dostaw,
+- `economy.json` — wszystkie czasy, rozmiar i limit dostaw, liczba slotów oraz pozostałe parametry ekonomii,
 - `laboratories.json` — poziomy, koszty i bonusy,
 - `contracts.json` — wymagania i nagrody kontraktów,
 - `mastery.json` — progi mistrzostwa receptur i bonusy rzadkości,
 - `localization.json` — polskie oraz angielskie teksty UI i contentu.
 
-Konfiguracja jest walidowana przy starcie, łącznie z referencjami kontraktów i brakującymi tłumaczeniami contentu.
+Konfiguracja jest walidowana przy starcie, łącznie z dodatnimi czasami i limitami. Główne pola czasu to `freeDeliveryIntervalSeconds`, `experimentDurationSeconds`, `productionDurationSeconds`, `maxStoredFreeDeliveries`, `initialLaboratorySlots`, `laboratoryLevelTimeReduction` i opcjonalne `maxOfflineProgressSeconds`. Wszystkie wartości czasu są wyrażone w sekundach.
 
 ## Zapis stanu
 
-Zapis wersji `5` przechowuje złoto, składniki (w tym nagrody kontraktowe), książkę receptur z licznikami wytworzeń, poziom laboratorium, język, aktywne kontrakty z postępem oraz nieodebrany wynik. Poziom mistrzostwa jest wyliczany z zapisanego licznika i konfiguracji.
+Zapis wersji `6` przechowuje złoto, składniki, książkę receptur, laboratorium, kontrakty, nieodebrany wynik, timestamp dostaw, liczbę gotowych dostaw i zadania laboratoryjne wraz z wejściem oraz czasami UTC. Poziom mistrzostwa jest wyliczany z zapisanego licznika i konfiguracji.
 
-Zapis wersji 2 jest migrowany automatycznie. Produkty pozostałe w starym magazynie zostają spieniężone, a stare kontrakty otrzymują początkowy postęp 0.
+Starsze zapisy są migrowane automatycznie. Brakujące pola czasu są inicjalizowane od chwili wczytania bez zmiany złota, magazynu, receptur ani mistrzostwa.
 
 Plik zapisu: `Application.persistentDataPath/distillery_save.json`.
 
@@ -90,10 +102,10 @@ W Unity: `Window → General → Test Runner → EditMode → Run All`.
   -testResults TestResults.xml -logFile TestRun.log
 ```
 
-Testy obejmują eksperymenty, produkcję, złoto i składnikowe nagrody kontraktów, mistrzostwo oraz jego wpływ na rzadkość, oczekujące nagrody, rotację kontraktów, laboratorium, migrację i zapis stanu.
+Testy używają kontrolowanego `ITimeProvider` i obejmują konfigurację, dostawy przed/po interwale, limity offline, zużycie składników, zajętość slotów, ukończenie i odbiór obu typów zadań, odroczone losowanie, zapis/odczyt oraz migrację.
 
 ## Celowo poza zakresem
 
-Timery i postęp idle/offline, reklamy, IAP, sezony, wiele laboratoriów, Firebase, Addressables, backend, konta, docelowa grafika i animacje. Mistrzostwo działa przy produkcji oraz przy eksperymencie zakończonym daną recepturą; nie ma osobnego XP ani bonusu ceny.
+Reklamy, IAP, sezony, wiele laboratoriów, Firebase, Addressables, backend, konta, docelowa grafika i animacje. Nie ma synchronizacji czasu z serwerem ani ochrony przed zmianą zegara urządzenia. Mistrzostwo nie ma osobnego XP ani bonusu ceny.
 
 Dokumenty projektowe znajdują się w `docs/`.

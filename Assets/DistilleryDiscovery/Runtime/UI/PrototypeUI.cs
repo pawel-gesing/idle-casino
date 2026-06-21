@@ -10,7 +10,7 @@ namespace DistilleryDiscovery
 {
     public sealed class PrototypeUI : MonoBehaviour
     {
-        private enum FooterMode { Experiment, Production, Laboratory, None }
+        private enum FooterMode { Experiment, Production, Laboratory, Delivery, None }
         private sealed class LocalizedBinding { public Text Text; public string Key; public string Fallback; }
         private sealed class TileOption { public string Label; public Action Action; }
 
@@ -40,6 +40,7 @@ namespace DistilleryDiscovery
         private Text selectionText;
         private Text secondaryActionText;
         private Text primaryActionText;
+        private Button primaryActionButton;
         private Text goldHeaderText;
         private Text recipesHeaderText;
         private Text ingredientsHeaderText;
@@ -50,6 +51,7 @@ namespace DistilleryDiscovery
         private Vector2Int lastScreenSize;
         private FooterMode footerMode;
         private string selectedProductionRecipeId;
+        private float nextTimerRefresh;
 
         private string Language => game.State.languageCode == "pl" ? "pl" : "en";
 
@@ -57,6 +59,13 @@ namespace DistilleryDiscovery
         {
             var screenSize = new Vector2Int(Screen.width, Screen.height);
             if (Screen.safeArea != lastSafeArea || screenSize != lastScreenSize) ApplyMobileLayout();
+            if (game != null && Time.unscaledTime >= nextTimerRefresh)
+            {
+                nextTimerRefresh = Time.unscaledTime + 1f;
+                game.UpdateTime();
+                if (footerMode == FooterMode.Delivery) ShowDelivery();
+                else if (footerMode == FooterMode.Laboratory) ShowLaboratory();
+            }
         }
 
         public void Initialize(GameService gameService, SaveService saveService)
@@ -66,7 +75,7 @@ namespace DistilleryDiscovery
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             Build();
             if (game.State.pendingResult != null) ShowPendingResult();
-            else ShowState(T("ui.status.ready", "Ready. Receive a delivery to begin."));
+            else ShowState(OfflineStatus(T("ui.status.ready", "Ready. Wait for a delivery to begin.")));
         }
 
         private void Build()
@@ -88,7 +97,7 @@ namespace DistilleryDiscovery
             AddLocalizedButton(nav.transform, "ui.nav.experiment", "EXPERIMENT", ShowExperiment);
             AddLocalizedButton(nav.transform, "ui.nav.production", "PRODUCTION", ShowProduction);
             AddLocalizedButton(nav.transform, "ui.nav.contracts", "CONTRACTS", ShowContracts);
-            AddLocalizedButton(nav.transform, "ui.nav.delivery", "DELIVERY", ReceiveDelivery);
+            AddLocalizedButton(nav.transform, "ui.nav.delivery", "DELIVERY", ShowDelivery);
             AddLocalizedButton(nav.transform, "ui.nav.laboratory", "LABORATORY", ShowLaboratory);
 
             BuildContent(background.transform);
@@ -143,7 +152,7 @@ namespace DistilleryDiscovery
             var footer = Panel("ActionBar", parent, Plum); Rect(footer, 0, 0, 1, .15f);
             selectionText = Label("", footer.transform, 28, TextAnchor.MiddleCenter); Rect(selectionText.gameObject, .03f, .54f, .97f, .95f);
             var secondary = AddButton(footer.transform, "—", ClearSelection); Rect(secondary, .02f, .10f, .30f, .48f); secondaryActionText = secondary.GetComponentInChildren<Text>();
-            var primary = AddButton(footer.transform, "—", DispatchPrimary, Gold, Ink); Rect(primary, .32f, .10f, .98f, .48f); primaryActionText = primary.GetComponentInChildren<Text>();
+            var primary = AddButton(footer.transform, "—", DispatchPrimary, Gold, Ink); Rect(primary, .32f, .10f, .98f, .48f); primaryActionText = primary.GetComponentInChildren<Text>(); primaryActionButton = primary.GetComponent<Button>();
             UpdateSelection();
         }
 
@@ -157,7 +166,9 @@ namespace DistilleryDiscovery
             var loadButton = AddLocalizedButton(card.transform, "ui.settings.load", "LOAD", LoadGame); Rect(loadButton, .12f, .52f, .88f, .63f);
             var resetButton = AddLocalizedButton(card.transform, "ui.settings.reset", "RESET", ResetGame); Rect(resetButton, .12f, .39f, .88f, .50f);
             var languageButton = AddLocalizedButton(card.transform, "ui.settings.language", "LANGUAGE: ENGLISH", ToggleLanguage); Rect(languageButton, .12f, .26f, .88f, .37f);
-            var exitButton = AddLocalizedButton(card.transform, "ui.settings.exit", "EXIT", Application.Quit); Rect(exitButton, .12f, .10f, .88f, .21f);
+            var debug15 = AddButton(card.transform, "DEBUG: +15 MIN", () => AdvanceDebugTime(TimeSpan.FromMinutes(15))); Rect(debug15, .12f, .17f, .48f, .24f);
+            var debugHour = AddButton(card.transform, "DEBUG: +1 H", () => AdvanceDebugTime(TimeSpan.FromHours(1))); Rect(debugHour, .52f, .17f, .88f, .24f);
+            var exitButton = AddLocalizedButton(card.transform, "ui.settings.exit", "EXIT", Application.Quit); Rect(exitButton, .12f, .06f, .88f, .14f);
             settingsModal.SetActive(false);
         }
 
@@ -203,9 +214,18 @@ namespace DistilleryDiscovery
             {
                 PrepareTextView(FooterMode.None); var delivery = game.ReceiveDelivery();
                 contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.delivery", "NEW DELIVERY")}</b></color>\n\n" + string.Join("\n", delivery.Items.Select(x => $"+{x.Value}  {IngredientName(x.Key)}"));
-                SetStatus(T("ui.status.delivery", "Delivery received")); RefreshHeaderCounters();
+                save.Save(game.State); SetStatus(T("ui.status.delivery", "Delivery received")); RefreshHeaderCounters();
             }
             catch (Exception ex) { SetStatus(ex.Message); }
+        }
+
+        private void ShowDelivery()
+        {
+            game.UpdateTime(); PrepareTextView(FooterMode.Delivery);
+            var remaining = game.TimeUntilNextFreeDelivery;
+            var timer = game.State.availableFreeDeliveries >= game.Config.Economy.maxStoredFreeDeliveries ? "MAX" : FormatDuration(remaining);
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.delivery", "FREE DELIVERY")}</b></color>\n\nAvailable: <b>{game.State.availableFreeDeliveries}/{game.Config.Economy.maxStoredFreeDeliveries}</b>\nNext: <b>{timer}</b>\nItems per delivery: <b>{game.Config.Economy.freeDeliveryMinItems}–{game.Config.Economy.freeDeliveryMaxItems}</b>";
+            SetStatus(game.State.availableFreeDeliveries > 0 ? "Free delivery ready to claim" : "Waiting for the next free delivery");
         }
 
         private void ShowIngredientInventory()
@@ -307,9 +327,21 @@ namespace DistilleryDiscovery
 
         private void ShowLaboratory()
         {
+            game.UpdateTime();
             PrepareTextView(FooterMode.Laboratory); var current = game.Config.LaboratoryLevel(game.State.laboratoryLevel); var next = game.Config.LaboratoryLevel(game.State.laboratoryLevel + 1);
             SetStatus(T("ui.status.laboratory", "Laboratory improves product rarity"));
-            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.laboratory", "LABORATORY")} · {T("ui.label.level", "LEVEL")} {current.level}</b></color>\n\n{T("ui.label.rarity_bonus", "Higher rarity bonus")}: <b>+{current.productQualityBonus:P0}</b>\n\n" + (next == null ? T("ui.laboratory.max", "Maximum level reached.") : $"{T("ui.label.next_level", "Next level")}: <b>{next.level}</b>\n{T("ui.label.new_bonus", "New bonus")}: <b>+{next.productQualityBonus:P0}</b>\n{T("ui.label.cost", "Cost")}: <b>{next.upgradeCost} {T("ui.label.gold_lower", "gold")}</b>");
+            var jobs = new StringBuilder();
+            var active = game.State.laboratoryJobs.Where(x => x.status != LaboratoryJobStatus.Claimed).ToList();
+            for (var i = 0; i < game.Config.Economy.initialLaboratorySlots; i++)
+            {
+                var job = i < active.Count ? active[i] : null;
+                if (job == null) jobs.Append($"\nSlot {i + 1}: <b>FREE</b>\n");
+                else
+                {
+                    jobs.Append($"\nSlot {i + 1}: <b>{job.type.ToUpperInvariant()}</b> · {(job.status == LaboratoryJobStatus.Completed ? "READY TO CLAIM" : FormatDuration(game.TimeRemaining(job)))}\n");
+                }
+            }
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.laboratory", "LABORATORY")} · {T("ui.label.level", "LEVEL")} {current.level}</b></color>\n\nFree slots: <b>{game.AvailableLaboratorySlots}/{game.Config.Economy.initialLaboratorySlots}</b>{jobs}\n\n{T("ui.label.rarity_bonus", "Higher rarity bonus")}: <b>+{current.productQualityBonus:P0}</b>\n" + (next == null ? T("ui.laboratory.max", "Maximum level reached.") : $"{T("ui.label.next_level", "Next level")}: <b>{next.level}</b> · {T("ui.label.cost", "Cost")}: <b>{next.upgradeCost}</b>");
         }
 
         private void ShowPendingResult()
@@ -353,20 +385,26 @@ namespace DistilleryDiscovery
             {
                 if (footerMode == FooterMode.Experiment) RunExperiment();
                 else if (footerMode == FooterMode.Production) RunProduction();
-                else if (footerMode == FooterMode.Laboratory) { game.UpgradeLaboratory(); RefreshHeaderCounters(); ShowLaboratory(); }
+                else if (footerMode == FooterMode.Delivery) { ReceiveDelivery(); ShowDelivery(); }
+                else if (footerMode == FooterMode.Laboratory)
+                {
+                    var completed = game.State.laboratoryJobs.FirstOrDefault(x => x.status == LaboratoryJobStatus.Completed);
+                    if (completed != null) { game.ClaimLaboratoryJob(completed.id); save.Save(game.State); ShowPendingResult(); }
+                    else { game.UpgradeLaboratory(); RefreshHeaderCounters(); ShowLaboratory(); }
+                }
             }
             catch (Exception ex) { SetStatus(ex.Message); }
         }
 
         private void RunExperiment()
         {
-            game.RunExperiment(selection); selection.Clear(); save.Save(game.State); RefreshHeaderCounters(); ShowPendingResult();
+            game.StartExperiment(selection); selection.Clear(); save.Save(game.State); RefreshHeaderCounters(); ShowLaboratory();
         }
 
         private void RunProduction()
         {
             if (string.IsNullOrEmpty(selectedProductionRecipeId)) throw new InvalidOperationException(T("ui.error.choose_recipe", "Choose a discovered recipe."));
-            game.RunProduction(selectedProductionRecipeId, selection); selection.Clear(); save.Save(game.State); RefreshHeaderCounters(); ShowPendingResult();
+            game.StartProduction(selectedProductionRecipeId, selection); selection.Clear(); save.Save(game.State); RefreshHeaderCounters(); ShowLaboratory();
         }
 
         private void ClearSelection()
@@ -399,9 +437,11 @@ namespace DistilleryDiscovery
             {
                 FooterMode.Experiment => T("ui.action.run_experiment", "RUN EXPERIMENT"),
                 FooterMode.Production => T("ui.action.produce", "PRODUCE"),
-                FooterMode.Laboratory => T("ui.action.upgrade", "UPGRADE LABORATORY"),
+                FooterMode.Laboratory => game.State.laboratoryJobs.Any(x => x.status == LaboratoryJobStatus.Completed) ? T("ui.action.claim", "CLAIM") : T("ui.action.upgrade", "UPGRADE LABORATORY"),
+                FooterMode.Delivery => game.State.availableFreeDeliveries > 0 ? T("ui.action.claim", "CLAIM") : "WAITING",
                 _ => "—"
             };
+            primaryActionButton.interactable = mode != FooterMode.None && (mode != FooterMode.Delivery || game.State.availableFreeDeliveries > 0);
             UpdateSelection();
         }
 
@@ -425,8 +465,11 @@ namespace DistilleryDiscovery
         private void CloseSettings() => settingsModal.SetActive(false);
         private void ToggleLanguage() { game.State.languageCode = Language == "pl" ? "en" : "pl"; RefreshLocalizedBindings(); RefreshHeaderCounters(); ShowState(T("ui.status.language_changed", "Language changed")); settingsModal.SetActive(true); }
         private void SaveGame() { save.Save(game.State); CloseSettings(); ShowState(T("ui.status.saved", "Game saved locally")); }
-        private void LoadGame() { try { game.ReplaceState(save.Load()); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); if (game.State.pendingResult != null) ShowPendingResult(); else ShowState(T("ui.status.loaded", "Local save loaded")); } catch (Exception ex) { SetStatus(ex.Message); } }
+        private void LoadGame() { try { game.ReplaceState(save.Load()); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); if (game.State.pendingResult != null) ShowPendingResult(); else ShowState(OfflineStatus(T("ui.status.loaded", "Local save loaded"))); } catch (Exception ex) { SetStatus(ex.Message); } }
         private void ResetGame() { save.Reset(); game.ReplaceState(GameService.NewState(game.Config, Language)); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); ShowState(T("ui.status.reset", "Save deleted and game reset")); }
+        private void AdvanceDebugTime(TimeSpan duration) { if (game.DebugAdvanceTime(duration)) { save.Save(game.State); CloseSettings(); ShowLaboratory(); } }
+        private string OfflineStatus(string prefix) => game.LastOfflineDeliveriesGained == 0 && game.LastOfflineJobsCompleted == 0 ? prefix : $"{prefix} · Offline: +{game.LastOfflineDeliveriesGained} deliveries, {game.LastOfflineJobsCompleted} jobs completed";
+        private static string FormatDuration(TimeSpan duration) { if (duration < TimeSpan.Zero) duration = TimeSpan.Zero; return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}:{duration.Seconds:00}"; }
 
         private string MasteryName(MasteryLevelDefinition level) => level == null ? "—" : game.Config.Text($"mastery.{level.id}", Language, level.displayName);
         private string ContractRewardDescription(ContractDefinition contract)

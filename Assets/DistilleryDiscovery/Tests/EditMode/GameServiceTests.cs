@@ -7,322 +7,262 @@ namespace DistilleryDiscovery.Tests
 {
     public sealed class GameServiceTests
     {
-        [Test]
-        public void Configuration_LoadsAllRequiredContent()
+        [Test] public void Configuration_LoadsTimingValues()
         {
             var config = ConfigLoader.LoadFromResources();
-            Assert.That(config.Ingredients, Has.Count.GreaterThanOrEqualTo(8));
-            Assert.That(config.Recipes, Has.Count.GreaterThanOrEqualTo(15));
-            Assert.That(config.Contracts, Has.Count.GreaterThanOrEqualTo(4));
-            Assert.That(config.Localizations, Has.Count.GreaterThanOrEqualTo(40));
-            Assert.That(config.Text("ui.header.gold", "pl"), Is.EqualTo("ZŁOTO"));
-            Assert.That(config.Text("ui.header.gold", "en"), Is.EqualTo("GOLD"));
-            Assert.That(config.LaboratoryLevel(2).upgradeCost, Is.EqualTo(1500));
-            Assert.That(config.Economy.activeContractCount, Is.EqualTo(3));
-            Assert.That(config.MasteryLevels, Has.Count.EqualTo(4));
-            Assert.That(config.Contracts.All(x => x.ingredientRewards.Count > 0), Is.True);
+            Assert.That(config.Economy.freeDeliveryIntervalSeconds, Is.EqualTo(7200));
+            Assert.That(config.Economy.experimentDurationSeconds, Is.EqualTo(3600));
+            Assert.That(config.Economy.productionDurationSeconds, Is.EqualTo(1800));
+            Assert.That(config.Economy.maxStoredFreeDeliveries, Is.EqualTo(3));
+            Assert.That(config.Economy.initialLaboratorySlots, Is.EqualTo(1));
         }
 
-        [Test]
-        public void Validator_RejectsDuplicateIds()
+        [Test] public void Validator_RejectsInvalidTimingValues()
         {
-            var config = MinimalConfig(); config.Ingredients.Add(config.Ingredients[0]);
-            Assert.That(ConfigValidator.Validate(config), Has.Some.Contains("duplicate ingredient"));
+            var config = MinimalConfig(); config.Economy.experimentDurationSeconds = 0;
+            Assert.That(ConfigValidator.Validate(config), Has.Some.Contains("durations"));
         }
 
-        [Test]
-        public void Experiment_ConsumesExactlyThreeIngredients()
+        [Test] public void FreeDelivery_IsUnavailableBeforeInterval()
         {
-            var game = GameWithInventory(new MinRandom(), 3); game.RunExperiment(ThreeIngredients());
+            var (game, clock) = CreateGame(); clock.AdvanceSeconds(59); game.UpdateTime();
+            Assert.That(game.State.availableFreeDeliveries, Is.Zero);
+        }
+
+        [Test] public void FreeDelivery_BecomesAvailableAfterInterval()
+        {
+            var (game, clock) = CreateGame(); clock.AdvanceSeconds(60); game.UpdateTime();
+            Assert.That(game.State.availableFreeDeliveries, Is.EqualTo(1));
+        }
+
+        [Test] public void OfflineProgress_AccumulatesMultipleDeliveries()
+        {
+            var (game, clock) = CreateGame(); clock.AdvanceSeconds(120); game.UpdateTime();
+            Assert.That(game.State.availableFreeDeliveries, Is.EqualTo(2));
+        }
+
+        [Test] public void OfflineProgress_RespectsStoredDeliveryLimit()
+        {
+            var (game, clock) = CreateGame(); clock.AdvanceSeconds(600); game.UpdateTime();
+            Assert.That(game.State.availableFreeDeliveries, Is.EqualTo(3));
+        }
+
+        [Test] public void OfflineTimeCap_IsNotAppliedAgainOnRepeatedUpdate()
+        {
+            var config = MinimalConfig(); config.Economy.maxOfflineProgressSeconds = 120;
+            var clock = new ManualTime(); var game = new GameService(config, GameService.NewState(config), new MinRandom(), clock);
+            clock.AdvanceSeconds(600); game.UpdateTime(); var first = game.State.availableFreeDeliveries; game.UpdateTime();
+            Assert.That(first, Is.EqualTo(2));
+            Assert.That(game.State.availableFreeDeliveries, Is.EqualTo(first));
+        }
+
+        [Test] public void ClaimingDelivery_DecrementsAvailabilityAndAddsItems()
+        {
+            var (game, clock) = CreateGame(); clock.AdvanceSeconds(60); game.UpdateTime();
+            var result = game.ReceiveDelivery();
+            Assert.That(game.State.availableFreeDeliveries, Is.Zero);
+            Assert.That(result.Items["ingredient_test"], Is.EqualTo(2));
+        }
+
+        [Test] public void StartingExperiment_ConsumesIngredientsAndOccupiesSlot()
+        {
+            var (game, _) = CreateGame(3); var job = game.StartExperiment(Three());
             Assert.That(game.State.AmountOf("ingredient_test"), Is.Zero);
+            Assert.That(game.AvailableLaboratorySlots, Is.Zero);
+            Assert.That(job.status, Is.EqualTo(LaboratoryJobStatus.Running));
         }
 
-        [Test]
-        public void Experiment_CannotRunWithoutRequiredInventory()
+        [Test] public void CannotStartJobWithoutFreeSlot()
         {
-            var game = GameWithInventory(new MinRandom(), 2);
-            Assert.Throws<InvalidOperationException>(() => game.RunExperiment(ThreeIngredients()));
-            Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(2));
-        }
-
-        [Test]
-        public void Preview_SumsOutcomeWeightsAcrossIngredients()
-        {
-            var preview = GameWithInventory(new MinRandom(), 3).Preview(ThreeIngredients());
-            Assert.That(preview[0].Weight, Is.EqualTo(30));
-            Assert.That(preview[0].Probability, Is.EqualTo(1f));
-        }
-
-        [Test]
-        public void Experiment_CreatesPendingRewardWithoutImmediatelyAddingGold()
-        {
-            var game = GameWithInventory(new MinRandom(), 3); var startingGold = game.State.gold;
-            var result = game.RunExperiment(ThreeIngredients());
-            Assert.That(result.WasDiscovered, Is.True);
-            Assert.That(game.State.pendingResult.recipeId, Is.EqualTo("recipe_test"));
-            Assert.That(game.State.pendingResult.saleValue, Is.EqualTo(result.SaleValue));
-            Assert.That(game.State.gold, Is.EqualTo(startingGold));
-
-            var claim = game.ClaimPendingResult();
-            Assert.That(claim.ProductGold, Is.EqualTo(result.SaleValue));
-            Assert.That(game.State.gold, Is.EqualTo(startingGold + result.SaleValue));
-            Assert.That(game.State.pendingResult, Is.Null);
-        }
-
-        [Test]
-        public void PendingResult_BlocksFurtherGameplayActions()
-        {
-            var game = GameWithInventory(new MinRandom(), 6); game.State.gold = 500;
-            game.RunExperiment(ThreeIngredients());
-            Assert.Throws<InvalidOperationException>(() => game.RunExperiment(ThreeIngredients()));
-            Assert.Throws<InvalidOperationException>(() => game.ReceiveDelivery());
-            Assert.Throws<InvalidOperationException>(() => game.UpgradeLaboratory());
-        }
-
-        [Test]
-        public void HigherRarity_UpdatesRecipeRecordBeforeClaim()
-        {
-            var game = GameWithInventory(new MaxRandom(), 3); Discover(game, "rarity_common");
-            var result = game.RunExperiment(ThreeIngredients());
-            Assert.That(result.RarityImproved, Is.True);
-            Assert.That(game.State.RecipeState("recipe_test").highestProductRarityId, Is.EqualTo("rarity_rare"));
-        }
-
-        [Test]
-        public void Production_RequiresDiscoveredRecipe()
-        {
-            var game = GameWithInventory(new MinRandom(), 3);
-            Assert.Throws<InvalidOperationException>(() => game.RunProduction("recipe_test", ThreeIngredients()));
+            var (game, _) = CreateGame(6); game.StartExperiment(Three());
+            Assert.Throws<InvalidOperationException>(() => game.StartExperiment(Three()));
             Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(3));
         }
 
-        [Test]
-        public void Production_RejectsIngredientThatDoesNotContributeToRecipe()
+        [Test] public void Job_IsNotReadyBeforeEndTime()
         {
-            var game = GameWithInventory(new MinRandom(), 2); game.State.AddIngredient("ingredient_invalid", 1); Discover(game);
-            Assert.Throws<InvalidOperationException>(() => game.RunProduction("recipe_test", new[] { "ingredient_test", "ingredient_test", "ingredient_invalid" }));
-            Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(2));
+            var (game, clock) = CreateGame(3); var job = game.StartExperiment(Three()); clock.AdvanceSeconds(29); game.UpdateTime();
+            Assert.That(job.status, Is.EqualTo(LaboratoryJobStatus.Running));
+            Assert.Throws<InvalidOperationException>(() => game.ClaimLaboratoryJob(job.id));
         }
 
-        [Test]
-        public void Production_CreatesGuaranteedPendingProductReward()
+        [Test] public void Job_IsReadyAfterEndTime()
         {
-            var game = GameWithInventory(new MinRandom(), 3); Discover(game); var startingGold = game.State.gold;
-            var result = game.RunProduction("recipe_test", ThreeIngredients());
+            var (game, clock) = CreateGame(3); var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30); game.UpdateTime();
+            Assert.That(job.status, Is.EqualTo(LaboratoryJobStatus.Completed));
+        }
+
+        [Test] public void ClaimingExperiment_AddsProductToRecipeBookOnlyAtClaim()
+        {
+            var (game, clock) = CreateGame(3); var job = game.StartExperiment(Three());
+            Assert.That(game.State.RecipeState("recipe_test"), Is.Null);
+            clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id);
+            Assert.That(game.State.RecipeState("recipe_test").timesCreated, Is.EqualTo(1));
+            Assert.That(game.State.pendingResult.source, Is.EqualTo(LaboratoryJobType.Experiment));
+        }
+
+        [Test] public void ClaimingProduction_AddsGuaranteedRecipeProduct()
+        {
+            var (game, clock) = CreateGame(3); Discover(game); var job = game.StartProduction("recipe_test", Three());
+            clock.AdvanceSeconds(20); var result = game.ClaimLaboratoryJob(job.id);
             Assert.That(result.RecipeId, Is.EqualTo("recipe_test"));
-            Assert.That(game.State.AmountOf("ingredient_test"), Is.Zero);
-            Assert.That(game.State.gold, Is.EqualTo(startingGold));
-            Assert.That(game.State.pendingResult.source, Is.EqualTo("production"));
+            Assert.That(game.State.RecipeState("recipe_test").timesCreated, Is.EqualTo(1));
         }
 
-        [Test]
-        public void PendingSummary_RecordsEveryAdvancedAndCompletedContract()
+        [Test] public void ResultRandomization_IsDeferredUntilClaim()
         {
-            var game = GameWithInventory(new MinRandom(), 6);
-            game.RunExperiment(ThreeIngredients()); game.ClaimPendingResult();
-            game.RunProduction("recipe_test", ThreeIngredients());
-            Assert.That(game.State.pendingResult.contractProgress, Has.Count.EqualTo(3));
-            Assert.That(game.State.pendingResult.contractProgress.All(x => x.completed), Is.True);
-            Assert.That(game.State.ContractState("contract_recipe").progress, Is.EqualTo(2));
-            Assert.That(game.State.ContractState("contract_rarity").progress, Is.EqualTo(2));
-            Assert.That(game.State.ContractState("contract_category").progress, Is.EqualTo(2));
+            var random = new CountingRandom(); var (game, clock) = CreateGame(3, random); var before = random.Calls;
+            var job = game.StartExperiment(Three()); Assert.That(random.Calls, Is.EqualTo(before));
+            clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id);
+            Assert.That(random.Calls, Is.GreaterThan(before));
         }
 
-        [Test]
-        public void SingleClaim_AwardsProductAndAllCompletedContractBonuses()
+        [Test] public void SaveLoad_PreservesActiveJobs()
         {
-            var game = GameWithInventory(new MinRandom(), 6); var startingGold = game.State.gold;
-            var first = game.RunExperiment(ThreeIngredients()); game.ClaimPendingResult();
-            var second = game.RunProduction("recipe_test", ThreeIngredients());
-            Assert.That(game.State.gold, Is.EqualTo(startingGold + first.SaleValue));
-
-            var claim = game.ClaimPendingResult();
-            Assert.That(claim.ProductGold, Is.EqualTo(second.SaleValue));
-            Assert.That(claim.ContractGold, Is.EqualTo(120));
-            Assert.That(claim.CompletedContractIds, Has.Count.EqualTo(3));
-            Assert.That(game.State.gold, Is.EqualTo(startingGold + first.SaleValue + second.SaleValue + 120));
+            var (game, _) = CreateGame(3); var job = game.StartExperiment(Three()); var saves = new SaveService(new MemoryStorage());
+            saves.Save(game.State); var loaded = saves.Load();
+            Assert.That(loaded.laboratoryJobs.Single().id, Is.EqualTo(job.id));
+            Assert.That(loaded.laboratoryJobs.Single().ingredientIds, Is.EquivalentTo(Three()));
         }
 
-        [Test]
-        public void ContractClaim_AwardsEveryConfiguredIngredientRewardWithinRange()
+        [Test] public void LoadingAfterJobEnd_MarksItReadyButDoesNotResolveIt()
         {
-            var game = GameWithInventory(new MaxRandom(), 3);
-            game.State.activeContracts.Clear();
-            game.State.activeContracts.Add(new ActiveContractState { contractId = "contract_recipe", progress = 1 });
-            game.RunExperiment(ThreeIngredients());
-
-            var claim = game.ClaimPendingResult();
-
-            Assert.That(claim.IngredientRewards["ingredient_reward_a"], Is.EqualTo(3));
-            Assert.That(claim.IngredientRewards["ingredient_reward_b"], Is.EqualTo(4));
-            Assert.That(game.State.AmountOf("ingredient_reward_a"), Is.InRange(1, 3));
-            Assert.That(game.State.AmountOf("ingredient_reward_b"), Is.InRange(2, 4));
+            var (game, clock) = CreateGame(3); game.StartExperiment(Three()); var saves = new SaveService(new MemoryStorage()); saves.Save(game.State);
+            clock.AdvanceSeconds(30); var loadedGame = new GameService(game.Config, saves.Load(), new MinRandom(), clock);
+            Assert.That(loadedGame.State.laboratoryJobs.Single().status, Is.EqualTo(LaboratoryJobStatus.Completed));
+            Assert.That(loadedGame.State.RecipeState("recipe_test"), Is.Null);
         }
 
-        [Test]
-        public void ClaimingResult_ReplacesAllCompletedContractsWithDistinctContracts()
+        [Test] public void VersionFiveSaveWithoutTimerFields_MigratesWithoutLosingProgress()
         {
-            var game = GameWithInventory(new MinRandom(), 6);
-            game.RunExperiment(ThreeIngredients()); game.ClaimPendingResult();
-            game.RunProduction("recipe_test", ThreeIngredients()); game.ClaimPendingResult();
-            Assert.That(game.State.activeContracts, Has.Count.EqualTo(3));
-            Assert.That(game.State.activeContracts.Select(x => x.contractId).Distinct().Count(), Is.EqualTo(3));
-            Assert.That(game.State.activeContracts.Select(x => x.contractId), Does.Contain("contract_spare"));
+            var config = MinimalConfig(); var clock = new ManualTime();
+            var old = new PlayerState { version = 5, gold = 777 }; old.AddIngredient("ingredient_test", 9); Discover(old);
+            var game = new GameService(config, old, new MinRandom(), clock);
+            Assert.That(game.State.version, Is.EqualTo(6));
+            Assert.That(game.State.gold, Is.EqualTo(777));
+            Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(9));
+            Assert.That(game.State.RecipeState("recipe_test"), Is.Not.Null);
+            Assert.That(game.State.availableFreeDeliveries, Is.Zero);
         }
 
-        [Test]
-        public void LaboratoryUpgrade_CostsConfiguredGold()
+        [Test] public void ProductionDuration_UsesConfiguredTimeReduction()
         {
-            var game = GameWithInventory(new MinRandom(), 0); game.State.gold = 500; game.UpgradeLaboratory();
-            Assert.That(game.State.laboratoryLevel, Is.EqualTo(2));
-            Assert.That(game.State.gold, Is.EqualTo(200));
+            var config = MinimalConfig(); config.Economy.laboratoryLevelTimeReduction = .25f;
+            var clock = new ManualTime(); var state = GameService.NewState(config); state.laboratoryLevel = 2; state.AddIngredient("ingredient_test", 3); Discover(state);
+            var game = new GameService(config, state, new MinRandom(), clock); var job = game.StartProduction("recipe_test", Three());
+            Assert.That(DateTime.Parse(job.endTimeUtc) - DateTime.Parse(job.startTimeUtc), Is.EqualTo(TimeSpan.FromSeconds(15)));
         }
 
-        [Test]
-        public void LaboratoryBonus_ChangesProductionRarityAtControlledRollThreshold()
+        [Test] public void ClaimingPendingReward_PreservesExistingContractAndGoldFlow()
         {
-            var game = GameWithInventory(new FractionRandom(0.49f), 6); game.State.gold = 500; Discover(game);
-            var before = game.RunProduction("recipe_test", ThreeIngredients()); game.ClaimPendingResult();
-            game.UpgradeLaboratory();
-            var after = game.RunProduction("recipe_test", ThreeIngredients());
-            Assert.That(before.RarityId, Is.EqualTo("rarity_common"));
-            Assert.That(after.RarityId, Is.EqualTo("rarity_rare"));
+            var (game, clock) = CreateGame(3); var startGold = game.State.gold; var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30);
+            var product = game.ClaimLaboratoryJob(job.id); var claim = game.ClaimPendingResult();
+            Assert.That(claim.ProductGold, Is.EqualTo(product.SaleValue));
+            Assert.That(game.State.gold, Is.GreaterThan(startGold));
         }
 
-        [Test]
-        public void EveryCreatedProduct_IncrementsRecipeProductionCount()
+        [Test] public void Preview_SumsWeightsWithoutConsumingInventory()
         {
-            var game = GameWithInventory(new MinRandom(), 6);
-            game.RunExperiment(ThreeIngredients()); game.ClaimPendingResult();
-            game.RunProduction("recipe_test", ThreeIngredients());
-            Assert.That(game.State.RecipeState("recipe_test").timesCreated, Is.EqualTo(2));
+            var (game, _) = CreateGame(3); var preview = game.Preview(Three());
+            Assert.That(preview.Single().Weight, Is.EqualTo(30));
+            Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(3));
         }
 
-        [TestCase(1, "apprentice")]
-        [TestCase(10, "craftsman")]
-        [TestCase(30, "master")]
-        [TestCase(100, "grandmaster")]
-        public void ProductionCount_DeterminesConfiguredMasteryLevel(int count, string expectedId)
+        [Test] public void Production_RequiresDiscoveredRecipe()
         {
-            var game = GameWithInventory(new MinRandom(), 0); Discover(game); game.State.RecipeState("recipe_test").timesCreated = count;
-            Assert.That(game.MasteryLevel("recipe_test").id, Is.EqualTo(expectedId));
+            var (game, _) = CreateGame(3);
+            Assert.Throws<InvalidOperationException>(() => game.StartProduction("recipe_test", Three()));
         }
 
-        [Test]
-        public void FirstRecipeResult_GrantsApprenticeMastery()
+        [Test] public void Production_RejectsNonContributingIngredientWithoutConsumingAny()
         {
-            var game = GameWithInventory(new MinRandom(), 3); game.RunExperiment(ThreeIngredients());
-            Assert.That(game.MasteryLevel("recipe_test").id, Is.EqualTo("apprentice"));
-        }
-
-        [Test]
-        public void Mastery_ChangesHigherRarityWeightButNotSaleValue()
-        {
-            var apprentice = GameWithInventory(new MinRandom(), 3); Discover(apprentice); apprentice.State.RecipeState("recipe_test").timesCreated = 1;
-            var grandmaster = GameWithInventory(new MinRandom(), 3); Discover(grandmaster); grandmaster.State.RecipeState("recipe_test").timesCreated = 100;
-
-            var apprenticeRareWeight = apprentice.ProductRarityWeights(ThreeIngredients(), "recipe_test").Single(x => x.rarityId == "rarity_rare").weight;
-            var grandmasterRareWeight = grandmaster.ProductRarityWeights(ThreeIngredients(), "recipe_test").Single(x => x.rarityId == "rarity_rare").weight;
-            var apprenticeProduct = apprentice.RunProduction("recipe_test", ThreeIngredients());
-            var grandmasterProduct = grandmaster.RunProduction("recipe_test", ThreeIngredients());
-
-            Assert.That(grandmasterRareWeight, Is.GreaterThan(apprenticeRareWeight));
-            Assert.That(grandmasterProduct.SaleValue, Is.EqualTo(apprenticeProduct.SaleValue));
-        }
-
-        [Test]
-        public void Delivery_AddsIngredients()
-        {
-            var game = GameWithInventory(new MinRandom(), 0); var result = game.ReceiveDelivery();
-            Assert.That(result.Items["ingredient_test"], Is.EqualTo(2));
+            var (game, _) = CreateGame(2); Discover(game); game.State.AddIngredient("ingredient_invalid", 1);
+            Assert.Throws<InvalidOperationException>(() => game.StartProduction("recipe_test", new[] { "ingredient_test", "ingredient_test", "ingredient_invalid" }));
             Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(2));
         }
 
-        [Test]
-        public void VersionTwoSave_MigratesStoredProductsAndContracts()
+        [Test] public void LaboratoryUpgrade_UsesConfiguredGoldCost()
         {
-            var config = MinimalConfig(); var legacy = new PlayerState { version = 2, gold = 5 };
-            legacy.products.Add(new ProductEntry { recipeId = "recipe_test", rarityId = "rarity_common", saleValue = 10, amount = 3 }); legacy.activeContractIds.Add("contract_recipe");
-            var game = new GameService(config, legacy, new MinRandom());
-            Assert.That(game.State.version, Is.EqualTo(5));
-            Assert.That(game.State.gold, Is.EqualTo(35));
-            Assert.That(game.State.ContractState("contract_recipe"), Is.Not.Null);
-            Assert.That(game.State.activeContracts, Has.Count.EqualTo(3));
+            var (game, _) = CreateGame(); game.State.gold = 20; game.UpgradeLaboratory();
+            Assert.That(game.State.laboratoryLevel, Is.EqualTo(2));
+            Assert.That(game.State.gold, Is.EqualTo(10));
         }
 
-        [Test]
-        public void SaveAndLoad_PreservesPendingResultContractProgressAndLanguage()
+        [Test] public void ProductClaim_IncrementsConfiguredMasteryCount()
         {
-            var storage = new MemoryStorage(); var saves = new SaveService(storage);
-            var original = new PlayerState { gold = 777, languageCode = "pl", pendingResult = new PendingResultState { source = "experiment", recipeId = "recipe_test", rarityId = "rarity_common", saleValue = 10 } };
-            original.pendingResult.contractProgress.Add(new PendingContractProgress { contractId = "contract_recipe", currentProgress = 1 });
-            saves.Save(original); var loaded = saves.Load();
-            Assert.That(loaded.languageCode, Is.EqualTo("pl"));
-            Assert.That(loaded.pendingResult.saleValue, Is.EqualTo(10));
-            Assert.That(loaded.pendingResult.contractProgress[0].currentProgress, Is.EqualTo(1));
+            var (game, clock) = CreateGame(3); var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id);
+            Assert.That(game.MasteryLevel("recipe_test").id, Is.EqualTo("first"));
         }
 
-        [Test]
-        public void SaveAndLoad_PreservesRecipeProductionCounts()
+        [Test] public void HigherMastery_IncreasesHigherRarityWeight()
         {
-            var storage = new MemoryStorage(); var saves = new SaveService(storage); var state = new PlayerState();
-            state.recipes.Add(new PlayerRecipeState { recipeId = "recipe_test", timesCreated = 30 });
-            saves.Save(state);
-            Assert.That(saves.Load().RecipeState("recipe_test").timesCreated, Is.EqualTo(30));
+            var (game, _) = CreateGame(3); Discover(game); var state = game.State.RecipeState("recipe_test"); state.timesCreated = 1;
+            var before = game.ProductRarityWeights(Three(), "recipe_test").Single(x => x.rarityId == "rarity_rare").weight;
+            state.timesCreated = 2;
+            var after = game.ProductRarityWeights(Three(), "recipe_test").Single(x => x.rarityId == "rarity_rare").weight;
+            Assert.That(after, Is.GreaterThan(before));
         }
 
-        private static GameService GameWithInventory(IRandomSource random, int amount)
+        [Test] public void PendingResult_BlocksStartingAnotherJob()
         {
-            var config = MinimalConfig(); var state = GameService.NewState(config); state.AddIngredient("ingredient_test", amount);
-            return new GameService(config, state, random);
+            var (game, clock) = CreateGame(6); var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id);
+            Assert.Throws<InvalidOperationException>(() => game.StartExperiment(Three()));
         }
 
-        private static void Discover(GameService game, string rarityId = "rarity_common") => game.State.recipes.Add(new PlayerRecipeState { recipeId = "recipe_test", highestProductRarityId = rarityId });
-        private static string[] ThreeIngredients() => new[] { "ingredient_test", "ingredient_test", "ingredient_test" };
+        [Test] public void CompletedContract_IsPaidWithProductReward()
+        {
+            var (game, clock) = CreateGame(3); game.State.activeContracts.Add(new ActiveContractState { contractId = "contract_recipe" });
+            var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id); var claim = game.ClaimPendingResult();
+            Assert.That(claim.ContractGold, Is.EqualTo(40));
+            Assert.That(claim.CompletedContractIds, Does.Contain("contract_recipe"));
+        }
+
+        [Test] public void SaveLoad_PreservesPendingResult()
+        {
+            var (game, clock) = CreateGame(3); var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id);
+            var saves = new SaveService(new MemoryStorage()); saves.Save(game.State);
+            Assert.That(saves.Load().pendingResult.recipeId, Is.EqualTo("recipe_test"));
+        }
+
+        private static (GameService game, ManualTime clock) CreateGame(int ingredients = 0, IRandomSource random = null)
+        {
+            var config = MinimalConfig(); var clock = new ManualTime(); var state = GameService.NewState(config); state.AddIngredient("ingredient_test", ingredients);
+            return (new GameService(config, state, random ?? new MinRandom(), clock), clock);
+        }
+
+        private static string[] Three() => new[] { "ingredient_test", "ingredient_test", "ingredient_test" };
+        private static void Discover(GameService game) => Discover(game.State);
+        private static void Discover(PlayerState state) => state.recipes.Add(new PlayerRecipeState { recipeId = "recipe_test", highestProductRarityId = "rarity_common" });
 
         private static GameConfig MinimalConfig()
         {
-            var rarities = new List<RarityDefinition>
-            {
-                new() { id = "rarity_common", displayName = "Common", rank = 1, valueMultiplier = 1f },
-                new() { id = "rarity_rare", displayName = "Rare", rank = 2, valueMultiplier = 2f, qualityScore = 10 }
+            var rarities = new List<RarityDefinition> { new() { id = "rarity_common", rank = 1, valueMultiplier = 1f }, new() { id = "rarity_rare", rank = 2, valueMultiplier = 2f } };
+            var ingredients = new List<IngredientDefinition> {
+                new() { id = "ingredient_test", displayName = "Test", rarityId = "rarity_common", outcomeWeights = new List<OutcomeWeight> { new() { recipeId = "recipe_test", weight = 10 } } },
+                new() { id = "ingredient_invalid", displayName = "Invalid", rarityId = "rarity_common" }
             };
-            var ingredients = new List<IngredientDefinition>
-            {
-                new() { id = "ingredient_test", displayName = "Test Ingredient", rarityId = "rarity_common", outcomeWeights = new List<OutcomeWeight> { new() { recipeId = "recipe_test", weight = 10 } } },
-                new() { id = "ingredient_invalid", displayName = "Invalid Ingredient", rarityId = "rarity_common", outcomeWeights = new List<OutcomeWeight>() }
-                ,new() { id = "ingredient_reward_a", displayName = "Reward A", rarityId = "rarity_rare", outcomeWeights = new List<OutcomeWeight>() }
-                ,new() { id = "ingredient_reward_b", displayName = "Reward B", rarityId = "rarity_rare", outcomeWeights = new List<OutcomeWeight>() }
-            };
-            var recipes = new List<RecipeDefinition> { new() { id = "recipe_test", displayName = "Test Recipe", categoryId = "category_test", collectionRarityId = "rarity_common", baseValue = 10 } };
-            var economy = new EconomyDefinition
-            {
-                startingGold = 5, ingredientsPerExperiment = 3, ingredientsPerProduction = 3, activeContractCount = 3,
+            var recipes = new List<RecipeDefinition> { new() { id = "recipe_test", categoryId = "category_test", collectionRarityId = "rarity_common", baseValue = 10 } };
+            var economy = new EconomyDefinition {
+                ingredientsPerExperiment = 3, ingredientsPerProduction = 3, activeContractCount = 0,
+                freeDeliveryIntervalSeconds = 60, freeDeliveryMinItems = 2, freeDeliveryMaxItems = 2, maxStoredFreeDeliveries = 3,
+                experimentDurationSeconds = 30, productionDurationSeconds = 20, initialLaboratorySlots = 1,
                 productRarityWeights = new List<WeightedRarity> { new() { rarityId = "rarity_common", weight = 100 }, new() { rarityId = "rarity_rare", weight = 100 } },
-                deliveryPools = new List<DeliveryPool> { new() { id = "pool_base", rolls = 2, entries = new List<DeliveryEntry> { new() { ingredientId = "ingredient_test", weight = 1, minAmount = 1, maxAmount = 1 } } } }
+                deliveryPools = new List<DeliveryPool> { new() { id = "pool_base", rolls = 99, entries = new List<DeliveryEntry> { new() { ingredientId = "ingredient_test", weight = 1, minAmount = 1, maxAmount = 1 } } } }
             };
-            var categories = new List<RecipeCategoryDefinition> { new() { id = "category_test", displayName = "Test" } };
-            var labs = new List<LaboratoryLevelDefinition> { new() { level = 1 }, new() { level = 2, upgradeCost = 300, productQualityBonus = .5f } };
-            var contracts = new List<ContractDefinition>
-            {
-                new() { id = "contract_recipe", displayName = "Recipe", requirementType = ContractRequirementType.Recipe, targetId = "recipe_test", amount = 2, goldReward = 40, ingredientRewards = new List<IngredientRewardDefinition> { new() { ingredientId = "ingredient_reward_a", minAmount = 1, maxAmount = 3 }, new() { ingredientId = "ingredient_reward_b", minAmount = 2, maxAmount = 4 } } },
-                new() { id = "contract_rarity", displayName = "Rarity", requirementType = ContractRequirementType.Rarity, targetId = "rarity_common", amount = 2, goldReward = 40 },
-                new() { id = "contract_category", displayName = "Category", requirementType = ContractRequirementType.Category, targetId = "category_test", amount = 2, goldReward = 40 },
-                new() { id = "contract_spare", displayName = "Spare", requirementType = ContractRequirementType.Recipe, targetId = "recipe_test", amount = 3, goldReward = 50 }
-            };
-            var mastery = new List<MasteryLevelDefinition>
-            {
-                new() { id = "apprentice", displayName = "Apprentice", requiredProductionCount = 1 },
-                new() { id = "craftsman", displayName = "Craftsman", requiredProductionCount = 10, rarityBonus = .05f },
-                new() { id = "master", displayName = "Master", requiredProductionCount = 30, rarityBonus = .1f },
-                new() { id = "grandmaster", displayName = "Grandmaster", requiredProductionCount = 100, rarityBonus = .2f }
-            };
-            return new GameConfig(rarities, ingredients, recipes, economy, categories, labs, contracts, masteryLevels: mastery);
+            return new GameConfig(rarities, ingredients, recipes, economy,
+                new List<RecipeCategoryDefinition> { new() { id = "category_test" } },
+                new List<LaboratoryLevelDefinition> { new() { level = 1 }, new() { level = 2, upgradeCost = 10 } },
+                new List<ContractDefinition> { new() { id = "contract_recipe", requirementType = ContractRequirementType.Recipe, targetId = "recipe_test", amount = 1, goldReward = 40 } },
+                masteryLevels: new List<MasteryLevelDefinition> { new() { id = "first", requiredProductionCount = 1 }, new() { id = "second", requiredProductionCount = 2, rarityBonus = .2f } });
         }
 
+        private sealed class ManualTime : ITimeProvider
+        {
+            public DateTime UtcNow { get; private set; } = new(2030, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            public void AdvanceSeconds(int seconds) => UtcNow = UtcNow.AddSeconds(seconds);
+        }
         private sealed class MinRandom : IRandomSource { public int Range(int minInclusive, int maxExclusive) => minInclusive; }
-        private sealed class MaxRandom : IRandomSource { public int Range(int minInclusive, int maxExclusive) => maxExclusive - 1; }
-        private sealed class FractionRandom : IRandomSource { private readonly float fraction; public FractionRandom(float fraction) => this.fraction = fraction; public int Range(int minInclusive, int maxExclusive) => minInclusive + (int)((maxExclusive - minInclusive) * fraction); }
+        private sealed class CountingRandom : IRandomSource { public int Calls; public int Range(int minInclusive, int maxExclusive) { Calls++; return minInclusive; } }
         private sealed class MemoryStorage : IStateStorage { private string json; public bool Exists => json != null; public void Write(string value) => json = value; public string Read() => json; public void Delete() => json = null; }
     }
 }

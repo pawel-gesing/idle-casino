@@ -16,7 +16,7 @@ namespace DistilleryDiscovery
             if (string.IsNullOrEmpty(state.languageCode)) state.languageCode = systemLanguage;
             var host = new GameObject("Distillery Discovery");
             Object.DontDestroyOnLoad(host);
-            host.AddComponent<PrototypeUI>().Initialize(new GameService(config, state), save);
+            host.AddComponent<PrototypeUI>().Initialize(new GameService(config, state, time: new AdjustableTimeProvider()), save);
         }
     }
 }

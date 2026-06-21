@@ -16,12 +16,16 @@ namespace DistilleryDiscovery
     {
         public GameConfig Config { get; }
         public PlayerState State { get; private set; }
+        public int LastOfflineDeliveriesGained { get; private set; }
+        public int LastOfflineJobsCompleted { get; private set; }
         private readonly IRandomSource random;
+        private readonly ITimeProvider time;
 
-        public GameService(GameConfig config, PlayerState state, IRandomSource random = null)
+        public GameService(GameConfig config, PlayerState state, IRandomSource random = null, ITimeProvider time = null)
         {
             Config = config ?? throw new ArgumentNullException(nameof(config));
             this.random = random ?? new SystemRandomSource();
+            this.time = time ?? new SystemTimeProvider();
             ReplaceState(state);
         }
 
@@ -40,6 +44,7 @@ namespace DistilleryDiscovery
             State.products ??= new List<ProductEntry>();
             State.activeContractIds ??= new List<string>();
             State.activeContracts ??= new List<ActiveContractState>();
+            State.laboratoryJobs ??= new List<LaboratoryJobState>();
             if (State.pendingResult != null) State.pendingResult.contractProgress ??= new List<PendingContractProgress>();
             if (State.laboratoryLevel < 1) State.laboratoryLevel = 1;
             if (State.languageCode != "pl" && State.languageCode != "en") State.languageCode = "en";
@@ -68,7 +73,80 @@ namespace DistilleryDiscovery
             if (State.activeContracts.Count > targetCount)
                 State.activeContracts.RemoveRange(targetCount, State.activeContracts.Count - targetCount);
             EnsureActiveContracts();
-            State.version = 5;
+            if (version < 6 || !TryUtc(State.freeDeliveryLastUpdateUtc, out _))
+            {
+                State.freeDeliveryLastUpdateUtc = time.UtcNow.ToString("O");
+                State.availableFreeDeliveries = 0;
+            }
+            State.availableFreeDeliveries = Math.Clamp(State.availableFreeDeliveries, 0, Config.Economy.maxStoredFreeDeliveries);
+            State.laboratoryJobs.RemoveAll(x => x == null || !TryUtc(x.endTimeUtc, out _) ||
+                (x.type != LaboratoryJobType.Experiment && x.type != LaboratoryJobType.Production));
+            foreach (var job in State.laboratoryJobs)
+            {
+                job.ingredientIds ??= new List<string>();
+                if (job.status != LaboratoryJobStatus.Running && job.status != LaboratoryJobStatus.Completed && job.status != LaboratoryJobStatus.Claimed)
+                    job.status = LaboratoryJobStatus.Running;
+            }
+            State.version = 6;
+            var deliveriesBefore = State.availableFreeDeliveries;
+            var completedBefore = State.laboratoryJobs.Count(x => x.status == LaboratoryJobStatus.Completed);
+            UpdateTime();
+            LastOfflineDeliveriesGained = Math.Max(0, State.availableFreeDeliveries - deliveriesBefore);
+            LastOfflineJobsCompleted = Math.Max(0, State.laboratoryJobs.Count(x => x.status == LaboratoryJobStatus.Completed) - completedBefore);
+        }
+
+        public int AvailableLaboratorySlots => Math.Max(0, Config.Economy.initialLaboratorySlots -
+            State.laboratoryJobs.Count(x => x.status == LaboratoryJobStatus.Running || x.status == LaboratoryJobStatus.Completed));
+
+        public TimeSpan TimeUntilNextFreeDelivery
+        {
+            get
+            {
+                UpdateTime();
+                if (State.availableFreeDeliveries >= Config.Economy.maxStoredFreeDeliveries) return TimeSpan.Zero;
+                TryUtc(State.freeDeliveryLastUpdateUtc, out var anchor);
+                var remaining = anchor.AddSeconds(Config.Economy.freeDeliveryIntervalSeconds) - time.UtcNow;
+                return remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
+            }
+        }
+
+        public TimeSpan TimeRemaining(LaboratoryJobState job)
+        {
+            if (job == null || !TryUtc(job.endTimeUtc, out var end)) return TimeSpan.Zero;
+            var remaining = end - time.UtcNow;
+            return remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
+        }
+
+        public void UpdateTime()
+        {
+            var now = time.UtcNow;
+            if (!TryUtc(State.freeDeliveryLastUpdateUtc, out var anchor) || anchor > now)
+            {
+                State.freeDeliveryLastUpdateUtc = now.ToString("O");
+                anchor = now;
+            }
+            var rawElapsedSeconds = (now - anchor).TotalSeconds;
+            var elapsedSeconds = rawElapsedSeconds;
+            var cap = Config.Economy.maxOfflineProgressSeconds;
+            if (cap > 0) elapsedSeconds = Math.Min(elapsedSeconds, cap);
+            var intervals = (int)(elapsedSeconds / Config.Economy.freeDeliveryIntervalSeconds);
+            if (intervals > 0)
+            {
+                State.availableFreeDeliveries = Math.Min(Config.Economy.maxStoredFreeDeliveries, State.availableFreeDeliveries + intervals);
+                State.freeDeliveryLastUpdateUtc = cap > 0 && rawElapsedSeconds > cap
+                    ? now.ToString("O")
+                    : anchor.AddSeconds((long)intervals * Config.Economy.freeDeliveryIntervalSeconds).ToString("O");
+            }
+            foreach (var job in State.laboratoryJobs.Where(x => x.status == LaboratoryJobStatus.Running))
+                if (TryUtc(job.endTimeUtc, out var end) && end <= now) job.status = LaboratoryJobStatus.Completed;
+        }
+
+        public bool DebugAdvanceTime(TimeSpan duration)
+        {
+            if (time is not AdjustableTimeProvider adjustable) return false;
+            adjustable.Advance(duration);
+            UpdateTime();
+            return true;
         }
 
         public List<OutcomeChance> Preview(IReadOnlyList<string> ingredientIds)
@@ -84,27 +162,16 @@ namespace DistilleryDiscovery
                 .OrderByDescending(x => x.Weight).ThenBy(x => x.RecipeId).ToList();
         }
 
-        public ExperimentResult RunExperiment(IReadOnlyList<string> ingredientIds)
+        public LaboratoryJobState StartExperiment(IReadOnlyList<string> ingredientIds)
         {
             EnsureNoPendingResult();
-            var outcomes = Preview(ingredientIds);
+            Preview(ingredientIds);
+            EnsureFreeLaboratorySlot();
             ConsumeIngredients(ingredientIds);
-            var recipeId = WeightedPick(outcomes.Select(x => (x.RecipeId, x.Weight)).ToList());
-            var product = CreateProduct(recipeId, ingredientIds);
-            var bookChange = UpdateRecipeBook(recipeId, product.RarityId, ingredientIds);
-            State.experimentsCompleted++;
-            BeginPendingResult("experiment", product, bookChange.discovered, bookChange.improved);
-            return new ExperimentResult
-            {
-                RecipeId = product.RecipeId,
-                RarityId = product.RarityId,
-                SaleValue = product.SaleValue,
-                WasDiscovered = bookChange.discovered,
-                RarityImproved = bookChange.improved
-            };
+            return CreateJob(LaboratoryJobType.Experiment, null, ingredientIds, Config.Economy.experimentDurationSeconds);
         }
 
-        public ProductResult RunProduction(string recipeId, IReadOnlyList<string> ingredientIds)
+        public LaboratoryJobState StartProduction(string recipeId, IReadOnlyList<string> ingredientIds)
         {
             EnsureNoPendingResult();
             var recipe = Config.Recipe(recipeId) ?? throw new InvalidOperationException($"Unknown recipe: {recipeId}");
@@ -114,12 +181,38 @@ namespace DistilleryDiscovery
                 if (!Config.Ingredient(ingredientId).outcomeWeights.Any(x => x.recipeId == recipe.id && x.weight > 0))
                     throw new InvalidOperationException($"{Config.Ingredient(ingredientId).displayName} does not contribute to {recipe.displayName}.");
 
+            EnsureFreeLaboratorySlot();
             ConsumeIngredients(ingredientIds);
-            var product = CreateProduct(recipeId, ingredientIds);
-            var bookChange = UpdateRecipeBook(recipeId, product.RarityId, ingredientIds);
-            State.productionsCompleted++;
-            BeginPendingResult("production", product, false, bookChange.improved);
-            return product;
+            return CreateJob(LaboratoryJobType.Production, recipeId, ingredientIds, Config.Economy.productionDurationSeconds);
+        }
+
+        public ProductResult ClaimLaboratoryJob(string jobId)
+        {
+            EnsureNoPendingResult();
+            UpdateTime();
+            var job = State.laboratoryJobs.Find(x => x.id == jobId) ?? throw new InvalidOperationException("Unknown laboratory job.");
+            if (job.status != LaboratoryJobStatus.Completed) throw new InvalidOperationException("Laboratory job is not ready.");
+            ProductResult result;
+            if (job.type == LaboratoryJobType.Experiment)
+            {
+                var outcomes = PreviewWithoutInventory(job.ingredientIds);
+                var recipeId = WeightedPick(outcomes.Select(x => (x.RecipeId, x.Weight)).ToList());
+                var product = CreateProduct(recipeId, job.ingredientIds);
+                var change = UpdateRecipeBook(recipeId, product.RarityId, job.ingredientIds);
+                State.experimentsCompleted++;
+                BeginPendingResult(job.type, product, change.discovered, change.improved);
+                result = new ExperimentResult { RecipeId = product.RecipeId, RarityId = product.RarityId, SaleValue = product.SaleValue, WasDiscovered = change.discovered, RarityImproved = change.improved };
+            }
+            else
+            {
+                var product = CreateProduct(job.recipeId, job.ingredientIds);
+                var change = UpdateRecipeBook(job.recipeId, product.RarityId, job.ingredientIds);
+                State.productionsCompleted++;
+                BeginPendingResult(job.type, product, false, change.improved);
+                result = product;
+            }
+            job.status = LaboratoryJobStatus.Claimed;
+            return result;
         }
 
         public PendingClaimResult ClaimPendingResult()
@@ -168,9 +261,12 @@ namespace DistilleryDiscovery
         public DeliveryResult ReceiveDelivery(string poolId = "pool_base")
         {
             EnsureNoPendingResult();
+            UpdateTime();
+            if (State.availableFreeDeliveries <= 0) throw new InvalidOperationException("No free delivery is ready.");
             var pool = Config.Economy.deliveryPools.Find(x => x.id == poolId) ?? throw new InvalidOperationException($"Unknown delivery pool: {poolId}");
             var result = new DeliveryResult();
-            for (var i = 0; i < pool.rolls; i++)
+            var rolls = random.Range(Config.Economy.freeDeliveryMinItems, Config.Economy.freeDeliveryMaxItems + 1);
+            for (var i = 0; i < rolls; i++)
             {
                 var entryId = WeightedPick(pool.entries.Select(x => (x.ingredientId, x.weight)).ToList());
                 var entry = pool.entries.Find(x => x.ingredientId == entryId);
@@ -178,6 +274,7 @@ namespace DistilleryDiscovery
                 State.AddIngredient(entryId, amount);
                 result.Items[entryId] = result.Items.GetValueOrDefault(entryId) + amount;
             }
+            State.availableFreeDeliveries--;
             return result;
         }
 
@@ -288,7 +385,7 @@ namespace DistilleryDiscovery
             var improved = false;
             if (book == null)
             {
-                book = new PlayerRecipeState { recipeId = recipeId, highestProductRarityId = rarityId, firstDiscoveredAt = DateTime.UtcNow.ToString("O") };
+                book = new PlayerRecipeState { recipeId = recipeId, highestProductRarityId = rarityId, firstDiscoveredAt = time.UtcNow.ToString("O") };
                 book.revealedIngredientIds.AddRange(ingredientIds.Distinct());
                 State.recipes.Add(book);
             }
@@ -314,6 +411,42 @@ namespace DistilleryDiscovery
         {
             if (State.pendingResult != null) throw new InvalidOperationException("Claim the current result first.");
         }
+
+        private LaboratoryJobState CreateJob(string type, string recipeId, IReadOnlyList<string> ingredientIds, int baseDurationSeconds)
+        {
+            var now = time.UtcNow;
+            var reduction = Math.Min(.9f, Config.Economy.laboratoryLevelTimeReduction * Math.Max(0, State.laboratoryLevel - 1));
+            var seconds = Math.Max(1, (int)Math.Ceiling(baseDurationSeconds * (1f - reduction)));
+            var job = new LaboratoryJobState
+            {
+                id = Guid.NewGuid().ToString("N"), type = type, recipeId = recipeId,
+                startTimeUtc = now.ToString("O"), endTimeUtc = now.AddSeconds(seconds).ToString("O"),
+                status = LaboratoryJobStatus.Running, ingredientIds = ingredientIds.ToList()
+            };
+            State.laboratoryJobs.Add(job);
+            return job;
+        }
+
+        private void EnsureFreeLaboratorySlot()
+        {
+            UpdateTime();
+            if (AvailableLaboratorySlots <= 0) throw new InvalidOperationException("No free laboratory slot.");
+        }
+
+        private List<OutcomeChance> PreviewWithoutInventory(IReadOnlyList<string> ingredientIds)
+        {
+            ValidateKnownIngredients(ingredientIds);
+            var weights = new Dictionary<string, int>();
+            foreach (var id in ingredientIds)
+                foreach (var outcome in Config.Ingredient(id).outcomeWeights)
+                    weights[outcome.recipeId] = weights.GetValueOrDefault(outcome.recipeId) + outcome.weight;
+            var total = weights.Values.Sum();
+            if (total <= 0) throw new InvalidOperationException("Selected ingredients cannot produce any recipe.");
+            return weights.Select(x => new OutcomeChance { RecipeId = x.Key, Weight = x.Value, Probability = (float)x.Value / total }).ToList();
+        }
+
+        private static bool TryUtc(string value, out DateTime utc) =>
+            DateTime.TryParse(value, null, System.Globalization.DateTimeStyles.RoundtripKind, out utc);
 
         private void ConsumeIngredients(IReadOnlyList<string> ingredientIds)
         {

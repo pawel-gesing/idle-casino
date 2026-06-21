@@ -31,6 +31,13 @@ namespace DistilleryDiscovery
             if (config.Economy.ingredientsPerExperiment <= 0 || config.Economy.ingredientsPerProduction <= 0)
                 errors.Add("Experiment and production ingredient counts must be positive.");
             if (config.Economy.activeContractCount < 0) errors.Add("Active contract count cannot be negative.");
+            if (config.Economy.freeDeliveryIntervalSeconds <= 0 || config.Economy.freeDeliveryMinItems <= 0 ||
+                config.Economy.freeDeliveryMaxItems < config.Economy.freeDeliveryMinItems || config.Economy.maxStoredFreeDeliveries <= 0)
+                errors.Add("Free delivery timing and item counts must be positive and ordered.");
+            if (config.Economy.experimentDurationSeconds <= 0 || config.Economy.productionDurationSeconds <= 0 || config.Economy.initialLaboratorySlots <= 0)
+                errors.Add("Laboratory durations and initial slot count must be positive.");
+            if (config.Economy.laboratoryLevelTimeReduction < 0f || config.Economy.laboratoryLevelTimeReduction >= 1f || config.Economy.maxOfflineProgressSeconds < 0)
+                errors.Add("Time reduction must be in [0,1), and offline cap cannot be negative.");
 
             foreach (var ingredient in config.Ingredients)
             {

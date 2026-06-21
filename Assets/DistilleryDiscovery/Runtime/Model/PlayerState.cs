@@ -48,9 +48,23 @@ namespace DistilleryDiscovery
         public List<string> revealedIngredientIds = new();
     }
 
+    public static class LaboratoryJobType { public const string Experiment = "experiment"; public const string Production = "production"; }
+    public static class LaboratoryJobStatus { public const string Running = "running"; public const string Completed = "completed"; public const string Claimed = "claimed"; }
+
+    [Serializable] public sealed class LaboratoryJobState
+    {
+        public string id;
+        public string type;
+        public string startTimeUtc;
+        public string endTimeUtc;
+        public string status;
+        public string recipeId;
+        public List<string> ingredientIds = new();
+    }
+
     [Serializable] public sealed class PlayerState
     {
-        public int version = 5;
+        public int version = 6;
         public int gold;
         public int experimentsCompleted;
         public int productionsCompleted;
@@ -60,6 +74,9 @@ namespace DistilleryDiscovery
         public List<PlayerRecipeState> recipes = new();
         public List<ActiveContractState> activeContracts = new();
         public PendingResultState pendingResult;
+        public string freeDeliveryLastUpdateUtc;
+        public int availableFreeDeliveries;
+        public List<LaboratoryJobState> laboratoryJobs = new();
 
         // Legacy version 2 fields. They are emptied when GameService normalizes the save.
         public List<ProductEntry> products = new();

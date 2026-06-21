@@ -44,6 +44,15 @@ namespace DistilleryDiscovery
         public int activeContractCount = 3;
         public float ingredientQualityInfluence = 1f;
         public float laboratoryQualityInfluence = 1f;
+        public int freeDeliveryIntervalSeconds = 7200;
+        public int freeDeliveryMinItems = 6;
+        public int freeDeliveryMaxItems = 6;
+        public int experimentDurationSeconds = 3600;
+        public int productionDurationSeconds = 1800;
+        public int maxStoredFreeDeliveries = 3;
+        public int initialLaboratorySlots = 1;
+        public float laboratoryLevelTimeReduction;
+        public int maxOfflineProgressSeconds;
         public List<WeightedRarity> productRarityWeights = new();
         public List<DeliveryPool> deliveryPools = new();
     }

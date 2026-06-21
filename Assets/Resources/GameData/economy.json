@@ -9,8 +9,6 @@
   "experimentDurationSeconds": 3600,
   "productionDurationSeconds": 1800,
   "maxStoredFreeDeliveries": 3,
-  "initialLaboratorySlots": 1,
-  "laboratoryLevelTimeReduction": 0.0,
   "maxOfflineProgressSeconds": 0,
   "ingredientQualityInfluence": 1.0,
   "laboratoryQualityInfluence": 1.0,

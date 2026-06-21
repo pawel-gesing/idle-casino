@@ -27,7 +27,11 @@ namespace DistilleryDiscovery
         private readonly IStateStorage storage;
         public SaveService(IStateStorage storage) => this.storage = storage;
         public bool HasSave => storage.Exists;
-        public void Save(PlayerState state) => storage.Write(JsonUtility.ToJson(state, true));
+        public void Save(PlayerState state)
+        {
+            state.lastSavedAtUtc = DateTime.UtcNow.ToString("O");
+            storage.Write(JsonUtility.ToJson(state, true));
+        }
         public PlayerState Load()
         {
             if (!storage.Exists) throw new InvalidOperationException("No local save exists.");
@@ -37,4 +41,3 @@ namespace DistilleryDiscovery
         public void Reset() => storage.Delete();
     }
 }
-

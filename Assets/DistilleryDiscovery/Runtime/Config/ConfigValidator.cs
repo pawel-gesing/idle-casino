@@ -34,10 +34,9 @@ namespace DistilleryDiscovery
             if (config.Economy.freeDeliveryIntervalSeconds <= 0 || config.Economy.freeDeliveryMinItems <= 0 ||
                 config.Economy.freeDeliveryMaxItems < config.Economy.freeDeliveryMinItems || config.Economy.maxStoredFreeDeliveries <= 0)
                 errors.Add("Free delivery timing and item counts must be positive and ordered.");
-            if (config.Economy.experimentDurationSeconds <= 0 || config.Economy.productionDurationSeconds <= 0 || config.Economy.initialLaboratorySlots <= 0)
-                errors.Add("Laboratory durations and initial slot count must be positive.");
-            if (config.Economy.laboratoryLevelTimeReduction < 0f || config.Economy.laboratoryLevelTimeReduction >= 1f || config.Economy.maxOfflineProgressSeconds < 0)
-                errors.Add("Time reduction must be in [0,1), and offline cap cannot be negative.");
+            if (config.Economy.experimentDurationSeconds <= 0 || config.Economy.productionDurationSeconds <= 0)
+                errors.Add("Laboratory durations must be positive.");
+            if (config.Economy.maxOfflineProgressSeconds < 0) errors.Add("Offline cap cannot be negative.");
 
             foreach (var ingredient in config.Ingredients)
             {
@@ -71,12 +70,15 @@ namespace DistilleryDiscovery
                 }
             }
 
-            var levels = config.LaboratoryLevels.OrderBy(x => x.level).ToList();
+            var levels = config.LaboratoryLevels;
             if (levels.Count == 0 || levels[0].level != 1) errors.Add("Laboratory configuration must start at level 1.");
             for (var i = 0; i < levels.Count; i++)
             {
                 if (levels[i].level != i + 1) errors.Add("Laboratory levels must be contiguous.");
-                if (levels[i].upgradeCost < 0 || levels[i].productQualityBonus < 0f) errors.Add($"Laboratory level {levels[i].level} has invalid values.");
+                if ((i > 0 && levels[i].upgradeCost <= 0) || levels[i].upgradeCost < 0 || levels[i].productQualityBonus < 0f ||
+                    levels[i].experimentSlots <= 0 || levels[i].productionSlots <= 0 ||
+                    levels[i].experimentTimeMultiplier <= 0f || levels[i].productionTimeMultiplier <= 0f)
+                    errors.Add($"Laboratory level {levels[i].level} has invalid cost, slots, or time multipliers.");
                 if (i > 0 && levels[i].productQualityBonus < levels[i - 1].productQualityBonus) errors.Add("Laboratory quality bonuses cannot decrease.");
             }
 

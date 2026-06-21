@@ -50,8 +50,6 @@ namespace DistilleryDiscovery
         public int experimentDurationSeconds = 3600;
         public int productionDurationSeconds = 1800;
         public int maxStoredFreeDeliveries = 3;
-        public int initialLaboratorySlots = 1;
-        public float laboratoryLevelTimeReduction;
         public int maxOfflineProgressSeconds;
         public List<WeightedRarity> productRarityWeights = new();
         public List<DeliveryPool> deliveryPools = new();
@@ -62,6 +60,10 @@ namespace DistilleryDiscovery
         public int level;
         public int upgradeCost;
         public float productQualityBonus;
+        public int experimentSlots = 1;
+        public int productionSlots = 1;
+        public float experimentTimeMultiplier = 1f;
+        public float productionTimeMultiplier = 1f;
     }
     [Serializable] public sealed class LaboratoryFile { public List<LaboratoryLevelDefinition> levels = new(); }
 

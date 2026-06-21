@@ -5,7 +5,6 @@ namespace DistilleryDiscovery
 {
     [Serializable] public sealed class InventoryEntry { public string ingredientId; public int amount; }
 
-    // Kept only so version 2 saves can turn stored products into gold during migration.
     [Serializable] public sealed class ProductEntry
     {
         public string recipeId;
@@ -64,7 +63,7 @@ namespace DistilleryDiscovery
 
     [Serializable] public sealed class PlayerState
     {
-        public int version = 6;
+        public int version = 7;
         public int gold;
         public int experimentsCompleted;
         public int productionsCompleted;
@@ -77,19 +76,29 @@ namespace DistilleryDiscovery
         public string freeDeliveryLastUpdateUtc;
         public int availableFreeDeliveries;
         public List<LaboratoryJobState> laboratoryJobs = new();
+        public string lastSavedAtUtc;
 
-        // Legacy version 2 fields. They are emptied when GameService normalizes the save.
         public List<ProductEntry> products = new();
+        // Legacy version 2 field. It is emptied when GameService normalizes the save.
         public List<string> activeContractIds = new();
 
         public int AmountOf(string id) => inventory.Find(x => x.ingredientId == id)?.amount ?? 0;
         public PlayerRecipeState RecipeState(string id) => recipes.Find(x => x.recipeId == id);
         public ActiveContractState ContractState(string id) => activeContracts.Find(x => x.contractId == id);
+        public int ProductAmount(string recipeId, string rarityId) =>
+            products.Find(x => x.recipeId == recipeId && x.rarityId == rarityId)?.amount ?? 0;
 
         public void AddIngredient(string id, int amount)
         {
             var entry = inventory.Find(x => x.ingredientId == id);
             if (entry == null) { entry = new InventoryEntry { ingredientId = id }; inventory.Add(entry); }
+            entry.amount += amount;
+        }
+
+        public void AddProduct(string recipeId, string rarityId, int saleValue, int amount = 1)
+        {
+            var entry = products.Find(x => x.recipeId == recipeId && x.rarityId == rarityId && x.saleValue == saleValue);
+            if (entry == null) { entry = new ProductEntry { recipeId = recipeId, rarityId = rarityId, saleValue = saleValue }; products.Add(entry); }
             entry.amount += amount;
         }
     }
@@ -105,5 +114,34 @@ namespace DistilleryDiscovery
         public int TotalGold;
         public List<string> CompletedContractIds = new();
         public readonly Dictionary<string, int> IngredientRewards = new();
+    }
+
+    public sealed class CollectedProductSummary
+    {
+        public string RecipeId;
+        public string RarityId;
+        public int Amount;
+    }
+
+    public sealed class CollectAllResult
+    {
+        public int JobsCollected;
+        public int ExperimentsCollected;
+        public int ProductionsCollected;
+        public int NewRecipesDiscovered;
+        public int RarityRecordsImproved;
+        public int ProductsAdded;
+        public int GoldGained;
+        public readonly List<CollectedProductSummary> Products = new();
+    }
+
+    public sealed class OfflineProgressSummary
+    {
+        public TimeSpan Elapsed;
+        public int DeliveriesGained;
+        public int JobsCompleted;
+        public int ExperimentsReady;
+        public int ProductionsReady;
+        public bool HasProgress => Elapsed > TimeSpan.Zero || DeliveriesGained > 0 || JobsCompleted > 0;
     }
 }

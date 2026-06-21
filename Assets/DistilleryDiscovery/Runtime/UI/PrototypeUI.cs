@@ -151,7 +151,7 @@ namespace DistilleryDiscovery
         {
             var footer = Panel("ActionBar", parent, Plum); Rect(footer, 0, 0, 1, .15f);
             selectionText = Label("", footer.transform, 28, TextAnchor.MiddleCenter); Rect(selectionText.gameObject, .03f, .54f, .97f, .95f);
-            var secondary = AddButton(footer.transform, "—", ClearSelection); Rect(secondary, .02f, .10f, .30f, .48f); secondaryActionText = secondary.GetComponentInChildren<Text>();
+            var secondary = AddButton(footer.transform, "—", DispatchSecondary); Rect(secondary, .02f, .10f, .30f, .48f); secondaryActionText = secondary.GetComponentInChildren<Text>();
             var primary = AddButton(footer.transform, "—", DispatchPrimary, Gold, Ink); Rect(primary, .32f, .10f, .98f, .48f); primaryActionText = primary.GetComponentInChildren<Text>(); primaryActionButton = primary.GetComponent<Button>();
             UpdateSelection();
         }
@@ -233,6 +233,10 @@ namespace DistilleryDiscovery
             PrepareTextView(FooterMode.None); SetStatus(T("ui.status.ingredients", "Ingredient storage"));
             var sb = new StringBuilder($"<color=#F2AD2E><b>{T("ui.heading.ingredients", "INGREDIENTS")}</b></color>\n\n");
             foreach (var item in game.Config.Ingredients) { var rarity = game.Config.Rarity(item.rarityId); sb.Append($"<color={rarity.colorHex}>●</color>  {IngredientName(item.id),-20}  <b>x{game.State.AmountOf(item.id)}</b>\n"); }
+            sb.Append($"\n<color=#F2AD2E><b>{T("ui.heading.products", "PRODUCTS")}</b></color>\n\n");
+            if (game.State.products.Count == 0) sb.Append("—\n");
+            foreach (var product in game.State.products)
+                sb.Append($"{RecipeName(product.recipeId)} · {RarityName(product.rarityId)}  <b>x{product.amount}</b>\n");
             contentText.text = sb.ToString();
         }
 
@@ -328,20 +332,41 @@ namespace DistilleryDiscovery
         private void ShowLaboratory()
         {
             game.UpdateTime();
-            PrepareTextView(FooterMode.Laboratory); var current = game.Config.LaboratoryLevel(game.State.laboratoryLevel); var next = game.Config.LaboratoryLevel(game.State.laboratoryLevel + 1);
+            selection.Clear(); selectedProductionRecipeId = null; SetMode(FooterMode.Laboratory);
+            var current = game.Config.LaboratoryLevel(game.State.laboratoryLevel); var next = game.Config.LaboratoryLevel(game.State.laboratoryLevel + 1);
             SetStatus(T("ui.status.laboratory", "Laboratory improves product rarity"));
-            var jobs = new StringBuilder();
-            var active = game.State.laboratoryJobs.Where(x => x.status != LaboratoryJobStatus.Claimed).ToList();
-            for (var i = 0; i < game.Config.Economy.initialLaboratorySlots; i++)
-            {
-                var job = i < active.Count ? active[i] : null;
-                if (job == null) jobs.Append($"\nSlot {i + 1}: <b>FREE</b>\n");
-                else
+            var jobs = game.State.laboratoryJobs.Where(x => x.status != LaboratoryJobStatus.Claimed)
+                .OrderBy(x => x.status == LaboratoryJobStatus.Completed ? 0 : x.type == LaboratoryJobType.Experiment ? 1 : 2)
+                .Select(job => new TileOption
                 {
-                    jobs.Append($"\nSlot {i + 1}: <b>{job.type.ToUpperInvariant()}</b> · {(job.status == LaboratoryJobStatus.Completed ? "READY TO CLAIM" : FormatDuration(game.TimeRemaining(job)))}\n");
-                }
-            }
-            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.laboratory", "LABORATORY")} · {T("ui.label.level", "LEVEL")} {current.level}</b></color>\n\nFree slots: <b>{game.AvailableLaboratorySlots}/{game.Config.Economy.initialLaboratorySlots}</b>{jobs}\n\n{T("ui.label.rarity_bonus", "Higher rarity bonus")}: <b>+{current.productQualityBonus:P0}</b>\n" + (next == null ? T("ui.laboratory.max", "Maximum level reached.") : $"{T("ui.label.next_level", "Next level")}: <b>{next.level}</b> · {T("ui.label.cost", "Cost")}: <b>{next.upgradeCost}</b>");
+                    Label = JobLabel(job),
+                    Action = job.status == LaboratoryJobStatus.Completed ? () => ClaimJob(job.id) : ShowLaboratory
+                }).ToList();
+            if (jobs.Count == 0) jobs.Add(new TileOption { Label = "NO ACTIVE JOBS", Action = ShowLaboratory });
+            ShowTiles(jobs);
+            tileGrid.cellSize = new Vector2(tileGrid.cellSize.x, 190f);
+            experimentPreviewText.gameObject.SetActive(true);
+            experimentPreviewText.text = $"<color=#F2AD2E><b>{T("ui.heading.laboratory", "LABORATORY")} · {T("ui.label.level", "LEVEL")} {current.level}</b></color>\n" +
+                $"Experiments: <b>{game.AvailableExperimentSlots}/{game.ExperimentSlotCount} free</b> · time ×{current.experimentTimeMultiplier:0.##}\n" +
+                $"Productions: <b>{game.AvailableProductionSlots}/{game.ProductionSlotCount} free</b> · time ×{current.productionTimeMultiplier:0.##}\n" +
+                $"{T("ui.label.rarity_bonus", "Higher rarity bonus")}: <b>+{current.productQualityBonus:P0}</b>\n" +
+                (next == null ? T("ui.laboratory.max", "Maximum level reached.") : $"{T("ui.label.next_level", "Next level")}: <b>{next.level}</b> · {T("ui.label.cost", "Cost")}: <b>{next.upgradeCost}</b>");
+        }
+
+        private string JobLabel(LaboratoryJobState job)
+        {
+            var ready = job.status == LaboratoryJobStatus.Completed;
+            var section = ready ? "READY TO COLLECT" : job.type == LaboratoryJobType.Experiment ? "ACTIVE EXPERIMENTS" : "ACTIVE PRODUCTIONS";
+            var target = job.type == LaboratoryJobType.Production ? $"\nRecipe: {RecipeName(job.recipeId)}" : "";
+            var ingredients = string.Join(" + ", job.ingredientIds.Select(IngredientName));
+            var status = ready ? "READY · CLAIM" : $"RUNNING · {FormatDuration(game.TimeRemaining(job))}";
+            return $"{section}\n{job.type.ToUpperInvariant()}{target}\n{ingredients}\n{status}";
+        }
+
+        private void ClaimJob(string jobId)
+        {
+            try { game.ClaimLaboratoryJob(jobId); save.Save(game.State); ShowPendingResult(); }
+            catch (Exception ex) { SetStatus(ex.Message); }
         }
 
         private void ShowPendingResult()
@@ -388,9 +413,8 @@ namespace DistilleryDiscovery
                 else if (footerMode == FooterMode.Delivery) { ReceiveDelivery(); ShowDelivery(); }
                 else if (footerMode == FooterMode.Laboratory)
                 {
-                    var completed = game.State.laboratoryJobs.FirstOrDefault(x => x.status == LaboratoryJobStatus.Completed);
-                    if (completed != null) { game.ClaimLaboratoryJob(completed.id); save.Save(game.State); ShowPendingResult(); }
-                    else { game.UpgradeLaboratory(); RefreshHeaderCounters(); ShowLaboratory(); }
+                    var result = game.CollectAll(); save.Save(game.State); RefreshHeaderCounters(); ShowLaboratory();
+                    SetStatus($"Collected {result.JobsCollected} jobs · {result.ProductsAdded} products · +{result.GoldGained} gold");
                 }
             }
             catch (Exception ex) { SetStatus(ex.Message); }
@@ -414,6 +438,13 @@ namespace DistilleryDiscovery
             else if (footerMode == FooterMode.Production && !string.IsNullOrEmpty(selectedProductionRecipeId)) ShowIngredientTiles(game.Config.Ingredients.Where(i => i.outcomeWeights.Any(x => x.recipeId == selectedProductionRecipeId && x.weight > 0)));
         }
 
+        private void DispatchSecondary()
+        {
+            if (footerMode != FooterMode.Laboratory) { ClearSelection(); return; }
+            try { game.UpgradeLaboratory(); save.Save(game.State); RefreshHeaderCounters(); ShowLaboratory(); }
+            catch (Exception ex) { SetStatus(ex.Message); }
+        }
+
         private void PrepareTextView(FooterMode mode)
         {
             selection.Clear(); selectedProductionRecipeId = null; SetMode(mode);
@@ -423,6 +454,7 @@ namespace DistilleryDiscovery
         private void ShowTiles(IEnumerable<TileOption> options)
         {
             experimentPreviewText.gameObject.SetActive(false);
+            tileGrid.cellSize = new Vector2(tileGrid.cellSize.x, 112f);
             foreach (Transform child in tileGridObject.transform) { child.gameObject.SetActive(false); Destroy(child.gameObject); }
             foreach (var option in options) AddButton(tileGridObject.transform, option.Label, option.Action);
             textContentObject.SetActive(false); tileContentObject.SetActive(true); scrollRect.content = tileContentRect; scrollRect.verticalNormalizedPosition = 1f;
@@ -432,16 +464,17 @@ namespace DistilleryDiscovery
         private void SetMode(FooterMode mode)
         {
             footerMode = mode;
-            secondaryActionText.text = mode is FooterMode.Experiment or FooterMode.Production ? T("ui.action.clear", "CLEAR") : "—";
+            secondaryActionText.text = mode is FooterMode.Experiment or FooterMode.Production ? T("ui.action.clear", "CLEAR") : mode == FooterMode.Laboratory ? T("ui.action.upgrade", "UPGRADE") : "—";
             primaryActionText.text = mode switch
             {
                 FooterMode.Experiment => T("ui.action.run_experiment", "RUN EXPERIMENT"),
                 FooterMode.Production => T("ui.action.produce", "PRODUCE"),
-                FooterMode.Laboratory => game.State.laboratoryJobs.Any(x => x.status == LaboratoryJobStatus.Completed) ? T("ui.action.claim", "CLAIM") : T("ui.action.upgrade", "UPGRADE LABORATORY"),
+                FooterMode.Laboratory => T("ui.action.collect_all", "COLLECT ALL"),
                 FooterMode.Delivery => game.State.availableFreeDeliveries > 0 ? T("ui.action.claim", "CLAIM") : "WAITING",
                 _ => "—"
             };
-            primaryActionButton.interactable = mode != FooterMode.None && (mode != FooterMode.Delivery || game.State.availableFreeDeliveries > 0);
+            primaryActionButton.interactable = mode != FooterMode.None && (mode != FooterMode.Delivery || game.State.availableFreeDeliveries > 0) &&
+                (mode != FooterMode.Laboratory || game.State.laboratoryJobs.Any(x => x.status == LaboratoryJobStatus.Completed));
             UpdateSelection();
         }
 
@@ -468,7 +501,13 @@ namespace DistilleryDiscovery
         private void LoadGame() { try { game.ReplaceState(save.Load()); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); if (game.State.pendingResult != null) ShowPendingResult(); else ShowState(OfflineStatus(T("ui.status.loaded", "Local save loaded"))); } catch (Exception ex) { SetStatus(ex.Message); } }
         private void ResetGame() { save.Reset(); game.ReplaceState(GameService.NewState(game.Config, Language)); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); ShowState(T("ui.status.reset", "Save deleted and game reset")); }
         private void AdvanceDebugTime(TimeSpan duration) { if (game.DebugAdvanceTime(duration)) { save.Save(game.State); CloseSettings(); ShowLaboratory(); } }
-        private string OfflineStatus(string prefix) => game.LastOfflineDeliveriesGained == 0 && game.LastOfflineJobsCompleted == 0 ? prefix : $"{prefix} · Offline: +{game.LastOfflineDeliveriesGained} deliveries, {game.LastOfflineJobsCompleted} jobs completed";
+        private string OfflineStatus(string prefix)
+        {
+            var offline = game.LastOfflineSummary;
+            if (!offline.HasProgress) return prefix;
+            return $"{prefix} · Offline {FormatDuration(offline.Elapsed)} · +{offline.DeliveriesGained} deliveries · " +
+                $"{offline.JobsCompleted} completed ({offline.ExperimentsReady} experiments, {offline.ProductionsReady} productions ready)";
+        }
         private static string FormatDuration(TimeSpan duration) { if (duration < TimeSpan.Zero) duration = TimeSpan.Zero; return $"{(int)duration.TotalHours:00}:{duration.Minutes:00}:{duration.Seconds:00}"; }
 
         private string MasteryName(MasteryLevelDefinition level) => level == null ? "—" : game.Config.Text($"mastery.{level.id}", Language, level.displayName);

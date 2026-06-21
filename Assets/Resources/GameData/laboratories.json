@@ -1,9 +1,9 @@
 {
   "levels": [
-    { "level": 1, "upgradeCost": 0, "productQualityBonus": 0.00 },
-    { "level": 2, "upgradeCost": 1500, "productQualityBonus": 0.05 },
-    { "level": 3, "upgradeCost": 4000, "productQualityBonus": 0.10 },
-    { "level": 4, "upgradeCost": 9000, "productQualityBonus": 0.15 },
-    { "level": 5, "upgradeCost": 18000, "productQualityBonus": 0.20 }
+    { "level": 1, "upgradeCost": 0, "productQualityBonus": 0.00, "experimentSlots": 1, "productionSlots": 1, "experimentTimeMultiplier": 1.00, "productionTimeMultiplier": 1.00 },
+    { "level": 2, "upgradeCost": 1500, "productQualityBonus": 0.05, "experimentSlots": 2, "productionSlots": 1, "experimentTimeMultiplier": 0.95, "productionTimeMultiplier": 1.00 },
+    { "level": 3, "upgradeCost": 4000, "productQualityBonus": 0.10, "experimentSlots": 2, "productionSlots": 2, "experimentTimeMultiplier": 0.90, "productionTimeMultiplier": 0.95 },
+    { "level": 4, "upgradeCost": 9000, "productQualityBonus": 0.15, "experimentSlots": 3, "productionSlots": 2, "experimentTimeMultiplier": 0.85, "productionTimeMultiplier": 0.90 },
+    { "level": 5, "upgradeCost": 18000, "productQualityBonus": 0.20, "experimentSlots": 3, "productionSlots": 3, "experimentTimeMultiplier": 0.80, "productionTimeMultiplier": 0.85 }
   ]
 }

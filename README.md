@@ -21,9 +21,11 @@ Interfejs działa w orientacji pionowej, skaluje się do szerokości urządzenia
 
 Gracz wybiera dokładnie 3 składniki z kafelków pokazujących dostępne ilości. Kliknięcie rezerwuje sztukę, a **Wyczyść** zwraca całą rezerwację. Składniki są faktycznie zużywane dopiero przy uruchomieniu. Receptura i rzadkość są losowane, książka receptur zostaje zaktualizowana, a produkt trafia do podsumowania z nagrodą w złocie.
 
-### Produkcja
+### Produkcja i mistrzostwo
 
-Produkcja zaczyna się od kafelkowej listy odkrytych receptur. Po wyborze wyświetlane są wyłącznie składniki mające dodatni wpływ na tę recepturę. Gracz rezerwuje dowolną poprawną konfigurację 3 składników. Receptura wyniku jest gwarantowana, a rzadkość zależy od składników i laboratorium.
+Produkcja zaczyna się od kafelkowej listy odkrytych receptur. Po wyborze wyświetlane są wyłącznie składniki mające dodatni wpływ na tę recepturę. Gracz rezerwuje dowolną poprawną konfigurację 3 składników. Receptura wyniku jest gwarantowana, a rzadkość zależy od składników, laboratorium i mistrzostwa receptury.
+
+Każdy produkt uzyskany z eksperymentu lub produkcji zwiększa licznik danej receptury. Progi mistrzostwa są konfigurowalne: Czeladnik (1), Rzemieślnik (10), Mistrz (30) i Arcymistrz (100). Poziomy dają odpowiednio 0%, 5%, 10% i 20% bonusu do wag wyższych rzadkości; nie zwiększają ceny sprzedaży i nie gwarantują najwyższej jakości. Książka receptur pokazuje licznik, poziom i brakującą liczbę wytworzeń albo informację o poziomie maksymalnym.
 
 ### Odbiór wyniku
 
@@ -37,7 +39,7 @@ Jednocześnie aktywne są 3 różne kontrakty losowane z puli. Mogą wymagać:
 - konkretnej rzadkości,
 - produktu z określonej kategorii.
 
-Eksperyment i produkcja zwiększają postęp. Jeżeli wynik ukończy jeden lub kilka kontraktów, wszystkie są pokazane w podsumowaniu i wypłacane wspólnym przyciskiem **Odbierz**. Następnie ukończone kontrakty są automatycznie zastępowane, bez duplikatów w aktywnej trójce. Ekran kontraktów służy wyłącznie do obserwowania postępu.
+Eksperyment i produkcja zwiększają postęp. Jeżeli wynik ukończy jeden lub kilka kontraktów, wszystkie są pokazane w podsumowaniu i wypłacane wspólnym przyciskiem **Odbierz**. Nagroda obejmuje złoto oraz skonfigurowane składniki w losowej ilości min–max; ekran odbioru pokazuje faktycznie otrzymane ilości. Kontrakty są głównym źródłem rzadkich składników — ich częstotliwość w zwykłych dostawach nie została zwiększona. Następnie ukończone kontrakty są automatycznie zastępowane, bez duplikatów w aktywnej trójce.
 
 ### Laboratorium
 
@@ -65,13 +67,14 @@ Konfiguracja znajduje się w `Assets/Resources/GameData/`:
 - `economy.json` — parametry eksperymentu, produkcji i dostaw,
 - `laboratories.json` — poziomy, koszty i bonusy,
 - `contracts.json` — wymagania i nagrody kontraktów,
+- `mastery.json` — progi mistrzostwa receptur i bonusy rzadkości,
 - `localization.json` — polskie oraz angielskie teksty UI i contentu.
 
 Konfiguracja jest walidowana przy starcie, łącznie z referencjami kontraktów i brakującymi tłumaczeniami contentu.
 
 ## Zapis stanu
 
-Zapis wersji `4` przechowuje złoto, składniki, książkę receptur, poziom laboratorium, liczniki, język, aktywne kontrakty z postępem oraz nieodebrany wynik wraz z nagrodami.
+Zapis wersji `5` przechowuje złoto, składniki (w tym nagrody kontraktowe), książkę receptur z licznikami wytworzeń, poziom laboratorium, język, aktywne kontrakty z postępem oraz nieodebrany wynik. Poziom mistrzostwa jest wyliczany z zapisanego licznika i konfiguracji.
 
 Zapis wersji 2 jest migrowany automatycznie. Produkty pozostałe w starym magazynie zostają spieniężone, a stare kontrakty otrzymują początkowy postęp 0.
 
@@ -87,10 +90,10 @@ W Unity: `Window → General → Test Runner → EditMode → Run All`.
   -testResults TestResults.xml -logFile TestRun.log
 ```
 
-Testy obejmują eksperymenty, produkcję, oczekujące nagrody, blokadę przed odbiorem, jednoczesne ukończenie wielu kontraktów, rotację kontraktów, laboratorium, migrację oraz zapis oczekującego wyniku.
+Testy obejmują eksperymenty, produkcję, złoto i składnikowe nagrody kontraktów, mistrzostwo oraz jego wpływ na rzadkość, oczekujące nagrody, rotację kontraktów, laboratorium, migrację i zapis stanu.
 
 ## Celowo poza zakresem
 
-Timery czasu rzeczywistego, reklamy, IAP, sezony, wiele laboratoriów, Firebase, Addressables, backend, konta, mastery, docelowa grafika i animacje.
+Timery i postęp idle/offline, reklamy, IAP, sezony, wiele laboratoriów, Firebase, Addressables, backend, konta, docelowa grafika i animacje. Mistrzostwo działa przy produkcji oraz przy eksperymencie zakończonym daną recepturą; nie ma osobnego XP ani bonusu ceny.
 
 Dokumenty projektowe znajdują się w `docs/`.

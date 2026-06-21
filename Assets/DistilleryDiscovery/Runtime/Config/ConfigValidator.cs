@@ -20,6 +20,7 @@ namespace DistilleryDiscovery
             CheckUnique(config.Recipes.Select(x => x.id), "recipe", errors);
             CheckUnique(config.Categories.Select(x => x.id), "recipe category", errors);
             CheckUnique(config.Contracts.Select(x => x.id), "contract", errors);
+            CheckUnique(config.MasteryLevels.Select(x => x.id), "mastery level", errors);
             CheckUnique(config.Localizations.Select(x => x.key), "localization", errors);
             CheckUnique(config.Economy.deliveryPools.Select(x => x.id), "delivery pool", errors);
             var rarityIds = config.Rarities.Select(x => x.id).ToHashSet();
@@ -75,6 +76,10 @@ namespace DistilleryDiscovery
             foreach (var contract in config.Contracts)
             {
                 if (contract.amount <= 0 || contract.goldReward <= 0) errors.Add($"Contract {contract.id} has invalid amount or reward.");
+                contract.ingredientRewards ??= new List<IngredientRewardDefinition>();
+                foreach (var reward in contract.ingredientRewards)
+                    if (!ingredientIds.Contains(reward.ingredientId) || reward.minAmount <= 0 || reward.maxAmount < reward.minAmount)
+                        errors.Add($"Contract {contract.id} has invalid ingredient reward {reward.ingredientId}.");
                 switch (contract.requirementType)
                 {
                     case ContractRequirementType.Recipe:
@@ -91,6 +96,16 @@ namespace DistilleryDiscovery
                         break;
                 }
             }
+            var masteryLevels = config.MasteryLevels.OrderBy(x => x.requiredProductionCount).ToList();
+            if (masteryLevels.Count == 0 || masteryLevels[0].requiredProductionCount != 1)
+                errors.Add("Mastery configuration must start at production count 1.");
+            for (var i = 0; i < masteryLevels.Count; i++)
+            {
+                if (masteryLevels[i].rarityBonus < 0f || masteryLevels[i].rarityBonus >= 1f)
+                    errors.Add($"Mastery level {masteryLevels[i].id} has invalid rarity bonus.");
+                if (i > 0 && (masteryLevels[i].requiredProductionCount <= masteryLevels[i - 1].requiredProductionCount || masteryLevels[i].rarityBonus < masteryLevels[i - 1].rarityBonus))
+                    errors.Add("Mastery thresholds must increase and bonuses cannot decrease.");
+            }
             foreach (var localization in config.Localizations)
                 if (string.IsNullOrWhiteSpace(localization.pl) || string.IsNullOrWhiteSpace(localization.en))
                     errors.Add($"Localization {localization.key} must define Polish and English text.");
@@ -99,6 +114,7 @@ namespace DistilleryDiscovery
             foreach (var recipe in config.Recipes) RequireLocalization(config, $"recipe.{recipe.id}", errors);
             foreach (var category in config.Categories) RequireLocalization(config, $"category.{category.id}", errors);
             foreach (var contract in config.Contracts) RequireLocalization(config, $"contract.{contract.id}", errors);
+            foreach (var level in config.MasteryLevels) RequireLocalization(config, $"mastery.{level.id}", errors);
             return errors;
         }
 

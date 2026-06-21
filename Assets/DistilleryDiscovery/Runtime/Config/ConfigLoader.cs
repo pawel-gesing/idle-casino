@@ -14,8 +14,9 @@ namespace DistilleryDiscovery
             var laboratories = Load<LaboratoryFile>("GameData/laboratories");
             var contracts = Load<ContractFile>("GameData/contracts");
             var localization = Load<LocalizationFile>("GameData/localization");
+            var mastery = Load<MasteryFile>("GameData/mastery");
             var config = new GameConfig(rarities.rarities, ingredients.ingredients, recipes.recipes, economy,
-                categories.categories, laboratories.levels, contracts.contracts, localization.entries);
+                categories.categories, laboratories.levels, contracts.contracts, localization.entries, mastery.levels);
             ConfigValidator.ValidateOrThrow(config);
             return config;
         }

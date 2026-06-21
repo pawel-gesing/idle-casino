@@ -68,7 +68,7 @@ namespace DistilleryDiscovery
             if (State.activeContracts.Count > targetCount)
                 State.activeContracts.RemoveRange(targetCount, State.activeContracts.Count - targetCount);
             EnsureActiveContracts();
-            State.version = 4;
+            State.version = 5;
         }
 
         public List<OutcomeChance> Preview(IReadOnlyList<string> ingredientIds)
@@ -129,16 +129,29 @@ namespace DistilleryDiscovery
             var contractGold = completedIds.Sum(id => Config.Contract(id)?.goldReward ?? 0);
             var total = checked(pending.saleValue + contractGold);
             State.gold = checked(State.gold + total);
+            var ingredientRewards = new Dictionary<string, int>();
+            foreach (var contractId in completedIds)
+            {
+                var rewards = Config.Contract(contractId)?.ingredientRewards ?? new List<IngredientRewardDefinition>();
+                foreach (var reward in rewards)
+                {
+                    var amount = random.Range(reward.minAmount, reward.maxAmount + 1);
+                    State.AddIngredient(reward.ingredientId, amount);
+                    ingredientRewards[reward.ingredientId] = ingredientRewards.GetValueOrDefault(reward.ingredientId) + amount;
+                }
+            }
             State.activeContracts.RemoveAll(x => completedIds.Contains(x.contractId));
             State.pendingResult = null;
             EnsureActiveContracts(completedIds);
-            return new PendingClaimResult
+            var result = new PendingClaimResult
             {
                 ProductGold = pending.saleValue,
                 ContractGold = contractGold,
                 TotalGold = total,
                 CompletedContractIds = completedIds
             };
+            foreach (var reward in ingredientRewards) result.IngredientRewards[reward.Key] = reward.Value;
+            return result;
         }
 
         public LaboratoryLevelDefinition UpgradeLaboratory()
@@ -168,14 +181,15 @@ namespace DistilleryDiscovery
             return result;
         }
 
-        public List<WeightedRarity> ProductRarityWeights(IReadOnlyList<string> ingredientIds)
+        public List<WeightedRarity> ProductRarityWeights(IReadOnlyList<string> ingredientIds, string recipeId = null)
         {
             ValidateKnownIngredients(ingredientIds);
             var ingredientQuality = ingredientIds.Average(id =>
                 Config.Rarity(Config.Ingredient(id).rarityId).qualityScore + Config.Ingredient(id).qualityBonus * 100f);
             var labQuality = (Config.LaboratoryLevel(State.laboratoryLevel)?.productQualityBonus ?? 0f) * 100f;
+            var masteryQuality = recipeId == null ? 0f : (MasteryLevel(recipeId)?.rarityBonus ?? 0f) * 100f;
             var quality = ingredientQuality * Config.Economy.ingredientQualityInfluence
-                + labQuality * Config.Economy.laboratoryQualityInfluence;
+                + labQuality * Config.Economy.laboratoryQualityInfluence + masteryQuality;
             return Config.Economy.productRarityWeights.Select(entry =>
             {
                 var rank = Config.Rarity(entry.rarityId).rank;
@@ -186,12 +200,18 @@ namespace DistilleryDiscovery
 
         private ProductResult CreateProduct(string recipeId, IReadOnlyList<string> ingredientIds)
         {
-            var rarityId = WeightedPick(ProductRarityWeights(ingredientIds).Select(x => (x.rarityId, x.weight)).ToList());
+            var rarityId = WeightedPick(ProductRarityWeights(ingredientIds, recipeId).Select(x => (x.rarityId, x.weight)).ToList());
             var recipe = Config.Recipe(recipeId);
             var rarity = Config.Rarity(rarityId);
             var ingredientBonus = ingredientIds.Average(id => Config.Ingredient(id).qualityBonus);
             var saleValue = Math.Max(1, (int)Math.Round(recipe.baseValue * rarity.valueMultiplier * (1f + ingredientBonus)));
             return new ProductResult { RecipeId = recipeId, RarityId = rarityId, SaleValue = saleValue };
+        }
+
+        public MasteryLevelDefinition MasteryLevel(string recipeId)
+        {
+            var recipeState = State.RecipeState(recipeId);
+            return recipeState == null ? null : Config.MasteryLevelForCount(recipeState.timesCreated);
         }
 
         private void BeginPendingResult(string source, ProductResult product, bool wasDiscovered, bool rarityImproved)

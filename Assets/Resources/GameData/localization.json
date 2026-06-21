@@ -45,6 +45,11 @@
     { "key": "contract.contract_rare", "pl": "Rzadkie zamówienie", "en": "Rare Order" },
     { "key": "contract.contract_beer", "pl": "Święto piwa", "en": "Beer Festival" },
 
+    { "key": "mastery.apprentice", "pl": "Czeladnik", "en": "Apprentice" },
+    { "key": "mastery.craftsman", "pl": "Rzemieślnik", "en": "Craftsman" },
+    { "key": "mastery.master", "pl": "Mistrz", "en": "Master" },
+    { "key": "mastery.grandmaster", "pl": "Arcymistrz", "en": "Grandmaster" },
+
     { "key": "ui.nav.state", "pl": "STAN", "en": "STATE" },
     { "key": "ui.nav.ingredients", "pl": "SKŁADNIKI", "en": "INGREDIENTS" },
     { "key": "ui.nav.recipes", "pl": "RECEPTURY", "en": "RECIPES" },
@@ -99,6 +104,7 @@
     { "key": "ui.label.cost", "pl": "Koszt", "en": "Cost" },
     { "key": "ui.label.record", "pl": "Rekord", "en": "Record" },
     { "key": "ui.label.created", "pl": "Wytworzenia", "en": "Created" },
+    { "key": "ui.label.mastery", "pl": "Mistrzostwo", "en": "Mastery" },
     { "key": "ui.label.discovered_ingredients", "pl": "Odkryte składniki", "en": "Discovered ingredients" },
     { "key": "ui.label.selected", "pl": "Wybrane", "en": "Selected" },
     { "key": "ui.label.created_product", "pl": "Produkt", "en": "Product" },
@@ -130,6 +136,8 @@
     { "key": "ui.production.help", "pl": "Wybierz dokładnie 3 składniki wpływające na recepturę. Duplikaty są dozwolone.", "en": "Choose exactly 3 contributing ingredients. Duplicates are allowed." },
     { "key": "ui.laboratory.max", "pl": "Osiągnięto maksymalny poziom.", "en": "Maximum level reached." },
     { "key": "ui.recipe.undiscovered", "pl": "Nieodkryta receptura", "en": "Undiscovered recipe" },
+    { "key": "ui.mastery.maximum", "pl": "Osiągnięto maksymalny poziom", "en": "Maximum level reached" },
+    { "key": "ui.mastery.to_next", "pl": "Do następnego poziomu: {0}", "en": "To next level: {0}" },
     { "key": "ui.contract.ready", "pl": "GOTOWY DO ODBIORU", "en": "READY TO CLAIM" },
     { "key": "ui.contract.recipe", "pl": "Wytwórz {0} × {1}", "en": "Create {0} × {1}" },
     { "key": "ui.contract.rarity", "pl": "Wytwórz {0} × produkt: {1}", "en": "Create {0} × {1} product" },

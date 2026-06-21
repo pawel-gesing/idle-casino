@@ -1,0 +1,8 @@
+{
+  "levels": [
+    { "id": "apprentice", "displayName": "Apprentice", "requiredProductionCount": 1, "rarityBonus": 0.00 },
+    { "id": "craftsman", "displayName": "Craftsman", "requiredProductionCount": 10, "rarityBonus": 0.05 },
+    { "id": "master", "displayName": "Master", "requiredProductionCount": 30, "rarityBonus": 0.10 },
+    { "id": "grandmaster", "displayName": "Grandmaster", "requiredProductionCount": 100, "rarityBonus": 0.20 }
+  ]
+}

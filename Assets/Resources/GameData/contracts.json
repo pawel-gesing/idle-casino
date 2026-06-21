@@ -1,10 +1,10 @@
 {
   "contracts": [
-    { "id": "contract_table_beer", "displayName": "Dostawa do gospody", "requirementType": "produce_recipe", "targetId": "recipe_table_beer", "amount": 2, "goldReward": 70, "enabled": true },
-    { "id": "contract_epic", "displayName": "Kolekcjoner osobliwości", "requirementType": "produce_rarity", "targetId": "rarity_epic", "amount": 1, "goldReward": 220, "enabled": true },
-    { "id": "contract_mead", "displayName": "Uczta miodowa", "requirementType": "produce_category", "targetId": "mead", "amount": 3, "goldReward": 180, "enabled": true },
-    { "id": "contract_smoked_whisky", "displayName": "Zapasy gorzelni", "requirementType": "produce_recipe", "targetId": "recipe_smoked_whisky", "amount": 2, "goldReward": 210, "enabled": true },
-    { "id": "contract_rare", "displayName": "Rzadkie zamówienie", "requirementType": "produce_rarity", "targetId": "rarity_rare", "amount": 2, "goldReward": 140, "enabled": true },
-    { "id": "contract_beer", "displayName": "Święto piwa", "requirementType": "produce_category", "targetId": "beer", "amount": 3, "goldReward": 125, "enabled": true }
+    { "id": "contract_table_beer", "displayName": "Dostawa do gospody", "requirementType": "produce_recipe", "targetId": "recipe_table_beer", "amount": 2, "goldReward": 70, "ingredientRewards": [{ "ingredientId": "ingredient_juniper_rare", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
+    { "id": "contract_epic", "displayName": "Kolekcjoner osobliwości", "requirementType": "produce_rarity", "targetId": "rarity_epic", "amount": 1, "goldReward": 220, "ingredientRewards": [{ "ingredientId": "ingredient_ghost_mushroom_epic", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
+    { "id": "contract_mead", "displayName": "Uczta miodowa", "requirementType": "produce_category", "targetId": "mead", "amount": 3, "goldReward": 180, "ingredientRewards": [{ "ingredientId": "ingredient_amber_epic", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
+    { "id": "contract_smoked_whisky", "displayName": "Zapasy gorzelni", "requirementType": "produce_recipe", "targetId": "recipe_smoked_whisky", "amount": 2, "goldReward": 210, "ingredientRewards": [{ "ingredientId": "ingredient_peat_rare", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
+    { "id": "contract_rare", "displayName": "Rzadkie zamówienie", "requirementType": "produce_rarity", "targetId": "rarity_rare", "amount": 2, "goldReward": 140, "ingredientRewards": [{ "ingredientId": "ingredient_amber_epic", "minAmount": 1, "maxAmount": 3 }], "enabled": true },
+    { "id": "contract_beer", "displayName": "Święto piwa", "requirementType": "produce_category", "targetId": "beer", "amount": 3, "goldReward": 125, "ingredientRewards": [{ "ingredientId": "ingredient_juniper_rare", "minAmount": 1, "maxAmount": 3 }], "enabled": true }
   ]
 }

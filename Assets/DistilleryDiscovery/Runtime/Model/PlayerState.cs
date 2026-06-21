@@ -50,7 +50,7 @@ namespace DistilleryDiscovery
 
     [Serializable] public sealed class PlayerState
     {
-        public int version = 4;
+        public int version = 5;
         public int gold;
         public int experimentsCompleted;
         public int productionsCompleted;
@@ -81,5 +81,12 @@ namespace DistilleryDiscovery
     public sealed class DeliveryResult { public readonly Dictionary<string, int> Items = new(); }
     public class ProductResult { public string RecipeId; public string RarityId; public int SaleValue; }
     public sealed class ExperimentResult : ProductResult { public bool WasDiscovered; public bool RarityImproved; }
-    public sealed class PendingClaimResult { public int ProductGold; public int ContractGold; public int TotalGold; public List<string> CompletedContractIds = new(); }
+    public sealed class PendingClaimResult
+    {
+        public int ProductGold;
+        public int ContractGold;
+        public int TotalGold;
+        public List<string> CompletedContractIds = new();
+        public readonly Dictionary<string, int> IngredientRewards = new();
+    }
 }

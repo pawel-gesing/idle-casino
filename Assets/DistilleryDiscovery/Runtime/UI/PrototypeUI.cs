@@ -224,7 +224,14 @@ namespace DistilleryDiscovery
             {
                 var state = game.State.RecipeState(recipe.id);
                 if (state == null) sb.Append($"◇  ???\n    {T("ui.recipe.undiscovered", "Undiscovered recipe")}\n\n");
-                else { var rarity = game.Config.Rarity(state.highestProductRarityId); sb.Append($"◆  <b>{RecipeName(recipe.id)}</b>\n    {T("ui.label.record", "Record")}: <color={rarity.colorHex}>{RarityName(rarity.id)}</color> · {T("ui.label.created", "Created")}: {state.timesCreated}\n    {T("ui.label.discovered_ingredients", "Discovered ingredients")}: {string.Join(", ", state.revealedIngredientIds.Select(IngredientName))}\n\n"); }
+                else
+                {
+                    var rarity = game.Config.Rarity(state.highestProductRarityId);
+                    var mastery = game.MasteryLevel(recipe.id);
+                    var next = game.Config.NextMasteryLevel(state.timesCreated);
+                    var progress = next == null ? T("ui.mastery.maximum", "Maximum level reached") : F("ui.mastery.to_next", "To next level: {0}", next.requiredProductionCount - state.timesCreated);
+                    sb.Append($"◆  <b>{RecipeName(recipe.id)}</b>\n    {T("ui.label.record", "Record")}: <color={rarity.colorHex}>{RarityName(rarity.id)}</color>\n    {T("ui.label.created", "Created")}: {state.timesCreated}\n    {T("ui.label.mastery", "Mastery")}: <b>{MasteryName(mastery)}</b>\n    {progress}\n    {T("ui.label.discovered_ingredients", "Discovered ingredients")}: {string.Join(", ", state.revealedIngredientIds.Select(IngredientName))}\n\n");
+                }
             }
             contentText.text = sb.ToString();
         }
@@ -293,7 +300,7 @@ namespace DistilleryDiscovery
             foreach (var state in game.State.activeContracts)
             {
                 var contract = game.Config.Contract(state.contractId);
-                sb.Append($"<b>{ContractName(contract.id)}</b>\n{DescribeRequirement(contract)}\n{T("ui.label.progress", "Progress")}: <b>{state.progress}/{contract.amount}</b> · {T("ui.label.reward", "Reward")}: <b>{contract.goldReward} {T("ui.label.gold_lower", "gold")}</b>\n\n");
+                sb.Append($"<b>{ContractName(contract.id)}</b>\n{DescribeRequirement(contract)}\n{T("ui.label.progress", "Progress")}: <b>{state.progress}/{contract.amount}</b> · {T("ui.label.reward", "Reward")}: <b>{ContractRewardDescription(contract)}</b>\n\n");
             }
             contentText.text = sb.ToString();
         }
@@ -321,7 +328,7 @@ namespace DistilleryDiscovery
             {
                 var contract = game.Config.Contract(change.contractId);
                 sb.Append($"{ContractName(change.contractId)}: <b>{change.currentProgress}/{contract.amount}</b>");
-                if (change.completed) sb.Append($"  <color=#63D889><b>+{contract.goldReward} {T("ui.label.gold_lower", "gold")}</b></color>");
+                if (change.completed) sb.Append($"  <color=#63D889><b>+{ContractRewardDescription(contract)}</b></color>");
                 sb.Append("\n");
             }
             if (completed.Count > 0) sb.Append($"\n<b>{T("ui.pending.contract_bonus", "Contract bonus")}: +{contractGold} {T("ui.label.gold_lower", "gold")}</b>\n");
@@ -334,7 +341,8 @@ namespace DistilleryDiscovery
             try
             {
                 var result = game.ClaimPendingResult(); save.Save(game.State); pendingModal.SetActive(false); RefreshHeaderCounters();
-                ShowState(F("ui.status.reward_claimed", "Claimed {0} gold", result.TotalGold));
+                var ingredients = result.IngredientRewards.Count == 0 ? "" : " · " + string.Join(", ", result.IngredientRewards.Select(x => $"+{x.Value} {IngredientName(x.Key)}"));
+                ShowState(F("ui.status.reward_claimed", "Claimed {0} gold", result.TotalGold) + ingredients);
             }
             catch (Exception ex) { pendingSummaryText.text = ex.Message; }
         }
@@ -419,6 +427,14 @@ namespace DistilleryDiscovery
         private void SaveGame() { save.Save(game.State); CloseSettings(); ShowState(T("ui.status.saved", "Game saved locally")); }
         private void LoadGame() { try { game.ReplaceState(save.Load()); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); if (game.State.pendingResult != null) ShowPendingResult(); else ShowState(T("ui.status.loaded", "Local save loaded")); } catch (Exception ex) { SetStatus(ex.Message); } }
         private void ResetGame() { save.Reset(); game.ReplaceState(GameService.NewState(game.Config, Language)); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); ShowState(T("ui.status.reset", "Save deleted and game reset")); }
+
+        private string MasteryName(MasteryLevelDefinition level) => level == null ? "—" : game.Config.Text($"mastery.{level.id}", Language, level.displayName);
+        private string ContractRewardDescription(ContractDefinition contract)
+        {
+            var rewards = new List<string> { $"{contract.goldReward} {T("ui.label.gold_lower", "gold")}" };
+            rewards.AddRange((contract.ingredientRewards ?? new List<IngredientRewardDefinition>()).Select(x => $"{x.minAmount}–{x.maxAmount} {IngredientName(x.ingredientId)}"));
+            return string.Join(" + ", rewards);
+        }
 
         private string T(string key, string fallback) => game.Config.Text(key, Language, fallback);
         private string F(string key, string fallback, params object[] args) => string.Format(T(key, fallback), args);

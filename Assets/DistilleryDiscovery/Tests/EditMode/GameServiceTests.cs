@@ -19,6 +19,8 @@ namespace DistilleryDiscovery.Tests
             Assert.That(config.Text("ui.header.gold", "en"), Is.EqualTo("GOLD"));
             Assert.That(config.LaboratoryLevel(2).upgradeCost, Is.EqualTo(1500));
             Assert.That(config.Economy.activeContractCount, Is.EqualTo(3));
+            Assert.That(config.MasteryLevels, Has.Count.EqualTo(4));
+            Assert.That(config.Contracts.All(x => x.ingredientRewards.Count > 0), Is.True);
         }
 
         [Test]
@@ -142,6 +144,22 @@ namespace DistilleryDiscovery.Tests
         }
 
         [Test]
+        public void ContractClaim_AwardsEveryConfiguredIngredientRewardWithinRange()
+        {
+            var game = GameWithInventory(new MaxRandom(), 3);
+            game.State.activeContracts.Clear();
+            game.State.activeContracts.Add(new ActiveContractState { contractId = "contract_recipe", progress = 1 });
+            game.RunExperiment(ThreeIngredients());
+
+            var claim = game.ClaimPendingResult();
+
+            Assert.That(claim.IngredientRewards["ingredient_reward_a"], Is.EqualTo(3));
+            Assert.That(claim.IngredientRewards["ingredient_reward_b"], Is.EqualTo(4));
+            Assert.That(game.State.AmountOf("ingredient_reward_a"), Is.InRange(1, 3));
+            Assert.That(game.State.AmountOf("ingredient_reward_b"), Is.InRange(2, 4));
+        }
+
+        [Test]
         public void ClaimingResult_ReplacesAllCompletedContractsWithDistinctContracts()
         {
             var game = GameWithInventory(new MinRandom(), 6);
@@ -172,6 +190,47 @@ namespace DistilleryDiscovery.Tests
         }
 
         [Test]
+        public void EveryCreatedProduct_IncrementsRecipeProductionCount()
+        {
+            var game = GameWithInventory(new MinRandom(), 6);
+            game.RunExperiment(ThreeIngredients()); game.ClaimPendingResult();
+            game.RunProduction("recipe_test", ThreeIngredients());
+            Assert.That(game.State.RecipeState("recipe_test").timesCreated, Is.EqualTo(2));
+        }
+
+        [TestCase(1, "apprentice")]
+        [TestCase(10, "craftsman")]
+        [TestCase(30, "master")]
+        [TestCase(100, "grandmaster")]
+        public void ProductionCount_DeterminesConfiguredMasteryLevel(int count, string expectedId)
+        {
+            var game = GameWithInventory(new MinRandom(), 0); Discover(game); game.State.RecipeState("recipe_test").timesCreated = count;
+            Assert.That(game.MasteryLevel("recipe_test").id, Is.EqualTo(expectedId));
+        }
+
+        [Test]
+        public void FirstRecipeResult_GrantsApprenticeMastery()
+        {
+            var game = GameWithInventory(new MinRandom(), 3); game.RunExperiment(ThreeIngredients());
+            Assert.That(game.MasteryLevel("recipe_test").id, Is.EqualTo("apprentice"));
+        }
+
+        [Test]
+        public void Mastery_ChangesHigherRarityWeightButNotSaleValue()
+        {
+            var apprentice = GameWithInventory(new MinRandom(), 3); Discover(apprentice); apprentice.State.RecipeState("recipe_test").timesCreated = 1;
+            var grandmaster = GameWithInventory(new MinRandom(), 3); Discover(grandmaster); grandmaster.State.RecipeState("recipe_test").timesCreated = 100;
+
+            var apprenticeRareWeight = apprentice.ProductRarityWeights(ThreeIngredients(), "recipe_test").Single(x => x.rarityId == "rarity_rare").weight;
+            var grandmasterRareWeight = grandmaster.ProductRarityWeights(ThreeIngredients(), "recipe_test").Single(x => x.rarityId == "rarity_rare").weight;
+            var apprenticeProduct = apprentice.RunProduction("recipe_test", ThreeIngredients());
+            var grandmasterProduct = grandmaster.RunProduction("recipe_test", ThreeIngredients());
+
+            Assert.That(grandmasterRareWeight, Is.GreaterThan(apprenticeRareWeight));
+            Assert.That(grandmasterProduct.SaleValue, Is.EqualTo(apprenticeProduct.SaleValue));
+        }
+
+        [Test]
         public void Delivery_AddsIngredients()
         {
             var game = GameWithInventory(new MinRandom(), 0); var result = game.ReceiveDelivery();
@@ -185,7 +244,7 @@ namespace DistilleryDiscovery.Tests
             var config = MinimalConfig(); var legacy = new PlayerState { version = 2, gold = 5 };
             legacy.products.Add(new ProductEntry { recipeId = "recipe_test", rarityId = "rarity_common", saleValue = 10, amount = 3 }); legacy.activeContractIds.Add("contract_recipe");
             var game = new GameService(config, legacy, new MinRandom());
-            Assert.That(game.State.version, Is.EqualTo(4));
+            Assert.That(game.State.version, Is.EqualTo(5));
             Assert.That(game.State.gold, Is.EqualTo(35));
             Assert.That(game.State.ContractState("contract_recipe"), Is.Not.Null);
             Assert.That(game.State.activeContracts, Has.Count.EqualTo(3));
@@ -201,6 +260,15 @@ namespace DistilleryDiscovery.Tests
             Assert.That(loaded.languageCode, Is.EqualTo("pl"));
             Assert.That(loaded.pendingResult.saleValue, Is.EqualTo(10));
             Assert.That(loaded.pendingResult.contractProgress[0].currentProgress, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void SaveAndLoad_PreservesRecipeProductionCounts()
+        {
+            var storage = new MemoryStorage(); var saves = new SaveService(storage); var state = new PlayerState();
+            state.recipes.Add(new PlayerRecipeState { recipeId = "recipe_test", timesCreated = 30 });
+            saves.Save(state);
+            Assert.That(saves.Load().RecipeState("recipe_test").timesCreated, Is.EqualTo(30));
         }
 
         private static GameService GameWithInventory(IRandomSource random, int amount)
@@ -223,6 +291,8 @@ namespace DistilleryDiscovery.Tests
             {
                 new() { id = "ingredient_test", displayName = "Test Ingredient", rarityId = "rarity_common", outcomeWeights = new List<OutcomeWeight> { new() { recipeId = "recipe_test", weight = 10 } } },
                 new() { id = "ingredient_invalid", displayName = "Invalid Ingredient", rarityId = "rarity_common", outcomeWeights = new List<OutcomeWeight>() }
+                ,new() { id = "ingredient_reward_a", displayName = "Reward A", rarityId = "rarity_rare", outcomeWeights = new List<OutcomeWeight>() }
+                ,new() { id = "ingredient_reward_b", displayName = "Reward B", rarityId = "rarity_rare", outcomeWeights = new List<OutcomeWeight>() }
             };
             var recipes = new List<RecipeDefinition> { new() { id = "recipe_test", displayName = "Test Recipe", categoryId = "category_test", collectionRarityId = "rarity_common", baseValue = 10 } };
             var economy = new EconomyDefinition
@@ -235,12 +305,19 @@ namespace DistilleryDiscovery.Tests
             var labs = new List<LaboratoryLevelDefinition> { new() { level = 1 }, new() { level = 2, upgradeCost = 300, productQualityBonus = .5f } };
             var contracts = new List<ContractDefinition>
             {
-                new() { id = "contract_recipe", displayName = "Recipe", requirementType = ContractRequirementType.Recipe, targetId = "recipe_test", amount = 2, goldReward = 40 },
+                new() { id = "contract_recipe", displayName = "Recipe", requirementType = ContractRequirementType.Recipe, targetId = "recipe_test", amount = 2, goldReward = 40, ingredientRewards = new List<IngredientRewardDefinition> { new() { ingredientId = "ingredient_reward_a", minAmount = 1, maxAmount = 3 }, new() { ingredientId = "ingredient_reward_b", minAmount = 2, maxAmount = 4 } } },
                 new() { id = "contract_rarity", displayName = "Rarity", requirementType = ContractRequirementType.Rarity, targetId = "rarity_common", amount = 2, goldReward = 40 },
                 new() { id = "contract_category", displayName = "Category", requirementType = ContractRequirementType.Category, targetId = "category_test", amount = 2, goldReward = 40 },
                 new() { id = "contract_spare", displayName = "Spare", requirementType = ContractRequirementType.Recipe, targetId = "recipe_test", amount = 3, goldReward = 50 }
             };
-            return new GameConfig(rarities, ingredients, recipes, economy, categories, labs, contracts);
+            var mastery = new List<MasteryLevelDefinition>
+            {
+                new() { id = "apprentice", displayName = "Apprentice", requiredProductionCount = 1 },
+                new() { id = "craftsman", displayName = "Craftsman", requiredProductionCount = 10, rarityBonus = .05f },
+                new() { id = "master", displayName = "Master", requiredProductionCount = 30, rarityBonus = .1f },
+                new() { id = "grandmaster", displayName = "Grandmaster", requiredProductionCount = 100, rarityBonus = .2f }
+            };
+            return new GameConfig(rarities, ingredients, recipes, economy, categories, labs, contracts, masteryLevels: mastery);
         }
 
         private sealed class MinRandom : IRandomSource { public int Range(int minInclusive, int maxExclusive) => minInclusive; }

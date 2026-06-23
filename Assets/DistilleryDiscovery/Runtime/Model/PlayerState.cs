@@ -58,6 +58,12 @@ namespace DistilleryDiscovery
         public List<string> revealedIngredientIds = new();
     }
 
+    [Serializable] public sealed class PlayerLaboratoryState
+    {
+        public string id;
+        public int level = 1;
+    }
+
     public static class LaboratoryJobType { public const string Experiment = "experiment"; public const string Production = "production"; }
     public static class LaboratoryJobStatus { public const string Running = "running"; public const string Completed = "completed"; public const string Claimed = "claimed"; }
 
@@ -69,16 +75,19 @@ namespace DistilleryDiscovery
         public string endTimeUtc;
         public string status;
         public string recipeId;
+        public string laboratoryId;
         public List<string> ingredientIds = new();
     }
 
     [Serializable] public sealed class PlayerState
     {
-        public int version = 8;
+        public int version = 9;
         public int gold;
         public int experimentsCompleted;
         public int productionsCompleted;
         public int laboratoryLevel = 1;
+        public int nextLaboratoryNumber = 2;
+        public List<PlayerLaboratoryState> laboratories = new();
         public string languageCode = "en";
         public List<InventoryEntry> inventory = new();
         public List<PlayerRecipeState> recipes = new();

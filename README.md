@@ -49,9 +49,11 @@ Eksperyment i produkcja emitują identyczne pełne zdarzenie zawierające recept
 
 ### Laboratorium
 
+Gracz zaczyna z jednym laboratorium, może kupować kolejne i ulepszać każde niezależnie. Przy starcie eksperymentu lub produkcji wybierane jest wolne laboratorium; jego poziom określa sloty, mnożniki czasu i bonus jakości dla danego zadania. Ceny kolejnych laboratoriów są mapowane na koszty kolejnych poziomów z `laboratories.json`.
+
 Ekran laboratorium dzieli zadania na aktywne eksperymenty, aktywne produkcje i gotowe do odbioru. Każdy kafelek pokazuje typ, składniki, docelową recepturę produkcji, pozostały czas i status; gotowy kafelek działa jako przycisk pojedynczego odbioru.
 
-Poziom laboratorium niezależnie określa liczbę slotów eksperymentów i produkcji oraz mnożniki czasu obu typów zadań. Ulepszenia nadal zwiększają jakość produktu. Wszystkie te wartości oraz koszt następnego poziomu pochodzą z `laboratories.json`.
+Poziom każdego laboratorium niezależnie określa liczbę slotów eksperymentów i produkcji oraz mnożniki czasu obu typów zadań. Ulepszenia nadal zwiększają jakość produktu. Wszystkie te wartości oraz koszt następnego poziomu pochodzą z `laboratories.json`.
 
 ### Offline progress i zegar debugowy
 
@@ -79,17 +81,17 @@ Konfiguracja znajduje się w `Assets/Resources/GameData/`:
 - `ingredients.json` — 22 składniki, rzadkości, grupy i źródła,
 - `recipes.json` — 175 receptur, wymagania, bazowe wagi, bonusy, kategorie, tagi i wartości,
 - `categories.json` — kategorie receptur,
-- `economy.json` — wszystkie czasy, rozmiar i limit dostaw, liczba slotów oraz pozostałe parametry ekonomii,
+- `economy.json` — wszystkie czasy, rozmiar i limit dostaw oraz pozostałe parametry ekonomii,
 - `laboratories.json` — poziomy, koszty, bonusy jakości, sloty eksperymentów/produkcji i ich mnożniki czasu,
 - `contracts.json` — 36 szablonów kontraktów v2 i ważone nagrody,
 - `mastery.json` — progi mistrzostwa receptur i bonusy rzadkości,
 - `localization.json` — polskie oraz angielskie teksty UI i contentu.
 
-Konfiguracja jest walidowana przy starcie, łącznie z dodatnimi czasami, kosztami, slotami i mnożnikami. Bazowe czasy w sekundach znajdują się w `economy.json`; pola `experimentSlots`, `productionSlots`, `experimentTimeMultiplier` i `productionTimeMultiplier` są definiowane dla każdego poziomu w `laboratories.json`. Opcjonalny `maxOfflineProgressSeconds` ogranicza naliczanie offline.
+Konfiguracja jest walidowana przy starcie, łącznie z dodatnimi czasami, kosztami, slotami i mnożnikami. Bazowe czasy w sekundach znajdują się w `economy.json`; darmowa dostawa trwa 20 minut i rusza dopiero po odebraniu poprzedniej gotowej dostawy. Pola `experimentSlots`, `productionSlots`, `experimentTimeMultiplier` i `productionTimeMultiplier` są definiowane dla każdego poziomu w `laboratories.json`. Opcjonalny `maxOfflineProgressSeconds` ogranicza naliczanie offline.
 
 ## Zapis stanu
 
-Zapis wersji `8` przechowuje złoto, poprawne składniki, produkty, książkę receptur, poziom laboratorium, wygenerowane cele i role kontraktów, zbiory różnych receptur, stan rerolla/odświeżenia, nieodebrany wynik, dostawy i zadania laboratoryjne wraz z wejściem oraz czasami UTC. Zapisy v7 są migrowane: zachowany zostaje poprawny postęp, a nieaktualne kontrakty są bezpiecznie generowane ponownie.
+Zapis wersji `9` przechowuje złoto, poprawne składniki, produkty, książkę receptur, listę laboratoriów z poziomami, wygenerowane cele i role kontraktów, zbiory różnych receptur, stan rerolla/odświeżenia, nieodebrany wynik, dostawy i zadania laboratoryjne wraz z wybranym laboratorium, wejściem oraz czasami UTC. Zapisy v7/v8 są migrowane: zachowany zostaje poprawny postęp, a nieaktualne kontrakty są bezpiecznie generowane ponownie.
 
 Starsze zapisy są migrowane automatycznie. Brakujące pola czasu są inicjalizowane od chwili wczytania bez zmiany złota, magazynu, receptur ani mistrzostwa.
 

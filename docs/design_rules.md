@@ -2,7 +2,7 @@
 
 ## Pętla gry
 
-`dostawa → wybór 3 składników → eksperyment albo produkcja → timed job → ręczny odbiór → pending reward → kontrakty i laboratorium`
+`dostawa → wybór laboratorium i 3 składników → eksperyment albo produkcja → timed job → ręczny odbiór → pending reward → kontrakty i laboratorium`
 
 Eksperyment odkrywa receptury i pozostaje ważonym losowaniem. Produkcja powtarza odkrytą recepturę deterministycznie. Obie ścieżki zachowują te same timery, offline progress, jakość produktu, mastery, magazyn produktów i claim nagród.
 
@@ -26,9 +26,9 @@ Produkcja wymaga odkrytej receptury i dokładnie trzech składników spełniają
 
 ## Dostawy i jakość
 
-`DeliveryPool.rolls` określa liczbę losowań. Common podtrzymuje częste eksperymenty, rare pochodzi głównie z dostaw i kontraktów, epic głównie z kontraktów z małą szansą dostawy, a legendary głównie z prestige z minimalną szansą dostawy.
+`DeliveryPool.rolls` określa liczbę losowań. Dostawy są częstsze i mniejsze: bazowo co 20 minut, a licznik kolejnej rusza dopiero po odebraniu gotowej. Common podtrzymuje częste eksperymenty, rare pochodzi głównie z dostaw i kontraktów, epic głównie z kontraktów z małą szansą dostawy, a legendary głównie z prestige z minimalną szansą dostawy.
 
-Jakość produktu zależy od rzadkości/bonusu składników, laboratorium i mastery. Mastery poprawia wagi wyższej jakości, nie gwarantuje konkretnego poziomu i nie dodaje osobnego mnożnika sprzedaży.
+Jakość produktu zależy od rzadkości/bonusu składników, wybranego laboratorium i mastery. Gracz zaczyna z jednym laboratorium, może kupować kolejne i ulepszać każde niezależnie; ceny kolejnych laboratoriów używają progów kosztów kolejnych poziomów. Mastery poprawia wagi wyższej jakości, nie gwarantuje konkretnego poziomu i nie dodaje osobnego mnożnika sprzedaży.
 
 ## Kontrakty
 
@@ -38,7 +38,7 @@ Zawsze aktywny jest jeden kontrakt każdej roli:
 - `specialist`: odkryte receptury, kategorie, tagi, składniki i grupy; główne nagrody rare,
 - `prestige`: jakość produktu, minimalna jakość receptury, różne receptury, odkrycia, rekordy i epic; ma kontrolowaną szansę legendary.
 
-Generator rozwiązuje cele tylko z dostępnego contentu i poziomu laboratorium. Dokładna produkcja używa odkrytych receptur; jawny kontrakt odkrycia może wskazać nieodkrytą recepturę. Aktywne cele nie mogą się duplikować ani mieć identycznego typu i targetu. Postęp distinct zapisuje widziane ID.
+Generator rozwiązuje cele tylko z dostępnego contentu i najwyższego poziomu posiadanego laboratorium. Dokładna produkcja używa odkrytych receptur; jawny kontrakt odkrycia może wskazać nieodkrytą recepturę. Aktywne cele nie mogą się duplikować ani mieć identycznego typu i targetu. Postęp distinct zapisuje widziane ID.
 
 Pełny `ProductionEvent` jest jedynym wejściem postępu kontraktów, dzięki czemu pojedynczy claim i `Collect All` naliczają identycznie. Sprzedaż i ukończone kontrakty są wypłacane wyłącznie przez pending-result claim. Jeden darmowy reroll na 24-godzinny cykl chroni przed blokadą.
 

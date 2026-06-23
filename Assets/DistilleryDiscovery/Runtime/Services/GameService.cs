@@ -34,14 +34,17 @@ namespace DistilleryDiscovery
         {
             gold = config.Economy.startingGold,
             languageCode = languageCode == "pl" ? "pl" : "en",
-            freeContractRerollsRemaining = config.Economy.freeContractRerolls
+            freeContractRerollsRemaining = config.Economy.freeContractRerolls,
+            laboratories = new List<PlayerLaboratoryState> { new() { id = "lab_1", level = 1 } },
+            laboratoryLevel = 1,
+            nextLaboratoryNumber = 2
         };
 
         public void ReplaceState(PlayerState state)
         {
             State = state ?? throw new ArgumentNullException(nameof(state));
             var version = State.version;
-            State.inventory ??= new(); State.recipes ??= new(); State.products ??= new();
+            State.inventory ??= new(); State.recipes ??= new(); State.products ??= new(); State.laboratories ??= new();
             State.activeContractIds ??= new(); State.activeContracts ??= new(); State.laboratoryJobs ??= new();
             NormalizeLegacyIngredientIds();
             State.inventory.RemoveAll(x => x == null || Config.Ingredient(x.ingredientId)?.enabled != true || x.amount <= 0);
@@ -53,10 +56,11 @@ namespace DistilleryDiscovery
             {
                 State.pendingResult.contractProgress ??= new(); State.pendingResult.ingredientIds ??= new();
                 State.pendingResult.ingredientIds = State.pendingResult.ingredientIds.Select(MapLegacyIngredientId).Where(x => Config.Ingredient(x) != null).ToList();
-                if (version < 8) State.pendingResult.contractProgress.Clear(); // preserve product gold; never pay invalid legacy contracts
+                if (Config.Recipe(State.pendingResult.recipeId) == null || Config.Rarity(State.pendingResult.rarityId) == null || State.pendingResult.saleValue <= 0)
+                    State.pendingResult = null;
+                else if (version < 8) State.pendingResult.contractProgress.Clear(); // preserve product gold; never pay invalid legacy contracts
             }
-            if (State.laboratoryLevel < 1) State.laboratoryLevel = 1;
-            if (Config.LaboratoryLevel(State.laboratoryLevel) == null) State.laboratoryLevel = Config.LaboratoryLevels.Max(x => x.level);
+            NormalizeLaboratories(version);
             if (State.languageCode != "pl" && State.languageCode != "en") State.languageCode = "en";
 
             if (version < 3)
@@ -92,10 +96,11 @@ namespace DistilleryDiscovery
             foreach (var job in State.laboratoryJobs)
             {
                 job.ingredientIds = job.ingredientIds.Select(MapLegacyIngredientId).ToList();
+                if (State.laboratories.All(x => x.id != job.laboratoryId)) job.laboratoryId = State.laboratories[0].id;
                 if (job.status != LaboratoryJobStatus.Running && job.status != LaboratoryJobStatus.Completed && job.status != LaboratoryJobStatus.Claimed)
                     job.status = LaboratoryJobStatus.Running;
             }
-            State.version = 8;
+            State.version = 9;
             var deliveriesBefore = State.availableFreeDeliveries;
             var completedBefore = State.laboratoryJobs.Count(x => x.status == LaboratoryJobStatus.Completed);
             var elapsed = TryUtc(State.lastSavedAtUtc, out var savedAt) && savedAt <= time.UtcNow ? time.UtcNow - savedAt : TimeSpan.Zero;
@@ -130,12 +135,51 @@ namespace DistilleryDiscovery
             _ => id
         };
 
-        private LaboratoryLevelDefinition CurrentLaboratoryLevel => Config.LaboratoryLevel(State.laboratoryLevel) ?? Config.LaboratoryLevel(1);
-        public int ExperimentSlotCount => CurrentLaboratoryLevel.experimentSlots;
-        public int ProductionSlotCount => CurrentLaboratoryLevel.productionSlots;
-        public int AvailableExperimentSlots => Math.Max(0, ExperimentSlotCount - State.laboratoryJobs.Count(x => x.type == LaboratoryJobType.Experiment && x.status != LaboratoryJobStatus.Claimed));
-        public int AvailableProductionSlots => Math.Max(0, ProductionSlotCount - State.laboratoryJobs.Count(x => x.type == LaboratoryJobType.Production && x.status != LaboratoryJobStatus.Claimed));
+        private void NormalizeLaboratories(int version)
+        {
+            var maxLevel = Config.LaboratoryLevels.Count == 0 ? 1 : Config.LaboratoryLevels.Max(x => x.level);
+            if (State.laboratoryLevel < 1) State.laboratoryLevel = 1;
+            if (Config.LaboratoryLevel(State.laboratoryLevel) == null) State.laboratoryLevel = maxLevel;
+
+            State.laboratories.RemoveAll(x => x == null);
+            if (State.laboratories.Count == 0)
+                State.laboratories.Add(new PlayerLaboratoryState { id = "lab_1", level = State.laboratoryLevel });
+            var seen = new HashSet<string>();
+            for (var i = 0; i < State.laboratories.Count; i++)
+            {
+                var lab = State.laboratories[i];
+                if (string.IsNullOrEmpty(lab.id) || !seen.Add(lab.id)) lab.id = $"lab_{i + 1}";
+                if (lab.level < 1) lab.level = 1;
+                if (Config.LaboratoryLevel(lab.level) == null) lab.level = maxLevel;
+            }
+            if (version < 9 || (State.laboratories.Count == 1 && State.laboratoryLevel != State.laboratories[0].level && Config.LaboratoryLevel(State.laboratoryLevel) != null))
+                State.laboratories[0].level = State.laboratoryLevel;
+
+            State.laboratoryLevel = State.laboratories[0].level; // legacy mirror for old UI/tests/saves
+            var maxNumber = State.laboratories.Select(x => int.TryParse((x.id ?? "").Replace("lab_", ""), out var n) ? n : 0).DefaultIfEmpty(1).Max();
+            State.nextLaboratoryNumber = Math.Max(Math.Max(2, State.nextLaboratoryNumber), maxNumber + 1);
+        }
+
+        private LaboratoryLevelDefinition CurrentLaboratoryLevel => Config.LaboratoryLevel(State.laboratories.FirstOrDefault()?.level ?? State.laboratoryLevel) ?? Config.LaboratoryLevel(1);
+        private int HighestLaboratoryLevel => State.laboratories.Count == 0 ? State.laboratoryLevel : State.laboratories.Max(x => x.level);
+        public int LaboratoryCount => State.laboratories.Count;
+        public int MaxLaboratoryCount => Config.LaboratoryLevels.Count;
+        public int NextLaboratoryCost => State.laboratories.Count >= MaxLaboratoryCount ? -1 : Config.LaboratoryLevel(State.laboratories.Count + 1)?.upgradeCost ?? -1;
+        public int ExperimentSlotCount => State.laboratories.Sum(x => Config.LaboratoryLevel(x.level)?.experimentSlots ?? 0);
+        public int ProductionSlotCount => State.laboratories.Sum(x => Config.LaboratoryLevel(x.level)?.productionSlots ?? 0);
+        public int AvailableExperimentSlots => State.laboratories.Sum(x => AvailableSlots(x.id, LaboratoryJobType.Experiment));
+        public int AvailableProductionSlots => State.laboratories.Sum(x => AvailableSlots(x.id, LaboratoryJobType.Production));
         public int AvailableLaboratorySlots => AvailableExperimentSlots + AvailableProductionSlots;
+        public LaboratoryLevelDefinition LaboratoryLevelFor(string laboratoryId) => Config.LaboratoryLevel(State.laboratories.Find(x => x.id == laboratoryId)?.level ?? State.laboratories.FirstOrDefault()?.level ?? 1);
+        public int AvailableSlots(string laboratoryId, string type)
+        {
+            var lab = State.laboratories.Find(x => x.id == laboratoryId);
+            if (lab == null) return 0;
+            var level = Config.LaboratoryLevel(lab.level);
+            var capacity = type == LaboratoryJobType.Experiment ? level.experimentSlots : level.productionSlots;
+            var used = State.laboratoryJobs.Count(x => x.laboratoryId == laboratoryId && x.type == type && x.status != LaboratoryJobStatus.Claimed);
+            return Math.Max(0, capacity - used);
+        }
 
         public TimeSpan TimeUntilNextFreeDelivery
         {
@@ -204,13 +248,13 @@ namespace DistilleryDiscovery
             return RecipeOutcomeResolver.IsEligible(Config, Config.Recipe(recipeId), ingredientIds);
         }
 
-        public LaboratoryJobState StartExperiment(IReadOnlyList<string> ingredientIds)
+        public LaboratoryJobState StartExperiment(IReadOnlyList<string> ingredientIds, string laboratoryId = null)
         {
-            EnsureNoPendingResult(); Preview(ingredientIds); EnsureFreeLaboratorySlot(LaboratoryJobType.Experiment);
-            ConsumeIngredients(ingredientIds); return CreateJob(LaboratoryJobType.Experiment, null, ingredientIds, Config.Economy.experimentDurationSeconds);
+            EnsureNoPendingResult(); Preview(ingredientIds); laboratoryId = ResolveFreeLaboratory(laboratoryId, LaboratoryJobType.Experiment);
+            ConsumeIngredients(ingredientIds); return CreateJob(LaboratoryJobType.Experiment, null, ingredientIds, Config.Economy.experimentDurationSeconds, laboratoryId);
         }
 
-        public LaboratoryJobState StartProduction(string recipeId, IReadOnlyList<string> ingredientIds)
+        public LaboratoryJobState StartProduction(string recipeId, IReadOnlyList<string> ingredientIds, string laboratoryId = null)
         {
             EnsureNoPendingResult();
             var recipe = Config.Recipe(recipeId) ?? throw new InvalidOperationException($"Unknown recipe: {recipeId}");
@@ -218,8 +262,8 @@ namespace DistilleryDiscovery
             ValidateIngredientSelection(ingredientIds, Config.Economy.ingredientsPerProduction);
             if (!RecipeOutcomeResolver.IsEligible(Config, recipe, ingredientIds))
                 throw new InvalidOperationException($"Selected ingredients do not satisfy the requirements for {recipe.displayName}.");
-            EnsureFreeLaboratorySlot(LaboratoryJobType.Production); ConsumeIngredients(ingredientIds);
-            return CreateJob(LaboratoryJobType.Production, recipeId, ingredientIds, Config.Economy.productionDurationSeconds);
+            laboratoryId = ResolveFreeLaboratory(laboratoryId, LaboratoryJobType.Production); ConsumeIngredients(ingredientIds);
+            return CreateJob(LaboratoryJobType.Production, recipeId, ingredientIds, Config.Economy.productionDurationSeconds, laboratoryId);
         }
 
         public ProductResult ClaimLaboratoryJob(string jobId)
@@ -236,7 +280,7 @@ namespace DistilleryDiscovery
                     throw new InvalidOperationException("Production job ingredients no longer satisfy its recipe.");
                 recipeId = job.recipeId;
             }
-            var product = CreateProduct(recipeId, job.ingredientIds);
+            var product = CreateProduct(recipeId, job.ingredientIds, job.laboratoryId);
             var change = UpdateRecipeBook(recipeId, product.RarityId, job.ingredientIds);
             if (job.type == LaboratoryJobType.Experiment) State.experimentsCompleted++; else State.productionsCompleted++;
             State.AddProduct(product.RecipeId, product.RarityId, product.SaleValue);
@@ -298,12 +342,26 @@ namespace DistilleryDiscovery
             State.AddIngredient(ingredientId, amount); result[ingredientId] = result.GetValueOrDefault(ingredientId) + amount;
         }
 
-        public LaboratoryLevelDefinition UpgradeLaboratory()
+        public PlayerLaboratoryState PurchaseLaboratory()
         {
             EnsureNoPendingResult();
-            var next = Config.LaboratoryLevel(State.laboratoryLevel + 1) ?? throw new InvalidOperationException("Laboratory is already at maximum level.");
+            var cost = NextLaboratoryCost;
+            if (cost < 0) throw new InvalidOperationException("Maximum number of laboratories reached.");
+            if (State.gold < cost) throw new InvalidOperationException("Not enough gold for a new laboratory.");
+            State.gold -= cost;
+            var lab = new PlayerLaboratoryState { id = $"lab_{State.nextLaboratoryNumber++}", level = 1 };
+            State.laboratories.Add(lab);
+            return lab;
+        }
+
+        public LaboratoryLevelDefinition UpgradeLaboratory(string laboratoryId = null)
+        {
+            EnsureNoPendingResult();
+            var lab = string.IsNullOrEmpty(laboratoryId) ? State.laboratories.FirstOrDefault() : State.laboratories.Find(x => x.id == laboratoryId);
+            if (lab == null) throw new InvalidOperationException("Unknown laboratory.");
+            var next = Config.LaboratoryLevel(lab.level + 1) ?? throw new InvalidOperationException("Laboratory is already at maximum level.");
             if (State.gold < next.upgradeCost) throw new InvalidOperationException("Not enough gold for the laboratory upgrade.");
-            State.gold -= next.upgradeCost; State.laboratoryLevel = next.level; return next;
+            State.gold -= next.upgradeCost; lab.level = next.level; State.laboratoryLevel = State.laboratories[0].level; return next;
         }
 
         public DeliveryResult ReceiveDelivery(string poolId = "pool_base")
@@ -318,14 +376,16 @@ namespace DistilleryDiscovery
                 var entry = pool.entries.Find(x => x.ingredientId == entryId); var amount = random.Range(entry.minAmount, entry.maxAmount + 1);
                 State.AddIngredient(entryId, amount); result.Items[entryId] = result.Items.GetValueOrDefault(entryId) + amount;
             }
-            State.availableFreeDeliveries--; return result;
+            State.availableFreeDeliveries--;
+            State.freeDeliveryLastUpdateUtc = time.UtcNow.ToString("O");
+            return result;
         }
 
-        public List<WeightedRarity> ProductRarityWeights(IReadOnlyList<string> ingredientIds, string recipeId = null)
+        public List<WeightedRarity> ProductRarityWeights(IReadOnlyList<string> ingredientIds, string recipeId = null, string laboratoryId = null)
         {
             ValidateKnownIngredients(ingredientIds);
             var ingredientQuality = ingredientIds.Average(id => Config.Rarity(Config.Ingredient(id).rarityId).qualityScore + Config.Ingredient(id).qualityBonus * 100f);
-            var labQuality = (Config.LaboratoryLevel(State.laboratoryLevel)?.productQualityBonus ?? 0f) * 100f;
+            var labQuality = (LaboratoryLevelFor(laboratoryId)?.productQualityBonus ?? 0f) * 100f;
             var masteryQuality = recipeId == null ? 0f : (MasteryLevel(recipeId)?.rarityBonus ?? 0f) * 100f;
             var quality = ingredientQuality * Config.Economy.ingredientQualityInfluence + labQuality * Config.Economy.laboratoryQualityInfluence + masteryQuality;
             return Config.Economy.productRarityWeights.Select(entry =>
@@ -335,9 +395,9 @@ namespace DistilleryDiscovery
             }).ToList();
         }
 
-        private ProductResult CreateProduct(string recipeId, IReadOnlyList<string> ingredientIds)
+        private ProductResult CreateProduct(string recipeId, IReadOnlyList<string> ingredientIds, string laboratoryId)
         {
-            var rarityId = WeightedPick(ProductRarityWeights(ingredientIds, recipeId).Select(x => (x.rarityId, x.weight)).ToList());
+            var rarityId = WeightedPick(ProductRarityWeights(ingredientIds, recipeId, laboratoryId).Select(x => (x.rarityId, x.weight)).ToList());
             var recipe = Config.Recipe(recipeId); var rarity = Config.Rarity(rarityId);
             var ingredientBonus = ingredientIds.Average(id => Config.Ingredient(id).qualityBonus);
             var saleValue = Math.Max(1, (int)Math.Round(recipe.baseValue * rarity.valueMultiplier * (1f + ingredientBonus)));
@@ -434,7 +494,7 @@ namespace DistilleryDiscovery
             var activeTemplateIds = State.activeContracts.Select(x => x.templateId).ToHashSet();
             var activeTargets = State.activeContracts.Select(x => $"{x.objectiveType}:{x.targetId}").ToHashSet();
             var options = new List<(ContractTemplateDefinition template, string target)>();
-            foreach (var template in Config.ContractTemplates.Where(x => x.enabled && x.role == role && x.minLaboratoryLevel <= State.laboratoryLevel && !activeTemplateIds.Contains(x.id)))
+            foreach (var template in Config.ContractTemplates.Where(x => x.enabled && x.role == role && x.minLaboratoryLevel <= HighestLaboratoryLevel && !activeTemplateIds.Contains(x.id)))
                 foreach (var target in ResolveTargets(template).DefaultIfEmpty(null))
                     if (target != null && !activeTargets.Contains($"{template.objectiveType}:{target}")) options.Add((template, target));
             if (options.Count == 0) return null;
@@ -489,7 +549,7 @@ namespace DistilleryDiscovery
             };
         }
 
-        private bool IngredientAccessible(IngredientDefinition ingredient) => ingredient.rarityId != "rarity_legendary" || State.laboratoryLevel >= 3;
+        private bool IngredientAccessible(IngredientDefinition ingredient) => ingredient.rarityId != "rarity_legendary" || HighestLaboratoryLevel >= 3;
         private bool RecipeAccessible(RecipeDefinition recipe) => recipe.requirements.All(clause => clause.type switch
         {
             RecipeRequirementType.Ingredient => IngredientAccessible(Config.Ingredient(clause.ingredientId)),
@@ -523,18 +583,24 @@ namespace DistilleryDiscovery
         }
 
         private void EnsureNoPendingResult() { if (State.pendingResult != null) throw new InvalidOperationException("Claim the current result first."); }
-        private LaboratoryJobState CreateJob(string type, string recipeId, IReadOnlyList<string> ingredientIds, int baseDurationSeconds)
+        private LaboratoryJobState CreateJob(string type, string recipeId, IReadOnlyList<string> ingredientIds, int baseDurationSeconds, string laboratoryId)
         {
-            var now = time.UtcNow; var multiplier = type == LaboratoryJobType.Experiment ? CurrentLaboratoryLevel.experimentTimeMultiplier : CurrentLaboratoryLevel.productionTimeMultiplier;
+            var now = time.UtcNow; var level = LaboratoryLevelFor(laboratoryId) ?? CurrentLaboratoryLevel;
+            var multiplier = type == LaboratoryJobType.Experiment ? level.experimentTimeMultiplier : level.productionTimeMultiplier;
             var seconds = Math.Max(1, (int)Math.Ceiling(baseDurationSeconds * multiplier));
             var job = new LaboratoryJobState { id = Guid.NewGuid().ToString("N"), type = type, recipeId = recipeId,
-                startTimeUtc = now.ToString("O"), endTimeUtc = now.AddSeconds(seconds).ToString("O"), status = LaboratoryJobStatus.Running, ingredientIds = ingredientIds.ToList() };
+                laboratoryId = laboratoryId, startTimeUtc = now.ToString("O"), endTimeUtc = now.AddSeconds(seconds).ToString("O"), status = LaboratoryJobStatus.Running, ingredientIds = ingredientIds.ToList() };
             State.laboratoryJobs.Add(job); return job;
         }
-        private void EnsureFreeLaboratorySlot(string type)
+        private string ResolveFreeLaboratory(string laboratoryId, string type)
         {
-            UpdateTime(); var available = type == LaboratoryJobType.Experiment ? AvailableExperimentSlots : AvailableProductionSlots;
-            if (available <= 0) throw new InvalidOperationException($"No free {type} slot.");
+            UpdateTime();
+            var lab = string.IsNullOrEmpty(laboratoryId)
+                ? State.laboratories.FirstOrDefault(x => AvailableSlots(x.id, type) > 0)
+                : State.laboratories.Find(x => x.id == laboratoryId);
+            if (lab == null) throw new InvalidOperationException("Unknown laboratory.");
+            if (AvailableSlots(lab.id, type) <= 0) throw new InvalidOperationException($"No free {type} slot in the selected laboratory.");
+            return lab.id;
         }
         private static bool TryUtc(string value, out DateTime utc) => DateTime.TryParse(value, null, System.Globalization.DateTimeStyles.RoundtripKind, out utc);
         private void ConsumeIngredients(IReadOnlyList<string> ingredientIds) { foreach (var group in ingredientIds.GroupBy(x => x)) State.AddIngredient(group.Key, -group.Count()); }

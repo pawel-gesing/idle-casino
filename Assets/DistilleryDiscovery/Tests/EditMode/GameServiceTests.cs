@@ -10,7 +10,7 @@ namespace DistilleryDiscovery.Tests
         [Test] public void Configuration_LoadsTimingValues()
         {
             var config = ConfigLoader.LoadFromResources();
-            Assert.That(config.Economy.freeDeliveryIntervalSeconds, Is.EqualTo(7200));
+            Assert.That(config.Economy.freeDeliveryIntervalSeconds, Is.EqualTo(1200));
             Assert.That(config.Economy.experimentDurationSeconds, Is.EqualTo(3600));
             Assert.That(config.Economy.productionDurationSeconds, Is.EqualTo(1800));
             Assert.That(config.Economy.maxStoredFreeDeliveries, Is.EqualTo(3));
@@ -63,6 +63,13 @@ namespace DistilleryDiscovery.Tests
             var result = game.ReceiveDelivery();
             Assert.That(game.State.availableFreeDeliveries, Is.Zero);
             Assert.That(result.Items["ingredient_test"], Is.EqualTo(2));
+        }
+
+        [Test] public void ClaimingDelivery_StartsNextTimerAtClaimTime()
+        {
+            var (game, clock) = CreateGame(); clock.AdvanceSeconds(90); game.UpdateTime();
+            game.ReceiveDelivery();
+            Assert.That(game.TimeUntilNextFreeDelivery, Is.EqualTo(TimeSpan.FromSeconds(60)).Within(TimeSpan.FromSeconds(1)));
         }
 
         [Test] public void StartingExperiment_ConsumesIngredientsAndOccupiesSlot()
@@ -139,7 +146,7 @@ namespace DistilleryDiscovery.Tests
             var config = MinimalConfig(); var clock = new ManualTime();
             var old = new PlayerState { version = 5, gold = 777 }; old.AddIngredient("ingredient_test", 9); Discover(old);
             var game = new GameService(config, old, new MinRandom(), clock);
-            Assert.That(game.State.version, Is.EqualTo(8));
+            Assert.That(game.State.version, Is.EqualTo(9));
             Assert.That(game.State.gold, Is.EqualTo(777));
             Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(9));
             Assert.That(game.State.RecipeState("recipe_test"), Is.Not.Null);
@@ -282,6 +289,24 @@ namespace DistilleryDiscovery.Tests
             var (game, _) = CreateGame(); game.State.gold = 20; game.UpgradeLaboratory();
             Assert.That(game.State.laboratoryLevel, Is.EqualTo(2));
             Assert.That(game.State.gold, Is.EqualTo(10));
+        }
+
+        [Test] public void LaboratoryPurchase_AddsIndependentExperimentCapacity()
+        {
+            var (game, _) = CreateGame(6); game.State.gold = 20; var lab = game.PurchaseLaboratory();
+            var first = game.StartExperiment(Three(), "lab_1");
+            var second = game.StartExperiment(Three(), lab.id);
+            Assert.That(first.laboratoryId, Is.EqualTo("lab_1"));
+            Assert.That(second.laboratoryId, Is.EqualTo(lab.id));
+            Assert.That(game.ExperimentSlotCount, Is.EqualTo(2));
+            Assert.That(game.AvailableExperimentSlots, Is.Zero);
+        }
+
+        [Test] public void InvalidEmptyPendingResult_IsDiscardedOnLoad()
+        {
+            var config = MinimalConfig(); var state = GameService.NewState(config); state.pendingResult = new PendingResultState();
+            var game = new GameService(config, state, new MinRandom(), new ManualTime());
+            Assert.That(game.State.pendingResult, Is.Null);
         }
 
         [Test] public void ProductClaim_IncrementsConfiguredMasteryCount()

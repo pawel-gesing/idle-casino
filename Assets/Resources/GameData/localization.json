@@ -306,11 +306,6 @@
       "en": "Mastery"
     },
     {
-      "key": "ui.label.discovered_ingredients",
-      "pl": "Odkryte składniki",
-      "en": "Discovered ingredients"
-    },
-    {
       "key": "ui.label.selected",
       "pl": "Wybrane",
       "en": "Selected"
@@ -1984,6 +1979,39 @@
       "key": "contract.contract_prestige_prestige_tag",
       "pl": "Prestiżowa partia",
       "en": "Prestige Batch"
-    }
+    },
+    { "key": "ui.inventory.no_products", "pl": "Brak produktów", "en": "No products yet" },
+    { "key": "ui.status.choose_laboratory", "pl": "Wybierz wolne laboratorium", "en": "Choose a free laboratory" },
+    { "key": "ui.error.choose_laboratory", "pl": "Wybierz wolne laboratorium.", "en": "Choose a free laboratory." },
+    { "key": "ui.heading.laboratories", "pl": "LABORATORIA", "en": "LABORATORIES" },
+    { "key": "ui.heading.jobs", "pl": "ZADANIA", "en": "JOBS" },
+    { "key": "ui.label.free", "pl": "wolne", "en": "free" },
+    { "key": "ui.label.laboratories", "pl": "Laboratoria", "en": "Laboratories" },
+    { "key": "ui.label.no_laboratory", "pl": "brak laboratorium", "en": "no laboratory" },
+    { "key": "ui.label.recipe", "pl": "Receptura", "en": "Recipe" },
+    { "key": "ui.action.buy_laboratory", "pl": "KUP LABORATORIUM", "en": "BUY LABORATORY" },
+    { "key": "ui.laboratory.no_jobs", "pl": "Brak aktywnych zadań", "en": "No active jobs" },
+    { "key": "ui.job.ready", "pl": "Gotowe do odbioru", "en": "Ready to collect" },
+    { "key": "ui.job.active_experiment", "pl": "Aktywny eksperyment", "en": "Active experiment" },
+    { "key": "ui.job.active_production", "pl": "Aktywna produkcja", "en": "Active production" },
+    { "key": "ui.job.claim", "pl": "Gotowe · odbierz", "en": "Ready · claim" },
+    { "key": "ui.job.running", "pl": "W toku", "en": "Running" },
+    { "key": "ui.source.experiment", "pl": "eksperyment", "en": "experiment" },
+    { "key": "ui.source.production", "pl": "produkcja", "en": "production" },
+    { "key": "ui.objective.recipe", "pl": "Receptura", "en": "Recipe" },
+    { "key": "ui.objective.category", "pl": "Kategoria", "en": "Category" },
+    { "key": "ui.objective.tag", "pl": "Tag", "en": "Tag" },
+    { "key": "ui.objective.rarity", "pl": "Rzadkość", "en": "Rarity" },
+    { "key": "ui.objective.ingredient", "pl": "Składnik", "en": "Ingredient" },
+    { "key": "ui.objective.group", "pl": "Grupa", "en": "Group" },
+    { "key": "ui.objective.discover", "pl": "Odkrycia", "en": "Discover" },
+    { "key": "ui.objective.distinct", "pl": "Różne receptury", "en": "Distinct recipes" },
+    { "key": "ui.objective.recipe_quality", "pl": "Jakość receptury", "en": "Recipe quality" },
+    { "key": "ui.objective.record", "pl": "Popraw rekord", "en": "Improve record" },
+    { "key": "ui.objective.source", "pl": "Źródło", "en": "Source" },
+    { "key": "ui.contract.any", "pl": "dowolne", "en": "any" },
+    { "key": "ui.contract.new_recipes", "pl": "nowe receptury", "en": "new recipes" },
+    { "key": "ui.contract.any_recipe", "pl": "dowolna receptura", "en": "any recipe" },
+    { "key": "ui.contract.min_quality", "pl": "min.", "en": "min." }
   ]
 }

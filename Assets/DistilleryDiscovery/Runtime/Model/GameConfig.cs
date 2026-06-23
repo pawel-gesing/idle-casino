@@ -72,7 +72,7 @@ namespace DistilleryDiscovery
         public int activeContractCount = 3;
         public float ingredientQualityInfluence = 1f;
         public float laboratoryQualityInfluence = 1f;
-        public int freeDeliveryIntervalSeconds = 7200;
+        public int freeDeliveryIntervalSeconds = 1200;
         public int experimentDurationSeconds = 3600;
         public int productionDurationSeconds = 1800;
         public int maxStoredFreeDeliveries = 3;

@@ -86,7 +86,7 @@ namespace DistilleryDiscovery.Tests
         {
             var pool = config.Economy.deliveryPools.Single(x => x.id == "pool_base");
             Assert.That(pool.entries.Select(x => x.ingredientId), Is.EquivalentTo(config.Ingredients.Select(x => x.id)));
-            Assert.That(pool.rolls, Is.EqualTo(8));
+            Assert.That(pool.rolls, Is.EqualTo(1));
             Assert.That(pool.entries.Where(x => config.Ingredient(x.ingredientId).rarityId == "rarity_legendary").Max(x => x.weight), Is.LessThanOrEqualTo(1));
         }
 
@@ -184,7 +184,7 @@ namespace DistilleryDiscovery.Tests
             state.AddIngredient(Id("barley"), 7);
             var recipe = config.Recipes[0]; state.recipes.Add(new PlayerRecipeState { recipeId = recipe.id, highestProductRarityId = "rarity_rare", timesCreated = 4 });
             var game = new GameService(config, state, new MinRandom(), new ManualTime());
-            Assert.That(game.State.version, Is.EqualTo(8));
+            Assert.That(game.State.version, Is.EqualTo(9));
             Assert.That(game.State.gold, Is.EqualTo(4321));
             Assert.That(game.State.AmountOf(Id("barley")), Is.EqualTo(7));
             Assert.That(game.State.RecipeState(recipe.id).timesCreated, Is.EqualTo(4));

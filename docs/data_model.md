@@ -61,9 +61,9 @@ Klauzule są łączone przez AND. Waga kwalifikującej się receptury wynosi `ba
 
 ## Rzadkość produktu i ekonomia
 
-Losowanie jakości następuje po wybraniu receptury. Bazowe wagi z `economy.json` są modyfikowane przez średnią jakość składników, poziom laboratorium i mastery. Cena to wartość receptury pomnożona przez mnożnik rzadkości i bonus jakości składników.
+Losowanie jakości następuje po wybraniu receptury. Bazowe wagi z `economy.json` są modyfikowane przez średnią jakość składników, poziom wybranego laboratorium i mastery. Cena to wartość receptury pomnożona przez mnożnik rzadkości i bonus jakości składników.
 
-`DeliveryPool.rolls` jest jedynym autorytatywnym polem liczby losowań dostawy. Każdy wpis ma dodatnią wagę i zakres ilości. Zwykła pula zawiera cały kanoniczny zestaw, ale epic ma małą, a legendary bardzo małą wagę; ich główne źródło stanowią odpowiednio kontrakty specialist/prestige.
+`DeliveryPool.rolls` jest jedynym autorytatywnym polem liczby losowań dostawy. Darmowa dostawa trwa 20 minut, po odebraniu gotowej dostawy licznik następnej rusza od chwili odbioru. Każdy wpis ma dodatnią wagę i zakres ilości. Zwykła pula zawiera cały kanoniczny zestaw, ale epic ma małą, a legendary bardzo małą wagę; ich główne źródło stanowią odpowiednio kontrakty specialist/prestige.
 
 ## ContractTemplate i ActiveContractState
 
@@ -100,7 +100,7 @@ Ta sama metoda aktualizuje kontrakty przy pojedynczym odbiorze i `Collect All`.
 
 ## PlayerState v8
 
-Zapis przechowuje złoto, inventory, produkty, postęp receptur/mastery, poziom laboratorium, timed jobs, dostawy, język, pending result i pełne wygenerowane kontrakty. Wynik i jego losowanie pozostają odroczone do claimu.
+Zapis v9 przechowuje złoto, inventory, produkty, postęp receptur/mastery, listę laboratoriów z poziomami, timed jobs z wybranym laboratorium, dostawy, język, pending result i pełne wygenerowane kontrakty. Wynik i jego losowanie pozostają odroczone do claimu.
 
 Migracja v7:
 

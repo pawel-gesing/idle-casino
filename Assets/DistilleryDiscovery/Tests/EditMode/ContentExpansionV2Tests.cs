@@ -97,6 +97,8 @@ namespace DistilleryDiscovery.Tests
             Assert.That(game.State.activeContracts.Select(x => x.templateId), Is.Unique);
             Assert.That(game.State.activeContracts.Select(x => $"{x.objectiveType}:{x.targetId}"), Is.Unique);
             Assert.That(game.State.activeContracts, Has.All.Matches<ActiveContractState>(x => x.amount > 0 && x.goldReward >= 0));
+            Assert.That(game.State.activeContracts, Has.All.Matches<ActiveContractState>(x =>
+                string.IsNullOrEmpty(x.rewardIngredientId) || (config.Ingredient(x.rewardIngredientId) != null && x.rewardIngredientAmount > 0)));
         }
 
         [Test] public void ContractGeneration_RemainsUnblockedAcrossSeedsAndProgressStates()
@@ -184,7 +186,7 @@ namespace DistilleryDiscovery.Tests
             state.AddIngredient(Id("barley"), 7);
             var recipe = config.Recipes[0]; state.recipes.Add(new PlayerRecipeState { recipeId = recipe.id, highestProductRarityId = "rarity_rare", timesCreated = 4 });
             var game = new GameService(config, state, new MinRandom(), new ManualTime());
-            Assert.That(game.State.version, Is.EqualTo(9));
+            Assert.That(game.State.version, Is.EqualTo(10));
             Assert.That(game.State.gold, Is.EqualTo(4321));
             Assert.That(game.State.AmountOf(Id("barley")), Is.EqualTo(7));
             Assert.That(game.State.RecipeState(recipe.id).timesCreated, Is.EqualTo(4));

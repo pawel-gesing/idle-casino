@@ -14,8 +14,8 @@ namespace DistilleryDiscovery.Tests
             Assert.That(config.Economy.experimentDurationSeconds, Is.EqualTo(3600));
             Assert.That(config.Economy.productionDurationSeconds, Is.EqualTo(1800));
             Assert.That(config.Economy.maxStoredFreeDeliveries, Is.EqualTo(3));
-            Assert.That(config.LaboratoryLevel(3).experimentSlots, Is.EqualTo(2));
-            Assert.That(config.LaboratoryLevel(3).productionSlots, Is.EqualTo(2));
+            Assert.That(config.LaboratoryLevel(3).experimentSlots, Is.EqualTo(1));
+            Assert.That(config.LaboratoryLevel(3).productionSlots, Is.EqualTo(1));
         }
 
         [Test] public void Validator_RejectsInvalidTimingValues()
@@ -146,7 +146,7 @@ namespace DistilleryDiscovery.Tests
             var config = MinimalConfig(); var clock = new ManualTime();
             var old = new PlayerState { version = 5, gold = 777 }; old.AddIngredient("ingredient_test", 9); Discover(old);
             var game = new GameService(config, old, new MinRandom(), clock);
-            Assert.That(game.State.version, Is.EqualTo(9));
+            Assert.That(game.State.version, Is.EqualTo(10));
             Assert.That(game.State.gold, Is.EqualTo(777));
             Assert.That(game.State.AmountOf("ingredient_test"), Is.EqualTo(9));
             Assert.That(game.State.RecipeState("recipe_test"), Is.Not.Null);
@@ -163,7 +163,8 @@ namespace DistilleryDiscovery.Tests
 
         [Test] public void CollectAll_ClaimsEveryReadyJob()
         {
-            var (game, clock) = CreateGame(6); Discover(game); game.StartExperiment(Three()); game.StartProduction("recipe_test", Three());
+            var (game, clock) = CreateGame(6); Discover(game); game.State.gold = 20; var lab = game.PurchaseLaboratory();
+            game.StartExperiment(Three(), "lab_1"); game.StartProduction("recipe_test", Three(), lab.id);
             clock.AdvanceSeconds(30); var result = game.CollectAll();
             Assert.That(result.JobsCollected, Is.EqualTo(2));
             Assert.That(game.State.laboratoryJobs.Count(x => x.status == LaboratoryJobStatus.Claimed), Is.EqualTo(2));
@@ -171,7 +172,8 @@ namespace DistilleryDiscovery.Tests
 
         [Test] public void CollectAll_DoesNotClaimRunningJobs()
         {
-            var (game, clock) = CreateGame(6); Discover(game); var ready = game.StartProduction("recipe_test", Three()); var running = game.StartExperiment(Three());
+            var (game, clock) = CreateGame(6); Discover(game); game.State.gold = 20; var lab = game.PurchaseLaboratory();
+            var ready = game.StartProduction("recipe_test", Three(), "lab_1"); var running = game.StartExperiment(Three(), lab.id);
             clock.AdvanceSeconds(20); var result = game.CollectAll();
             Assert.That(result.JobsCollected, Is.EqualTo(1));
             Assert.That(ready.status, Is.EqualTo(LaboratoryJobStatus.Claimed));
@@ -214,7 +216,8 @@ namespace DistilleryDiscovery.Tests
 
         [Test] public void OfflineSummary_ReportsCompletedJobTypesWithoutClaiming()
         {
-            var (game, clock) = CreateGame(6); Discover(game); game.StartExperiment(Three()); game.StartProduction("recipe_test", Three());
+            var (game, clock) = CreateGame(6); Discover(game); game.State.gold = 20; var lab = game.PurchaseLaboratory();
+            game.StartExperiment(Three(), "lab_1"); game.StartProduction("recipe_test", Three(), lab.id);
             game.State.lastSavedAtUtc = clock.UtcNow.ToString("O"); clock.AdvanceSeconds(30);
             var loaded = new GameService(game.Config, game.State, new MinRandom(), clock);
             Assert.That(loaded.LastOfflineSummary.JobsCompleted, Is.EqualTo(2));
@@ -223,16 +226,16 @@ namespace DistilleryDiscovery.Tests
             Assert.That(loaded.State.laboratoryJobs, Has.All.Matches<LaboratoryJobState>(x => x.status == LaboratoryJobStatus.Completed));
         }
 
-        [Test] public void LaboratoryLevel_ChangesExperimentSlots()
+        [Test] public void LaboratoryLevel_KeepsOneExperimentSlotPerLaboratory()
         {
             var config = MinimalConfig(); var state = GameService.NewState(config); state.laboratoryLevel = 2;
-            Assert.That(new GameService(config, state).ExperimentSlotCount, Is.EqualTo(2));
+            Assert.That(new GameService(config, state).ExperimentSlotCount, Is.EqualTo(1));
         }
 
-        [Test] public void LaboratoryLevel_ChangesProductionSlots()
+        [Test] public void LaboratoryLevel_KeepsOneProductionSlotPerLaboratory()
         {
             var config = MinimalConfig(); var state = GameService.NewState(config); state.laboratoryLevel = 3;
-            Assert.That(new GameService(config, state).ProductionSlotCount, Is.EqualTo(2));
+            Assert.That(new GameService(config, state).ProductionSlotCount, Is.EqualTo(1));
         }
 
         [Test] public void LaboratoryLevel_ShortensExperimentDuration()
@@ -338,6 +341,17 @@ namespace DistilleryDiscovery.Tests
             Assert.That(claim.CompletedContractIds, Does.Contain("contract_recipe"));
         }
 
+        [Test] public void CompletedBasicContract_EntersTwoHourCooldownBeforeRegeneration()
+        {
+            var (game, clock) = CreateGame(3);
+            game.State.activeContracts.Add(new ActiveContractState { instanceId = "contract_recipe", templateId = "contract_recipe", role = ContractRole.Basic, objectiveType = ContractObjectiveType.Recipe, targetId = "recipe_test", amount = 1, goldReward = 40 });
+            var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id); game.ClaimPendingResult();
+            Assert.That(game.State.activeContracts.Select(x => x.role), Has.None.EqualTo(ContractRole.Basic));
+            Assert.That(game.TimeUntilContractAvailable(ContractRole.Basic), Is.EqualTo(TimeSpan.FromHours(2)).Within(TimeSpan.FromSeconds(1)));
+            clock.AdvanceSeconds(2 * 60 * 60); game.UpdateTime();
+            Assert.That(game.State.activeContracts.Select(x => x.role), Does.Contain(ContractRole.Basic));
+        }
+
         [Test] public void SaveLoad_PreservesPendingResult()
         {
             var (game, clock) = CreateGame(3); var job = game.StartExperiment(Three()); clock.AdvanceSeconds(30); game.ClaimLaboratoryJob(job.id);
@@ -374,8 +388,8 @@ namespace DistilleryDiscovery.Tests
                 new List<RecipeCategoryDefinition> { new() { id = "category_test" } },
                 new List<LaboratoryLevelDefinition> {
                     new() { level = 1, experimentSlots = 1, productionSlots = 1, experimentTimeMultiplier = 1f, productionTimeMultiplier = 1f },
-                    new() { level = 2, upgradeCost = 10, experimentSlots = 2, productionSlots = 1, experimentTimeMultiplier = .9f, productionTimeMultiplier = 1f },
-                    new() { level = 3, upgradeCost = 20, experimentSlots = 2, productionSlots = 2, experimentTimeMultiplier = .8f, productionTimeMultiplier = .75f }
+                    new() { level = 2, upgradeCost = 10, experimentSlots = 1, productionSlots = 1, experimentTimeMultiplier = .9f, productionTimeMultiplier = 1f },
+                    new() { level = 3, upgradeCost = 20, experimentSlots = 1, productionSlots = 1, experimentTimeMultiplier = .8f, productionTimeMultiplier = .75f }
                 },
                 new List<ContractTemplateDefinition> { new() { id = "contract_recipe", role = ContractRole.Basic, objectiveType = ContractObjectiveType.Recipe, targetSelector = ContractTargetSelector.DiscoveredRecipe, selectionWeight = 1, minAmount = 1, maxAmount = 1, minGoldReward = 40, maxGoldReward = 40 } },
                 masteryLevels: new List<MasteryLevelDefinition> { new() { id = "first", requiredProductionCount = 1 }, new() { id = "second", requiredProductionCount = 2, rarityBonus = .2f } },

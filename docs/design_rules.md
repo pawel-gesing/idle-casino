@@ -32,7 +32,7 @@ Jakość produktu zależy od rzadkości/bonusu składników, wybranego laborator
 
 ## Kontrakty
 
-Zawsze aktywny jest jeden kontrakt każdej roli:
+System utrzymuje po jednym slocie kontraktu każdej roli, ale po ukończeniu rola czeka na następny kontrakt: basic 2h, specialist 6h, prestige 24h:
 
 - `basic`: szeroki, niezawodny cel i nagrody common,
 - `specialist`: odkryte receptury, kategorie, tagi, składniki i grupy; główne nagrody rare,
@@ -40,11 +40,11 @@ Zawsze aktywny jest jeden kontrakt każdej roli:
 
 Generator rozwiązuje cele tylko z dostępnego contentu i najwyższego poziomu posiadanego laboratorium. Dokładna produkcja używa odkrytych receptur; jawny kontrakt odkrycia może wskazać nieodkrytą recepturę. Aktywne cele nie mogą się duplikować ani mieć identycznego typu i targetu. Postęp distinct zapisuje widziane ID.
 
-Pełny `ProductionEvent` jest jedynym wejściem postępu kontraktów, dzięki czemu pojedynczy claim i `Collect All` naliczają identycznie. Sprzedaż i ukończone kontrakty są wypłacane wyłącznie przez pending-result claim. Jeden darmowy reroll na 24-godzinny cykl chroni przed blokadą.
+Pełny `ProductionEvent` jest jedynym wejściem postępu kontraktów, dzięki czemu pojedynczy claim i `Collect All` naliczają identycznie. Nagroda składnikowa kontraktu jest losowana przy wygenerowaniu kontraktu i od razu widoczna w UI; sprzedaż i ukończone kontrakty są wypłacane wyłącznie przez pending-result claim. Jeden darmowy reroll na 24-godzinny cykl chroni przed blokadą.
 
 ## Trwałość i czas
 
-Wszystkie czasy są UTC. Timed jobs i dostawy są aktualizowane po powrocie, ale produkty nie odbierają się automatycznie. Save v8 przechowuje cele kontraktów i refresh. Migracja nie wypłaca starych niepoprawnych kontraktów i nie dubluje pending rewards.
+Wszystkie czasy są UTC. Timed jobs i dostawy są aktualizowane po powrocie, a UI po starcie prowadzi gracza przez gotowe wyniki oraz dostawy do odebrania. Save v10 przechowuje cele kontraktów, konkretne nagrody i cooldowny ról. Migracja nie wypłaca starych niepoprawnych kontraktów i nie dubluje pending rewards.
 
 ## UI i lokalizacja
 

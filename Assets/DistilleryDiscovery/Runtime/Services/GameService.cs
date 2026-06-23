@@ -36,6 +36,7 @@ namespace DistilleryDiscovery
             languageCode = languageCode == "pl" ? "pl" : "en",
             freeContractRerollsRemaining = config.Economy.freeContractRerolls,
             laboratories = new List<PlayerLaboratoryState> { new() { id = "lab_1", level = 1 } },
+            contractCooldowns = new List<ContractCooldownState>(),
             laboratoryLevel = 1,
             nextLaboratoryNumber = 2
         };
@@ -44,7 +45,7 @@ namespace DistilleryDiscovery
         {
             State = state ?? throw new ArgumentNullException(nameof(state));
             var version = State.version;
-            State.inventory ??= new(); State.recipes ??= new(); State.products ??= new(); State.laboratories ??= new();
+            State.inventory ??= new(); State.recipes ??= new(); State.products ??= new(); State.laboratories ??= new(); State.contractCooldowns ??= new();
             State.activeContractIds ??= new(); State.activeContracts ??= new(); State.laboratoryJobs ??= new();
             NormalizeLegacyIngredientIds();
             State.inventory.RemoveAll(x => x == null || Config.Ingredient(x.ingredientId)?.enabled != true || x.amount <= 0);
@@ -72,7 +73,10 @@ namespace DistilleryDiscovery
             foreach (var contract in State.activeContracts) contract.seenRecipeIds ??= new();
             State.activeContracts.RemoveAll(x => x == null || Config.ContractTemplate(x.templateId)?.enabled != true ||
                 !ContractRole.All.Contains(x.role) || string.IsNullOrEmpty(x.instanceId));
+            State.contractCooldowns.RemoveAll(x => x == null || !ContractRole.All.Contains(x.role) || !TryUtc(x.availableAtUtc, out _));
             RemoveDuplicateContracts();
+            foreach (var contract in State.activeContracts)
+                EnsureConcreteContractReward(contract);
 
             if (version < 8)
             {
@@ -100,7 +104,7 @@ namespace DistilleryDiscovery
                 if (job.status != LaboratoryJobStatus.Running && job.status != LaboratoryJobStatus.Completed && job.status != LaboratoryJobStatus.Claimed)
                     job.status = LaboratoryJobStatus.Running;
             }
-            State.version = 9;
+            State.version = 10;
             var deliveriesBefore = State.availableFreeDeliveries;
             var completedBefore = State.laboratoryJobs.Count(x => x.status == LaboratoryJobStatus.Completed);
             var elapsed = TryUtc(State.lastSavedAtUtc, out var savedAt) && savedAt <= time.UtcNow ? time.UtcNow - savedAt : TimeSpan.Zero;
@@ -165,20 +169,26 @@ namespace DistilleryDiscovery
         public int LaboratoryCount => State.laboratories.Count;
         public int MaxLaboratoryCount => Config.LaboratoryLevels.Count;
         public int NextLaboratoryCost => State.laboratories.Count >= MaxLaboratoryCount ? -1 : Config.LaboratoryLevel(State.laboratories.Count + 1)?.upgradeCost ?? -1;
-        public int ExperimentSlotCount => State.laboratories.Sum(x => Config.LaboratoryLevel(x.level)?.experimentSlots ?? 0);
-        public int ProductionSlotCount => State.laboratories.Sum(x => Config.LaboratoryLevel(x.level)?.productionSlots ?? 0);
+        public int ExperimentSlotCount => State.laboratories.Count;
+        public int ProductionSlotCount => State.laboratories.Count;
         public int AvailableExperimentSlots => State.laboratories.Sum(x => AvailableSlots(x.id, LaboratoryJobType.Experiment));
         public int AvailableProductionSlots => State.laboratories.Sum(x => AvailableSlots(x.id, LaboratoryJobType.Production));
-        public int AvailableLaboratorySlots => AvailableExperimentSlots + AvailableProductionSlots;
+        public int AvailableLaboratorySlots => State.laboratories.Count(x => AvailableSlots(x.id, LaboratoryJobType.Experiment) > 0);
         public LaboratoryLevelDefinition LaboratoryLevelFor(string laboratoryId) => Config.LaboratoryLevel(State.laboratories.Find(x => x.id == laboratoryId)?.level ?? State.laboratories.FirstOrDefault()?.level ?? 1);
         public int AvailableSlots(string laboratoryId, string type)
         {
             var lab = State.laboratories.Find(x => x.id == laboratoryId);
             if (lab == null) return 0;
-            var level = Config.LaboratoryLevel(lab.level);
-            var capacity = type == LaboratoryJobType.Experiment ? level.experimentSlots : level.productionSlots;
-            var used = State.laboratoryJobs.Count(x => x.laboratoryId == laboratoryId && x.type == type && x.status != LaboratoryJobStatus.Claimed);
-            return Math.Max(0, capacity - used);
+            var used = State.laboratoryJobs.Any(x => x.laboratoryId == laboratoryId && x.status != LaboratoryJobStatus.Claimed);
+            return used ? 0 : 1;
+        }
+
+        public TimeSpan TimeUntilContractAvailable(string role)
+        {
+            var cooldown = State.contractCooldowns.Find(x => x.role == role);
+            if (cooldown == null || !TryUtc(cooldown.availableAtUtc, out var availableAt)) return TimeSpan.Zero;
+            var remaining = availableAt - time.UtcNow;
+            return remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
         }
 
         public TimeSpan TimeUntilNextFreeDelivery
@@ -217,11 +227,11 @@ namespace DistilleryDiscovery
                 if (TryUtc(job.endTimeUtc, out var end) && end <= now) job.status = LaboratoryJobStatus.Completed;
             if (State.pendingResult == null && TryUtc(State.contractRefreshUtc, out var refresh) && refresh <= now)
             {
-                State.activeContracts.Clear();
                 State.freeContractRerollsRemaining = Config.Economy.freeContractRerolls;
                 State.contractRefreshUtc = now.AddSeconds(Config.Economy.contractRefreshSeconds).ToString("O");
-                EnsureActiveContracts();
             }
+            State.contractCooldowns.RemoveAll(x => TryUtc(x.availableAtUtc, out var availableAt) && availableAt <= now);
+            if (State.pendingResult == null) EnsureActiveContracts();
         }
 
         public bool DebugAdvanceTime(TimeSpan duration)
@@ -316,6 +326,7 @@ namespace DistilleryDiscovery
             var total = checked(pending.saleValue + contractGold); State.gold = checked(State.gold + total);
             var ingredientRewards = new Dictionary<string, int>();
             foreach (var contract in completed) GrantContractIngredientReward(contract, ingredientRewards);
+            foreach (var contract in completed) SetContractCooldown(contract.role);
             State.activeContracts.RemoveAll(x => completedIds.Contains(x.instanceId));
             State.pendingResult = null; EnsureActiveContracts();
             var result = new PendingClaimResult { ProductGold = pending.saleValue, ContractGold = contractGold, TotalGold = total, CompletedContractIds = completedIds };
@@ -325,21 +336,10 @@ namespace DistilleryDiscovery
 
         private void GrantContractIngredientReward(ActiveContractState state, Dictionary<string, int> result)
         {
-            var pool = Config.ContractTemplate(state.templateId)?.ingredientRewards?.Where(x => x.weight > 0).ToList() ?? new();
-            if (pool.Count == 0) return;
-            var selected = WeightedPick(pool.Select((x, i) => (i.ToString(), x.weight)).ToList());
-            var reward = pool[int.Parse(selected)];
-            var candidates = reward.selectorType switch
-            {
-                RewardSelectorType.Ingredient => Config.Ingredients.Where(x => x.id == reward.targetId),
-                RewardSelectorType.Group => Config.Ingredients.Where(x => x.enabled && x.groupId == reward.targetId),
-                RewardSelectorType.Rarity => Config.Ingredients.Where(x => x.enabled && x.rarityId == reward.targetId),
-                _ => Enumerable.Empty<IngredientDefinition>()
-            };
-            var list = candidates.ToList(); if (list.Count == 0) return;
-            var ingredientId = list[random.Range(0, list.Count)].id;
-            var amount = random.Range(reward.minAmount, reward.maxAmount + 1);
-            State.AddIngredient(ingredientId, amount); result[ingredientId] = result.GetValueOrDefault(ingredientId) + amount;
+            EnsureConcreteContractReward(state);
+            if (string.IsNullOrEmpty(state.rewardIngredientId) || state.rewardIngredientAmount <= 0) return;
+            State.AddIngredient(state.rewardIngredientId, state.rewardIngredientAmount);
+            result[state.rewardIngredientId] = result.GetValueOrDefault(state.rewardIngredientId) + state.rewardIngredientAmount;
         }
 
         public PlayerLaboratoryState PurchaseLaboratory()
@@ -482,7 +482,7 @@ namespace DistilleryDiscovery
         private void EnsureActiveContracts()
         {
             foreach (var role in ContractRole.All)
-                if (!State.activeContracts.Any(x => x.role == role))
+                if (!State.activeContracts.Any(x => x.role == role) && TimeUntilContractAvailable(role) <= TimeSpan.Zero)
                 {
                     var generated = GenerateContract(role);
                     if (generated != null) State.activeContracts.Add(generated);
@@ -502,7 +502,7 @@ namespace DistilleryDiscovery
             var selectedTemplateId = WeightedPick(templateIds.Select(id => (id, Config.ContractTemplate(id).selectionWeight)).ToList());
             var selectedOptions = options.Where(x => x.template.id == selectedTemplateId).ToList();
             var selected = selectedOptions[random.Range(0, selectedOptions.Count)];
-            return new ActiveContractState
+            var state = new ActiveContractState
             {
                 instanceId = Guid.NewGuid().ToString("N"), templateId = selected.template.id, role = role,
                 objectiveType = selected.template.objectiveType, targetId = selected.target,
@@ -511,6 +511,49 @@ namespace DistilleryDiscovery
                 goldReward = random.Range(selected.template.minGoldReward, selected.template.maxGoldReward + 1),
                 generatedAtUtc = time.UtcNow.ToString("O")
             };
+            EnsureConcreteContractReward(state);
+            return state;
+        }
+
+        private void EnsureConcreteContractReward(ActiveContractState state)
+        {
+            if (!string.IsNullOrEmpty(state.rewardIngredientId) && state.rewardIngredientAmount > 0 && Config.Ingredient(state.rewardIngredientId)?.enabled == true)
+                return;
+            var template = Config.ContractTemplate(state.templateId);
+            var reward = RollContractReward(template);
+            state.rewardIngredientId = reward.ingredientId;
+            state.rewardIngredientAmount = reward.amount;
+        }
+
+        private (string ingredientId, int amount) RollContractReward(ContractTemplateDefinition template)
+        {
+            var pool = template?.ingredientRewards?.Where(x => x.weight > 0).ToList() ?? new();
+            if (pool.Count == 0) return (null, 0);
+            var selected = WeightedPick(pool.Select((x, i) => (i.ToString(), x.weight)).ToList());
+            var reward = pool[int.Parse(selected)];
+            var candidates = reward.selectorType switch
+            {
+                RewardSelectorType.Ingredient => Config.Ingredients.Where(x => x.enabled && x.id == reward.targetId),
+                RewardSelectorType.Group => Config.Ingredients.Where(x => x.enabled && x.groupId == reward.targetId),
+                RewardSelectorType.Rarity => Config.Ingredients.Where(x => x.enabled && x.rarityId == reward.targetId),
+                _ => Enumerable.Empty<IngredientDefinition>()
+            };
+            var list = candidates.ToList();
+            if (list.Count == 0) return (null, 0);
+            return (list[random.Range(0, list.Count)].id, random.Range(reward.minAmount, reward.maxAmount + 1));
+        }
+
+        private void SetContractCooldown(string role)
+        {
+            var seconds = role switch
+            {
+                ContractRole.Basic => 2 * 60 * 60,
+                ContractRole.Specialist => 6 * 60 * 60,
+                ContractRole.Prestige => 24 * 60 * 60,
+                _ => Config.Economy.contractRefreshSeconds
+            };
+            State.contractCooldowns.RemoveAll(x => x.role == role);
+            State.contractCooldowns.Add(new ContractCooldownState { role = role, availableAtUtc = time.UtcNow.AddSeconds(seconds).ToString("O") });
         }
 
         private IEnumerable<string> ResolveTargets(ContractTemplateDefinition template)

@@ -25,8 +25,16 @@ namespace DistilleryDiscovery
         public int amount;
         public int progress;
         public int goldReward;
+        public string rewardIngredientId;
+        public int rewardIngredientAmount;
         public List<string> seenRecipeIds = new();
         public string generatedAtUtc;
+    }
+
+    [Serializable] public sealed class ContractCooldownState
+    {
+        public string role;
+        public string availableAtUtc;
     }
 
     [Serializable] public sealed class PendingContractProgress
@@ -81,7 +89,7 @@ namespace DistilleryDiscovery
 
     [Serializable] public sealed class PlayerState
     {
-        public int version = 9;
+        public int version = 10;
         public int gold;
         public int experimentsCompleted;
         public int productionsCompleted;
@@ -92,6 +100,7 @@ namespace DistilleryDiscovery
         public List<InventoryEntry> inventory = new();
         public List<PlayerRecipeState> recipes = new();
         public List<ActiveContractState> activeContracts = new();
+        public List<ContractCooldownState> contractCooldowns = new();
         public PendingResultState pendingResult;
         public string freeDeliveryLastUpdateUtc;
         public int availableFreeDeliveries;

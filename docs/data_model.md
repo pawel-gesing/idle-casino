@@ -76,7 +76,7 @@ Obsługiwane cele:
 - `discover_recipes`, `distinct_recipes`,
 - `recipe_min_rarity`, `improve_record`, `produce_source`.
 
-Wygenerowany `ActiveContractState` zapisuje `instanceId`, `templateId`, rolę, rozwiązany cel, wymaganą ilość, postęp, złoto, źródło/minimalną jakość, czas utworzenia i `seenRecipeIds` dla celów distinct. Ponowne wczytanie nie losuje celu od nowa.
+Wygenerowany `ActiveContractState` zapisuje `instanceId`, `templateId`, rolę, rozwiązany cel, wymaganą ilość, postęp, złoto, konkretny wylosowany `rewardIngredientId`/`rewardIngredientAmount`, źródło/minimalną jakość, czas utworzenia i `seenRecipeIds` dla celów distinct. Ponowne wczytanie nie losuje celu ani nagrody od nowa.
 
 Nagrody składnikowe są ważoną pulą selektorów:
 
@@ -84,7 +84,7 @@ Nagrody składnikowe są ważoną pulą selektorów:
 - losowy składnik z `group`,
 - losowy składnik o `rarity`.
 
-Nagroda i złoto trafiają do gracza wyłącznie przez claim nieodebranego wyniku. Dostępny jest zapisywany darmowy reroll oraz odświeżenie czasowe.
+Nagroda i złoto trafiają do gracza wyłącznie przez claim nieodebranego wyniku. Po ukończeniu rola kontraktu przechodzi w cooldown: basic 2h, specialist 6h, prestige 24h. Dostępny jest zapisywany darmowy reroll oraz odświeżenie czasowe.
 
 ## ProductionEvent
 
@@ -98,9 +98,9 @@ Każdy odebrany produkt tworzy niemutowalne zdarzenie zawierające:
 
 Ta sama metoda aktualizuje kontrakty przy pojedynczym odbiorze i `Collect All`.
 
-## PlayerState v8
+## PlayerState v10
 
-Zapis v9 przechowuje złoto, inventory, produkty, postęp receptur/mastery, listę laboratoriów z poziomami, timed jobs z wybranym laboratorium, dostawy, język, pending result i pełne wygenerowane kontrakty. Wynik i jego losowanie pozostają odroczone do claimu.
+Zapis v10 przechowuje złoto, inventory, produkty, postęp receptur/mastery, listę laboratoriów z poziomami, timed jobs z wybranym laboratorium, dostawy, język, pending result, pełne wygenerowane kontrakty z konkretnymi nagrodami oraz cooldowny ról kontraktów. Wynik i jego losowanie pozostają odroczone do claimu.
 
 Migracja v7:
 

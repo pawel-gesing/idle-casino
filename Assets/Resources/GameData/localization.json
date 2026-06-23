@@ -362,8 +362,8 @@
     },
     {
       "key": "ui.status.contracts",
-      "pl": "Jednocześnie aktywne są trzy kontrakty",
-      "en": "Three contracts are active at once"
+      "pl": "Kontrakty odnawiają się według roli",
+      "en": "Contracts renew by role"
     },
     {
       "key": "ui.status.laboratory",
@@ -2012,6 +2012,24 @@
     { "key": "ui.contract.any", "pl": "dowolne", "en": "any" },
     { "key": "ui.contract.new_recipes", "pl": "nowe receptury", "en": "new recipes" },
     { "key": "ui.contract.any_recipe", "pl": "dowolna receptura", "en": "any recipe" },
-    { "key": "ui.contract.min_quality", "pl": "min.", "en": "min." }
+    { "key": "ui.contract.min_quality", "pl": "min.", "en": "min." },
+    { "key": "ui.group.other", "pl": "Pozostałe", "en": "Other" },
+    { "key": "contract.role.basic", "pl": "Podstawowy", "en": "Basic" },
+    { "key": "contract.role.specialist", "pl": "Specjalistyczny", "en": "Specialist" },
+    { "key": "contract.role.prestige", "pl": "Prestiżowy", "en": "Prestige" },
+    { "key": "ui.contract.waiting", "pl": "Nowy kontrakt za", "en": "New contract in" },
+    { "key": "ui.delivery.next_after_claim", "pl": "Zegar kolejnej dostawy został uruchomiony.", "en": "The next delivery timer has started." },
+    { "key": "ui.job.experiment_running", "pl": "Eksperyment w toku", "en": "Experiment in progress" },
+    { "key": "ui.job.experiment_ready", "pl": "Eksperyment gotowy", "en": "Experiment ready" },
+    { "key": "ui.job.production_running", "pl": "Produkcja: {0}", "en": "Production: {0}" },
+    { "key": "ui.job.production_ready", "pl": "Produkcja gotowa: {0}", "en": "Production ready: {0}" },
+    { "key": "ui.laboratory.no_free", "pl": "Brak wolnego laboratorium", "en": "No free laboratory" },
+    { "key": "ui.delivery.available", "pl": "Dostępne", "en": "Available" },
+    { "key": "ui.delivery.next", "pl": "Następna", "en": "Next" },
+    { "key": "ui.delivery.rolls", "pl": "Losowania na dostawę", "en": "Rolls per delivery" },
+    { "key": "ui.status.delivery_ready", "pl": "Dostawa gotowa do odebrania", "en": "Free delivery ready to claim" },
+    { "key": "ui.status.delivery_waiting", "pl": "Oczekiwanie na następną dostawę", "en": "Waiting for the next free delivery" },
+    { "key": "ui.action.waiting", "pl": "OCZEKIWANIE", "en": "WAITING" },
+    { "key": "ui.status.collect_all", "pl": "Odebrano {0} zadań - {1} produktów - +{2} złota", "en": "Collected {0} jobs - {1} products - +{2} gold" }
   ]
 }

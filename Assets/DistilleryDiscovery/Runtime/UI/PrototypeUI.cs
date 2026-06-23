@@ -56,6 +56,8 @@ namespace DistilleryDiscovery
         private string selectedLaboratoryId;
         private float tileCellHeight = 112f;
         private float nextTimerRefresh;
+        private bool startupRewardFlow;
+        private DeliveryResult pendingDeliveryAcknowledgement;
 
         private string Language => game.State.languageCode == "pl" ? "pl" : "en";
 
@@ -78,8 +80,42 @@ namespace DistilleryDiscovery
             save = saveService;
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             Build();
-            if (game.State.pendingResult != null) ShowPendingResult();
-            else ShowState(OfflineStatus(T("ui.status.ready", "Ready. Wait for a delivery to begin.")));
+            StartStartupRewardFlow();
+        }
+
+        private void StartStartupRewardFlow()
+        {
+            startupRewardFlow = true;
+            ContinueStartupRewardFlow();
+        }
+
+        private void ContinueStartupRewardFlow()
+        {
+            game.UpdateTime();
+            if (game.State.pendingResult != null) { ShowPendingResult(); return; }
+            var readyJob = game.State.laboratoryJobs
+                .Where(x => x.status == LaboratoryJobStatus.Completed)
+                .OrderBy(x => x.endTimeUtc)
+                .FirstOrDefault();
+            if (readyJob != null)
+            {
+                try { game.ClaimLaboratoryJob(readyJob.id); save.Save(game.State); ShowPendingResult(); }
+                catch (Exception ex) { startupRewardFlow = false; ShowState(ex.Message); }
+                return;
+            }
+            if (game.State.availableFreeDeliveries > 0)
+            {
+                try
+                {
+                    pendingDeliveryAcknowledgement = game.ReceiveDelivery();
+                    save.Save(game.State);
+                    ShowDeliveryAcknowledgement();
+                }
+                catch (Exception ex) { startupRewardFlow = false; ShowState(ex.Message); }
+                return;
+            }
+            startupRewardFlow = false;
+            ShowState(OfflineStatus(T("ui.status.ready", "Ready. Receive a delivery to begin.")));
         }
 
         private void Build()
@@ -236,8 +272,8 @@ namespace DistilleryDiscovery
             var remaining = game.TimeUntilNextFreeDelivery;
             var timer = game.State.availableFreeDeliveries >= game.Config.Economy.maxStoredFreeDeliveries ? "MAX" : FormatDuration(remaining);
             var rolls = game.Config.Economy.deliveryPools.FirstOrDefault()?.rolls ?? 0;
-            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.delivery", "FREE DELIVERY")}</b></color>\n\nAvailable: <b>{game.State.availableFreeDeliveries}/{game.Config.Economy.maxStoredFreeDeliveries}</b>\nNext: <b>{timer}</b>\nRolls per delivery: <b>{rolls}</b>";
-            SetStatus(game.State.availableFreeDeliveries > 0 ? "Free delivery ready to claim" : "Waiting for the next free delivery");
+            contentText.text = $"<color=#F2AD2E><b>{T("ui.heading.delivery", "FREE DELIVERY")}</b></color>\n\n{T("ui.delivery.available", "Available")}: <b>{game.State.availableFreeDeliveries}/{game.Config.Economy.maxStoredFreeDeliveries}</b>\n{T("ui.delivery.next", "Next")}: <b>{timer}</b>\n{T("ui.delivery.rolls", "Rolls per delivery")}: <b>{rolls}</b>";
+            SetStatus(game.State.availableFreeDeliveries > 0 ? T("ui.status.delivery_ready", "Free delivery ready to claim") : T("ui.status.delivery_waiting", "Waiting for the next free delivery"));
         }
 
         private void ShowIngredientInventory()
@@ -306,13 +342,20 @@ namespace DistilleryDiscovery
 
         private List<TileSection> IngredientSections(IEnumerable<IngredientDefinition> ingredients, Func<IngredientDefinition, TileOption> map)
         {
-            return game.Config.Groups.Select(group => new TileSection
+            var ingredientList = ingredients.Where(item => item.enabled).ToList();
+            var knownGroupIds = new HashSet<string>(game.Config.Groups.Select(group => group.id));
+            var sections = game.Config.Groups.Select(group => new TileSection
             {
                 Heading = GroupName(group.id),
-                Options = ingredients.Where(item => item.enabled && item.groupId == group.id)
+                Options = ingredientList.Where(item => item.groupId == group.id)
                     .OrderBy(item => game.Config.Rarity(item.rarityId)?.rank ?? 0).ThenBy(item => IngredientName(item.id))
                     .Select(map).ToList()
             }).Where(section => section.Options.Count > 0).ToList();
+            var other = ingredientList.Where(item => string.IsNullOrEmpty(item.groupId) || !knownGroupIds.Contains(item.groupId))
+                .OrderBy(item => game.Config.Rarity(item.rarityId)?.rank ?? 0).ThenBy(item => IngredientName(item.id))
+                .Select(map).ToList();
+            if (other.Count > 0) sections.Add(new TileSection { Heading = T("ui.group.other", "Other"), Options = other });
+            return sections;
         }
 
         private TileOption RecipeBookTile(RecipeDefinition recipe)
@@ -332,13 +375,15 @@ namespace DistilleryDiscovery
 
         private void ShowFreeLaboratoryTiles(string jobType, Action afterSelect)
         {
-            var options = game.State.laboratories.Select(lab =>
-            {
-                var level = game.Config.LaboratoryLevel(lab.level);
-                var free = game.AvailableSlots(lab.id, jobType);
-                var label = $"{LaboratoryName(lab)}\n{T("ui.label.level", "level")} {lab.level} · {T("ui.label.free", "free")}: {free}\n{T("ui.label.rarity_bonus", "Higher rarity bonus")}: +{level.productQualityBonus:P0}";
-                return new TileOption { Label = label, Action = () => { selectedLaboratoryId = lab.id; SetStatus($"{T("ui.label.laboratory", "Laboratory")}: {LaboratoryName(lab)}"); afterSelect(); } };
-            }).ToList();
+            var options = game.State.laboratories
+                .Where(lab => game.AvailableSlots(lab.id, jobType) > 0)
+                .Select(lab =>
+                {
+                    var level = game.Config.LaboratoryLevel(lab.level);
+                    var label = $"{LaboratoryName(lab)}\n{T("ui.label.level", "level")} {lab.level}\n{T("ui.label.rarity_bonus", "Higher rarity bonus")}: +{level.productQualityBonus:P0}";
+                    return new TileOption { Label = label, Action = () => { selectedLaboratoryId = lab.id; SetStatus($"{T("ui.label.laboratory", "Laboratory")}: {LaboratoryName(lab)}"); afterSelect(); } };
+                }).ToList();
+            if (options.Count == 0) options.Add(new TileOption { Label = T("ui.laboratory.no_free", "No free laboratory"), Action = ShowLaboratory });
             ShowTileSections(new[] { new TileSection { Heading = T("ui.heading.laboratories", "LABORATORIES"), Options = options } }, 150f);
             UpdateSelection();
         }
@@ -371,15 +416,29 @@ namespace DistilleryDiscovery
         private void ShowContracts()
         {
             PrepareTextView(FooterMode.None); SetStatus(T("ui.status.contracts", "Three contracts are active at once"));
-            var sb = new StringBuilder($"<color=#F2AD2E><b>{T("ui.heading.contracts", "ACTIVE CONTRACTS")}</b></color>\n\n");
-            foreach (var state in game.State.activeContracts)
+            game.UpdateTime();
+            var options = new List<TileOption>();
+            foreach (var role in ContractRole.All)
             {
+                var state = game.State.activeContracts.Find(x => x.role == role);
+                if (state == null)
+                {
+                    options.Add(new TileOption
+                    {
+                        Label = $"{RoleName(role)}\n{T("ui.contract.waiting", "New contract in")} {FormatDuration(game.TimeUntilContractAvailable(role))}",
+                        Action = ShowContracts
+                    });
+                    continue;
+                }
                 var template = game.Config.ContractTemplate(state.templateId);
-                sb.Append($"<b>[{state.role.ToUpperInvariant()}] {ContractName(state.templateId)}</b>\n{DescribeRequirement(state)}\n{T("ui.label.progress", "Progress")}: <b>{state.progress}/{state.amount}</b>");
-                if (state.objectiveType == ContractObjectiveType.DistinctRecipes) sb.Append($" ({state.seenRecipeIds.Count} distinct)");
-                sb.Append($" · {T("ui.label.reward", "Reward")}: <b>{ContractRewardDescription(state, template)}</b>\n\n");
+                var distinct = state.objectiveType == ContractObjectiveType.DistinctRecipes ? $" ({state.seenRecipeIds.Count} {T("ui.objective.distinct", "Distinct recipes")})" : "";
+                options.Add(new TileOption
+                {
+                    Label = $"{RoleName(role)} - {ContractName(state.templateId)}\n{DescribeRequirement(state)}\n{T("ui.label.progress", "Progress")}: {state.progress}/{state.amount}{distinct}\n{T("ui.label.reward", "Reward")}: {ContractRewardDescription(state, template)}",
+                    Action = ShowContracts
+                });
             }
-            contentText.text = sb.ToString();
+            ShowTileSections(new[] { new TileSection { Heading = T("ui.heading.contracts", "ACTIVE CONTRACTS"), Options = options } }, 210f);
         }
 
         private void ShowLaboratory()
@@ -391,8 +450,7 @@ namespace DistilleryDiscovery
             {
                 var level = game.Config.LaboratoryLevel(lab.level);
                 var upgrade = game.Config.LaboratoryLevel(lab.level + 1);
-                var label = $"{LaboratoryName(lab)}\n{T("ui.label.level", "level")} {lab.level} · {T("ui.label.rarity_bonus", "Higher rarity bonus")} +{level.productQualityBonus:P0}\n" +
-                    $"{T("ui.label.experiments", "Experiments")}: {game.AvailableSlots(lab.id, LaboratoryJobType.Experiment)}/{level.experimentSlots} · {T("ui.label.productions", "Productions")}: {game.AvailableSlots(lab.id, LaboratoryJobType.Production)}/{level.productionSlots}\n" +
+                var label = $"{LaboratoryName(lab)}\n{T("ui.label.level", "level")} {lab.level} - {T("ui.label.rarity_bonus", "Higher rarity bonus")} +{level.productQualityBonus:P0}\n" +
                     (upgrade == null ? T("ui.laboratory.max", "Maximum level reached.") : $"{T("ui.action.upgrade", "UPGRADE")}: {upgrade.upgradeCost} {T("ui.label.gold_lower", "gold")}");
                 return new TileOption { Label = label, Action = () => UpgradeLaboratory(lab.id) };
             }).ToList();
@@ -409,19 +467,18 @@ namespace DistilleryDiscovery
             }, 190f);
             experimentPreviewText.gameObject.SetActive(true);
             experimentPreviewText.text = $"<color=#F2AD2E><b>{T("ui.heading.laboratory", "LABORATORY")}</b></color>\n" +
-                $"{T("ui.label.laboratories", "Laboratories")}: <b>{game.LaboratoryCount}/{game.MaxLaboratoryCount}</b>\n" +
-                $"{T("ui.label.experiments", "Experiments")}: <b>{game.AvailableExperimentSlots}/{game.ExperimentSlotCount} {T("ui.label.free", "free")}</b>\n" +
-                $"{T("ui.label.productions", "Productions")}: <b>{game.AvailableProductionSlots}/{game.ProductionSlotCount} {T("ui.label.free", "free")}</b>";
+                $"{T("ui.label.laboratories", "Laboratories")}: <b>{game.LaboratoryCount}/{game.MaxLaboratoryCount}</b>";
         }
 
         private string JobLabel(LaboratoryJobState job)
         {
-            var rdy = job.status == LaboratoryJobStatus.Completed;
-            var sec = rdy ? T("ui.job.ready", "Ready to collect") : job.type == LaboratoryJobType.Experiment ? T("ui.job.active_experiment", "Active experiment") : T("ui.job.active_production", "Active production");
-            var recipeLine = job.type == LaboratoryJobType.Production ? $"\n{T("ui.label.recipe", "Recipe")}: {RecipeName(job.recipeId)}" : "";
+            var ready = job.status == LaboratoryJobStatus.Completed;
+            var title = job.type == LaboratoryJobType.Experiment
+                ? ready ? T("ui.job.experiment_ready", "Experiment ready") : T("ui.job.experiment_running", "Experiment in progress")
+                : ready ? F("ui.job.production_ready", "Production ready: {0}", RecipeName(job.recipeId)) : F("ui.job.production_running", "Production: {0}", RecipeName(job.recipeId));
             var ingredientLine = string.Join(" + ", job.ingredientIds.Select(IngredientName));
-            var statusLine = rdy ? T("ui.job.claim", "Ready · claim") : $"{T("ui.job.running", "Running")} · {FormatDuration(game.TimeRemaining(job))}";
-            return $"{sec}\n{LaboratoryName(game.State.laboratories.Find(x => x.id == job.laboratoryId))}{recipeLine}\n{ingredientLine}\n{statusLine}";
+            var statusLine = ready ? T("ui.job.claim", "Ready - claim") : FormatDuration(game.TimeRemaining(job));
+            return $"{LaboratoryName(game.State.laboratories.Find(x => x.id == job.laboratoryId))}\n{title}\n{ingredientLine}\n{statusLine}";
         }
 
         private void ClaimJob(string jobId)
@@ -445,6 +502,7 @@ namespace DistilleryDiscovery
         private void ShowPendingResult()
         {
             var pending = game.State.pendingResult; if (pending == null) return;
+            pendingDeliveryAcknowledgement = null;
             var completed = pending.contractProgress.Where(x => x.completed).ToList();
             var contractGold = completed.Sum(x => game.State.ContractState(x.contractId)?.goldReward ?? 0);
             var sb = new StringBuilder();
@@ -466,13 +524,31 @@ namespace DistilleryDiscovery
             pendingSummaryText.text = sb.ToString(); pendingModal.SetActive(true); RefreshHeaderCounters();
         }
 
+        private void ShowDeliveryAcknowledgement()
+        {
+            var delivery = pendingDeliveryAcknowledgement; if (delivery == null) return;
+            var sb = new StringBuilder();
+            sb.Append($"<color=#F2AD2E><b>{T("ui.heading.delivery", "NEW DELIVERY")}</b></color>\n\n");
+            foreach (var item in delivery.Items.OrderBy(x => IngredientName(x.Key)))
+                sb.Append($"+{item.Value}  <b>{IngredientName(item.Key)}</b>\n");
+            sb.Append($"\n{T("ui.delivery.next_after_claim", "The next delivery timer has started.")}");
+            pendingSummaryText.text = sb.ToString(); pendingModal.SetActive(true); RefreshHeaderCounters();
+        }
+
         private void ClaimPendingResult()
         {
             try
             {
+                if (pendingDeliveryAcknowledgement != null)
+                {
+                    pendingDeliveryAcknowledgement = null; pendingModal.SetActive(false); RefreshHeaderCounters();
+                    if (startupRewardFlow) ContinueStartupRewardFlow(); else ShowDelivery();
+                    return;
+                }
                 var result = game.ClaimPendingResult(); save.Save(game.State); pendingModal.SetActive(false); RefreshHeaderCounters();
-                var ingredients = result.IngredientRewards.Count == 0 ? "" : " · " + string.Join(", ", result.IngredientRewards.Select(x => $"+{x.Value} {IngredientName(x.Key)}"));
-                ShowState(F("ui.status.reward_claimed", "Claimed {0} gold", result.TotalGold) + ingredients);
+                var ingredients = result.IngredientRewards.Count == 0 ? "" : " - " + string.Join(", ", result.IngredientRewards.Select(x => $"+{x.Value} {IngredientName(x.Key)}"));
+                if (startupRewardFlow) ContinueStartupRewardFlow();
+                else ShowState(F("ui.status.reward_claimed", "Claimed {0} gold", result.TotalGold) + ingredients);
             }
             catch (Exception ex) { pendingSummaryText.text = ex.Message; }
         }
@@ -487,7 +563,7 @@ namespace DistilleryDiscovery
                 else if (footerMode == FooterMode.Laboratory)
                 {
                     var result = game.CollectAll(); save.Save(game.State); RefreshHeaderCounters(); ShowLaboratory();
-                    SetStatus($"Collected {result.JobsCollected} jobs · {result.ProductsAdded} products · +{result.GoldGained} gold");
+                    SetStatus(F("ui.status.collect_all", "Collected {0} jobs - {1} products - +{2} gold", result.JobsCollected, result.ProductsAdded, result.GoldGained));
                 }
             }
             catch (Exception ex) { SetStatus(ex.Message); }
@@ -568,7 +644,7 @@ namespace DistilleryDiscovery
                 FooterMode.Experiment => T("ui.action.run_experiment", "RUN EXPERIMENT"),
                 FooterMode.Production => T("ui.action.produce", "PRODUCE"),
                 FooterMode.Laboratory => T("ui.action.collect_all", "COLLECT ALL"),
-                FooterMode.Delivery => game.State.availableFreeDeliveries > 0 ? T("ui.action.claim", "CLAIM") : "WAITING",
+                FooterMode.Delivery => game.State.availableFreeDeliveries > 0 ? T("ui.action.claim", "CLAIM") : T("ui.action.waiting", "WAITING"),
                 _ => "—"
             };
             primaryActionButton.interactable = mode != FooterMode.None && (mode != FooterMode.Delivery || game.State.availableFreeDeliveries > 0) &&
@@ -618,7 +694,7 @@ namespace DistilleryDiscovery
         private void CloseSettings() => settingsModal.SetActive(false);
         private void ToggleLanguage() { game.State.languageCode = Language == "pl" ? "en" : "pl"; RefreshLocalizedBindings(); RefreshHeaderCounters(); ShowState(T("ui.status.language_changed", "Language changed")); settingsModal.SetActive(true); }
         private void SaveGame() { save.Save(game.State); CloseSettings(); ShowState(T("ui.status.saved", "Game saved locally")); }
-        private void LoadGame() { try { game.ReplaceState(save.Load()); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); if (game.State.pendingResult != null) ShowPendingResult(); else ShowState(OfflineStatus(T("ui.status.loaded", "Local save loaded"))); } catch (Exception ex) { SetStatus(ex.Message); } }
+        private void LoadGame() { try { game.ReplaceState(save.Load()); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); StartStartupRewardFlow(); } catch (Exception ex) { SetStatus(ex.Message); } }
         private void ResetGame() { save.Reset(); game.ReplaceState(GameService.NewState(game.Config, Language)); RefreshLocalizedBindings(); RefreshHeaderCounters(); CloseSettings(); ShowState(T("ui.status.reset", "Save deleted and game reset")); }
         private void AdvanceDebugTime(TimeSpan duration) { if (game.DebugAdvanceTime(duration)) { save.Save(game.State); CloseSettings(); ShowLaboratory(); } }
         private string OfflineStatus(string prefix)
@@ -633,10 +709,10 @@ namespace DistilleryDiscovery
         private string MasteryName(MasteryLevelDefinition level) => level == null ? "—" : game.Config.Text($"mastery.{level.id}", Language, level.displayName);
         private string ContractRewardDescription(ActiveContractState contract, ContractTemplateDefinition template)
         {
-            if (contract == null) return "—";
+            if (contract == null) return "-";
             var rewards = new List<string> { $"{contract.goldReward} {T("ui.label.gold_lower", "gold")}" };
-            foreach (var reward in template?.ingredientRewards ?? new List<ContractRewardDefinition>())
-                rewards.Add(ContractIngredientRewardDescription(reward));
+            if (!string.IsNullOrEmpty(contract.rewardIngredientId) && contract.rewardIngredientAmount > 0)
+                rewards.Add($"{contract.rewardIngredientAmount}x {IngredientName(contract.rewardIngredientId)}");
             return string.Join(" + ", rewards);
         }
 
@@ -669,6 +745,13 @@ namespace DistilleryDiscovery
         private string GroupName(string id) => game.Config.Text($"group.{id}", Language, game.Config.Group(id)?.displayName ?? id);
         private string TagName(string id) => game.Config.Text($"tag.{id}", Language, id);
         private string ContractName(string id) => game.Config.Text($"contract.{id}", Language, game.Config.ContractTemplate(id)?.displayName ?? id);
+        private string RoleName(string role) => role switch
+        {
+            ContractRole.Basic => T("contract.role.basic", "Basic"),
+            ContractRole.Specialist => T("contract.role.specialist", "Specialist"),
+            ContractRole.Prestige => T("contract.role.prestige", "Prestige"),
+            _ => role
+        };
         private string LaboratoryName(PlayerLaboratoryState lab) => lab == null ? T("ui.label.laboratory", "Laboratory") : $"{T("ui.label.laboratory", "Laboratory")} {lab.id.Replace("lab_", "#")}";
         private string SourceName(string source) => source == LaboratoryJobType.Experiment ? T("ui.source.experiment", "experiment") : source == LaboratoryJobType.Production ? T("ui.source.production", "production") : source;
         private string ObjectiveName(string objective) => objective switch

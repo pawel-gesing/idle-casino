@@ -23,6 +23,7 @@ namespace DistilleryDiscovery
             CheckUnique(config.ContractTemplates.Select(x => x.id), "contract template", errors);
             CheckUnique(config.MasteryLevels.Select(x => x.id), "mastery level", errors);
             CheckUnique(config.Localizations.Select(x => x.key), "localization", errors);
+            CheckUnique(config.Visuals.Select(x => x.id), "visual", errors);
             CheckUnique(config.Economy.deliveryPools.Select(x => x.id), "delivery pool", errors);
 
             var rarityIds = config.Rarities.Select(x => x.id).ToHashSet();
@@ -88,6 +89,7 @@ namespace DistilleryDiscovery
             }
             ValidateDeliveries(config, ingredientIds, errors);
             ValidateContracts(config, rarityIds, ingredientIds, groupIds, recipeIds, categoryIds, tags, errors);
+            ValidateVisuals(config, errors);
             ValidateProgression(config, errors);
             return errors;
         }
@@ -235,11 +237,46 @@ namespace DistilleryDiscovery
                     errors.Add($"Mastery level {ordered[i].id} has invalid progression values.");
         }
 
+        private static void ValidateVisuals(GameConfig config, List<string> errors)
+        {
+            if (config.Visuals.Count == 0) return;
+
+            foreach (var visual in config.Visuals)
+            {
+                if (!string.IsNullOrEmpty(visual.tintHex) && !visual.tintHex.StartsWith("#"))
+                    errors.Add($"Visual {visual.id}.tintHex must use #RRGGBB or #RRGGBBAA format.");
+            }
+
+            var ids = config.Visuals.Select(x => x.id).ToHashSet();
+            foreach (var ingredient in config.Ingredients.Where(x => x.enabled))
+                RequireVisual(ids, VisualIds.Ingredient(ingredient.id), $"Ingredient {ingredient.id}", errors);
+            foreach (var group in config.Groups)
+                RequireVisual(ids, VisualIds.Group(group.id), $"Ingredient group {group.id}", errors);
+            foreach (var category in config.Categories)
+                RequireVisual(ids, VisualIds.Category(category.id), $"Recipe category {category.id}", errors);
+            foreach (var rarity in config.Rarities)
+                RequireVisual(ids, VisualIds.Rarity(rarity.id), $"Rarity {rarity.id}", errors);
+
+            RequireVisual(ids, VisualIds.NavExperiment, "Experiment navigation", errors);
+            RequireVisual(ids, VisualIds.NavProduction, "Production navigation", errors);
+            RequireVisual(ids, VisualIds.NavContracts, "Contracts navigation", errors);
+            RequireVisual(ids, VisualIds.NavDelivery, "Delivery navigation", errors);
+            RequireVisual(ids, VisualIds.NavLaboratory, "Laboratory navigation", errors);
+            RequireVisual(ids, VisualIds.HeaderGold, "Gold header resource", errors);
+            RequireVisual(ids, VisualIds.HeaderRecipes, "Recipes header resource", errors);
+            RequireVisual(ids, VisualIds.HeaderIngredients, "Ingredients header resource", errors);
+        }
+
         private static void RequireLocalization(GameConfig config, string key, string entity, List<string> errors)
         {
             var value = config.Localizations.Find(x => x.key == key);
             if (value == null || string.IsNullOrWhiteSpace(value.pl) || string.IsNullOrWhiteSpace(value.en))
                 errors.Add($"{entity} is missing complete PL/EN localization at {key}.");
+        }
+
+        private static void RequireVisual(HashSet<string> ids, string id, string entity, List<string> errors)
+        {
+            if (!ids.Contains(id)) errors.Add($"{entity} is missing visual id {id}.");
         }
 
         private static void CheckUnique(IEnumerable<string> ids, string type, List<string> errors)

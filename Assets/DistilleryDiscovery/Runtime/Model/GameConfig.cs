@@ -177,6 +177,16 @@ namespace DistilleryDiscovery
     [Serializable] public sealed class LocalizationDefinition { public string key; public string pl; public string en; }
     [Serializable] public sealed class LocalizationFile { public List<LocalizationDefinition> entries = new(); }
 
+    [Serializable] public sealed class VisualDefinition
+    {
+        public string id;
+        public string displayName;
+        public string spriteResource;
+        public string tintHex;
+        public string category;
+    }
+    [Serializable] public sealed class VisualFile { public List<VisualDefinition> visuals = new(); }
+
     public sealed class GameConfig
     {
         public List<RarityDefinition> Rarities { get; }
@@ -188,6 +198,7 @@ namespace DistilleryDiscovery
         public List<MasteryLevelDefinition> MasteryLevels { get; }
         public List<ContractTemplateDefinition> ContractTemplates { get; }
         public List<LocalizationDefinition> Localizations { get; }
+        public List<VisualDefinition> Visuals { get; }
         public EconomyDefinition Economy { get; }
 
         public GameConfig(List<RarityDefinition> rarities, List<IngredientDefinition> ingredients,
@@ -197,18 +208,20 @@ namespace DistilleryDiscovery
             List<ContractTemplateDefinition> contractTemplates = null,
             List<LocalizationDefinition> localizations = null,
             List<MasteryLevelDefinition> masteryLevels = null,
-            List<IngredientGroupDefinition> groups = null)
+            List<IngredientGroupDefinition> groups = null,
+            List<VisualDefinition> visuals = null)
         {
             Rarities = rarities ?? new(); Ingredients = ingredients ?? new(); Recipes = recipes ?? new();
             Economy = economy ?? new(); Categories = categories ?? new(); LaboratoryLevels = laboratoryLevels ?? new();
             MasteryLevels = masteryLevels ?? new(); ContractTemplates = contractTemplates ?? new();
-            Localizations = localizations ?? new(); Groups = groups ?? new();
+            Localizations = localizations ?? new(); Groups = groups ?? new(); Visuals = visuals ?? new();
         }
 
         public IngredientDefinition Ingredient(string id) => Ingredients.Find(x => x.id == id);
         public IngredientGroupDefinition Group(string id) => Groups.Find(x => x.id == id);
         public RecipeDefinition Recipe(string id) => Recipes.Find(x => x.id == id);
         public RarityDefinition Rarity(string id) => Rarities.Find(x => x.id == id);
+        public VisualDefinition Visual(string id) => Visuals.Find(x => x.id == id);
         public RecipeCategoryDefinition Category(string id) => Categories.Find(x => x.id == id);
         public ContractTemplateDefinition ContractTemplate(string id) => ContractTemplates.Find(x => x.id == id);
         public LaboratoryLevelDefinition LaboratoryLevel(int level) => LaboratoryLevels.Find(x => x.level == level);

@@ -17,7 +17,34 @@ namespace DistilleryDiscovery.Tests
             Assert.That(config.Groups.Count, Is.EqualTo(5));
             Assert.That(config.Recipes.Count(x => x.enabled), Is.EqualTo(175));
             Assert.That(config.ContractTemplates.Count(x => x.enabled), Is.InRange(30, 40));
+            Assert.That(config.Visuals.Count, Is.GreaterThanOrEqualTo(47));
             Assert.That(ConfigValidator.Validate(config), Is.Empty);
+        }
+
+        [Test] public void VisualCatalog_CoversPriorityUiDomains()
+        {
+            var visualIds = config.Visuals.Select(x => x.id).ToHashSet();
+            Assert.That(config.Ingredients.Where(x => x.enabled).Select(x => VisualIds.Ingredient(x.id)), Is.SubsetOf(visualIds));
+            Assert.That(config.Groups.Select(x => VisualIds.Group(x.id)), Is.SubsetOf(visualIds));
+            Assert.That(config.Categories.Select(x => VisualIds.Category(x.id)), Is.SubsetOf(visualIds));
+            Assert.That(config.Rarities.Select(x => VisualIds.Rarity(x.id)), Is.SubsetOf(visualIds));
+            Assert.That(new[] { VisualIds.NavExperiment, VisualIds.NavProduction, VisualIds.NavContracts, VisualIds.NavDelivery, VisualIds.NavLaboratory,
+                VisualIds.HeaderGold, VisualIds.HeaderRecipes, VisualIds.HeaderIngredients }, Is.SubsetOf(visualIds));
+        }
+
+        [Test] public void Validator_RejectsMissingVisualId()
+        {
+            config.Visuals.RemoveAll(x => x.id == VisualIds.Ingredient("ingredient_barley_common"));
+            Assert.That(ConfigValidator.Validate(config), Has.Some.Contains("visual id ingredient.ingredient_barley_common"));
+        }
+
+        [Test] public void VisualCatalog_ReturnsPlaceholderSpriteUntilProductionAssetExists()
+        {
+            var catalog = new VisualCatalog(config);
+            var sprite = catalog.Sprite(VisualIds.Ingredient("ingredient_barley_common"));
+            Assert.That(sprite, Is.Not.Null);
+            Assert.That(catalog.Contains(VisualIds.HeaderGold), Is.True);
+            Assert.That(catalog.Sprite("missing.visual"), Is.Null);
         }
 
         [Test] public void Requirements_SupportExactGroupDistinctAndAnyOf()

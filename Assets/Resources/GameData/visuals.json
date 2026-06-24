@@ -1,0 +1,56 @@
+{
+  "visuals": [
+    { "id": "ingredient.ingredient_barley_common", "displayName": "Barley icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_barley_common", "tintHex": "#C9A85A", "category": "ingredient" },
+    { "id": "ingredient.ingredient_wheat_common", "displayName": "Wheat icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_wheat_common", "tintHex": "#D7BE68", "category": "ingredient" },
+    { "id": "ingredient.ingredient_rye_common", "displayName": "Rye icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_rye_common", "tintHex": "#A98E4C", "category": "ingredient" },
+    { "id": "ingredient.ingredient_honey_common", "displayName": "Honey icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_honey_common", "tintHex": "#F0B92F", "category": "ingredient" },
+    { "id": "ingredient.ingredient_cane_sugar_common", "displayName": "Cane sugar icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_cane_sugar_common", "tintHex": "#F1E2B6", "category": "ingredient" },
+    { "id": "ingredient.ingredient_molasses_common", "displayName": "Molasses icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_molasses_common", "tintHex": "#7C4B2B", "category": "ingredient" },
+    { "id": "ingredient.ingredient_plum_common", "displayName": "Plum icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_plum_common", "tintHex": "#8A4CB4", "category": "ingredient" },
+    { "id": "ingredient.ingredient_apple_common", "displayName": "Apple icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_apple_common", "tintHex": "#D85B58", "category": "ingredient" },
+    { "id": "ingredient.ingredient_grape_common", "displayName": "Grapes icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_grape_common", "tintHex": "#6E58C8", "category": "ingredient" },
+    { "id": "ingredient.ingredient_orange_common", "displayName": "Orange icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_orange_common", "tintHex": "#E28432", "category": "ingredient" },
+    { "id": "ingredient.ingredient_juniper_rare", "displayName": "Juniper icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_juniper_rare", "tintHex": "#4F8F6A", "category": "ingredient" },
+    { "id": "ingredient.ingredient_wormwood_rare", "displayName": "Wormwood icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_wormwood_rare", "tintHex": "#7BA66A", "category": "ingredient" },
+    { "id": "ingredient.ingredient_anise_rare", "displayName": "Anise icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_anise_rare", "tintHex": "#B4D0D2", "category": "ingredient" },
+    { "id": "ingredient.ingredient_pepper_rare", "displayName": "Pepper icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_pepper_rare", "tintHex": "#5F5B64", "category": "ingredient" },
+    { "id": "ingredient.ingredient_hops_rare", "displayName": "Hops icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_hops_rare", "tintHex": "#65A85B", "category": "ingredient" },
+    { "id": "ingredient.ingredient_peat_rare", "displayName": "Peat icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_peat_rare", "tintHex": "#59493F", "category": "ingredient" },
+    { "id": "ingredient.ingredient_oak_rare", "displayName": "Oak icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_oak_rare", "tintHex": "#9A6A3A", "category": "ingredient" },
+    { "id": "ingredient.ingredient_angelica_epic", "displayName": "Angelica icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_angelica_epic", "tintHex": "#8BCB9C", "category": "ingredient" },
+    { "id": "ingredient.ingredient_vanilla_epic", "displayName": "Vanilla icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_vanilla_epic", "tintHex": "#E8C98B", "category": "ingredient" },
+    { "id": "ingredient.ingredient_tonka_epic", "displayName": "Tonka bean icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_tonka_epic", "tintHex": "#9A7658", "category": "ingredient" },
+    { "id": "ingredient.ingredient_amber_legendary", "displayName": "Amber icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_amber_legendary", "tintHex": "#E6A23C", "category": "ingredient" },
+    { "id": "ingredient.ingredient_mastic_legendary", "displayName": "Mastic icon", "spriteResource": "Visuals/Sprites/Ingredients/ingredient_mastic_legendary", "tintHex": "#D9D0B4", "category": "ingredient" },
+
+    { "id": "group.grain", "displayName": "Grain group icon", "spriteResource": "Visuals/Sprites/Groups/grain", "tintHex": "#D2B45E", "category": "ingredient_group" },
+    { "id": "group.sweetener", "displayName": "Sweetener group icon", "spriteResource": "Visuals/Sprites/Groups/sweetener", "tintHex": "#E7B343", "category": "ingredient_group" },
+    { "id": "group.fruit", "displayName": "Fruit group icon", "spriteResource": "Visuals/Sprites/Groups/fruit", "tintHex": "#D75F67", "category": "ingredient_group" },
+    { "id": "group.herb", "displayName": "Herb group icon", "spriteResource": "Visuals/Sprites/Groups/herb", "tintHex": "#6FA866", "category": "ingredient_group" },
+    { "id": "group.spice", "displayName": "Spice group icon", "spriteResource": "Visuals/Sprites/Groups/spice", "tintHex": "#B8794E", "category": "ingredient_group" },
+
+    { "id": "category.beer", "displayName": "Beer category icon", "spriteResource": "Visuals/Sprites/Categories/beer", "tintHex": "#D8A743", "category": "recipe_category" },
+    { "id": "category.grain_spirit", "displayName": "Grain spirits category icon", "spriteResource": "Visuals/Sprites/Categories/grain_spirit", "tintHex": "#C1A068", "category": "recipe_category" },
+    { "id": "category.mead_sugar", "displayName": "Mead and sugar spirits category icon", "spriteResource": "Visuals/Sprites/Categories/mead_sugar", "tintHex": "#E6BA4E", "category": "recipe_category" },
+    { "id": "category.fruit_wine", "displayName": "Fruit wines and ciders category icon", "spriteResource": "Visuals/Sprites/Categories/fruit_wine", "tintHex": "#C95E7A", "category": "recipe_category" },
+    { "id": "category.fruit_spirit", "displayName": "Fruit spirits and liqueurs category icon", "spriteResource": "Visuals/Sprites/Categories/fruit_spirit", "tintHex": "#A962C3", "category": "recipe_category" },
+    { "id": "category.gin_herbal", "displayName": "Gin and herbal category icon", "spriteResource": "Visuals/Sprites/Categories/gin_herbal", "tintHex": "#6EA879", "category": "recipe_category" },
+    { "id": "category.special", "displayName": "Special category icon", "spriteResource": "Visuals/Sprites/Categories/special", "tintHex": "#F2AD2E", "category": "recipe_category" },
+
+    { "id": "rarity.rarity_common", "displayName": "Common rarity frame", "spriteResource": "Visuals/Sprites/Rarities/rarity_common", "tintHex": "#B8B8B8", "category": "rarity" },
+    { "id": "rarity.rarity_rare", "displayName": "Rare rarity frame", "spriteResource": "Visuals/Sprites/Rarities/rarity_rare", "tintHex": "#5B9DFF", "category": "rarity" },
+    { "id": "rarity.rarity_epic", "displayName": "Epic rarity frame", "spriteResource": "Visuals/Sprites/Rarities/rarity_epic", "tintHex": "#C06BFF", "category": "rarity" },
+    { "id": "rarity.rarity_legendary", "displayName": "Legendary rarity frame", "spriteResource": "Visuals/Sprites/Rarities/rarity_legendary", "tintHex": "#F2AD2E", "category": "rarity" },
+    { "id": "rarity.rarity_mythic", "displayName": "Mythic rarity frame", "spriteResource": "Visuals/Sprites/Rarities/rarity_mythic", "tintHex": "#FF5B83", "category": "rarity" },
+
+    { "id": "nav.experiment", "displayName": "Experiment navigation icon", "spriteResource": "Visuals/Sprites/Navigation/experiment", "tintHex": "#63D889", "category": "navigation" },
+    { "id": "nav.production", "displayName": "Production navigation icon", "spriteResource": "Visuals/Sprites/Navigation/production", "tintHex": "#F2AD2E", "category": "navigation" },
+    { "id": "nav.contracts", "displayName": "Contracts navigation icon", "spriteResource": "Visuals/Sprites/Navigation/contracts", "tintHex": "#5B9DFF", "category": "navigation" },
+    { "id": "nav.delivery", "displayName": "Delivery navigation icon", "spriteResource": "Visuals/Sprites/Navigation/delivery", "tintHex": "#D75F67", "category": "navigation" },
+    { "id": "nav.laboratory", "displayName": "Laboratory navigation icon", "spriteResource": "Visuals/Sprites/Navigation/laboratory", "tintHex": "#C06BFF", "category": "navigation" },
+
+    { "id": "header.gold", "displayName": "Gold resource icon", "spriteResource": "Visuals/Sprites/Header/gold", "tintHex": "#F2AD2E", "category": "header_resource" },
+    { "id": "header.recipes", "displayName": "Recipes resource icon", "spriteResource": "Visuals/Sprites/Header/recipes", "tintHex": "#5B9DFF", "category": "header_resource" },
+    { "id": "header.ingredients", "displayName": "Ingredients resource icon", "spriteResource": "Visuals/Sprites/Header/ingredients", "tintHex": "#63D889", "category": "header_resource" }
+  ]
+}

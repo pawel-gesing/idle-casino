@@ -12,7 +12,19 @@ namespace DistilleryDiscovery
     {
         private enum FooterMode { Experiment, Production, Laboratory, Delivery, None }
         private sealed class LocalizedBinding { public Text Text; public string Key; public string Fallback; }
-        private sealed class TileOption { public string Label; public Action Action; }
+        private sealed class TileOption
+        {
+            public string Label;
+            public string MainText;
+            public string SecondaryText;
+            public string DetailText;
+            public string VisualId;
+            public string RarityId;
+            public bool Selected;
+            public bool Locked;
+            public bool Ready;
+            public Action Action;
+        }
         private sealed class TileSection { public string Heading; public List<TileOption> Options = new(); }
 
         private static readonly Color Ink = new(0.09f, 0.08f, 0.12f);
@@ -23,6 +35,7 @@ namespace DistilleryDiscovery
         private readonly List<LocalizedBinding> localizedBindings = new();
         private GameService game;
         private SaveService save;
+        private VisualCatalog visualCatalog;
         private Font font;
         private CanvasScaler canvasScaler;
         private RectTransform safeAreaRoot;
@@ -78,6 +91,7 @@ namespace DistilleryDiscovery
         {
             game = gameService;
             save = saveService;
+            visualCatalog = new VisualCatalog(game.Config);
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             Build();
             StartStartupRewardFlow();
@@ -134,11 +148,11 @@ namespace DistilleryDiscovery
 
             var nav = Panel("Menu", background.transform, new Color(.11f, .10f, .14f)); Rect(nav, 0, .67f, 1, .80f);
             navigationGrid = nav.AddComponent<GridLayoutGroup>(); navigationGrid.padding = new RectOffset(18, 18, 10, 10); navigationGrid.spacing = new Vector2(10, 8); navigationGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount; navigationGrid.constraintCount = 3;
-            AddLocalizedButton(nav.transform, "ui.nav.experiment", "EXPERIMENT", ShowExperiment);
-            AddLocalizedButton(nav.transform, "ui.nav.production", "PRODUCTION", ShowProduction);
-            AddLocalizedButton(nav.transform, "ui.nav.contracts", "CONTRACTS", ShowContracts);
-            AddLocalizedButton(nav.transform, "ui.nav.delivery", "DELIVERY", ShowDelivery);
-            AddLocalizedButton(nav.transform, "ui.nav.laboratory", "LABORATORY", ShowLaboratory);
+            AddLocalizedButton(nav.transform, "ui.nav.experiment", "EXPERIMENT", ShowExperiment, visualId: VisualIds.NavExperiment);
+            AddLocalizedButton(nav.transform, "ui.nav.production", "PRODUCTION", ShowProduction, visualId: VisualIds.NavProduction);
+            AddLocalizedButton(nav.transform, "ui.nav.contracts", "CONTRACTS", ShowContracts, visualId: VisualIds.NavContracts);
+            AddLocalizedButton(nav.transform, "ui.nav.delivery", "DELIVERY", ShowDelivery, visualId: VisualIds.NavDelivery);
+            AddLocalizedButton(nav.transform, "ui.nav.laboratory", "LABORATORY", ShowLaboratory, visualId: VisualIds.NavLaboratory);
 
             BuildContent(background.transform);
             BuildFooter(background.transform);
@@ -152,9 +166,9 @@ namespace DistilleryDiscovery
         {
             var header = Panel("Header", parent, Plum); Rect(header, 0, .86f, 1, 1);
             var title = Label("DISTILLERY DISCOVERY", header.transform, 38, TextAnchor.MiddleLeft); Rect(title.gameObject, .035f, .52f, .82f, .98f);
-            var goldTile = AddButton(header.transform, "", () => ShowState(), Gold, Ink); Rect(goldTile, .03f, .08f, .28f, .47f); goldHeaderText = goldTile.GetComponentInChildren<Text>();
-            var recipesTile = AddButton(header.transform, "", ShowRecipeBook); Rect(recipesTile, .30f, .08f, .57f, .47f); recipesHeaderText = recipesTile.GetComponentInChildren<Text>();
-            var ingredientsTile = AddButton(header.transform, "", ShowIngredientInventory); Rect(ingredientsTile, .59f, .08f, .82f, .47f); ingredientsHeaderText = ingredientsTile.GetComponentInChildren<Text>();
+            var goldTile = AddVisualTile(header.transform, new TileOption { VisualId = VisualIds.HeaderGold, Action = () => ShowState() }, Gold, Ink); Rect(goldTile, .03f, .08f, .28f, .47f); goldHeaderText = goldTile.GetComponentInChildren<Text>();
+            var recipesTile = AddVisualTile(header.transform, new TileOption { VisualId = VisualIds.HeaderRecipes, Action = ShowRecipeBook }); Rect(recipesTile, .30f, .08f, .57f, .47f); recipesHeaderText = recipesTile.GetComponentInChildren<Text>();
+            var ingredientsTile = AddVisualTile(header.transform, new TileOption { VisualId = VisualIds.HeaderIngredients, Action = ShowIngredientInventory }); Rect(ingredientsTile, .59f, .08f, .82f, .47f); ingredientsHeaderText = ingredientsTile.GetComponentInChildren<Text>();
             var settings = AddButton(header.transform, "⚙", OpenSettings, Gold, Ink); Rect(settings, .86f, .25f, .97f, .75f);
         }
 
@@ -282,11 +296,30 @@ namespace DistilleryDiscovery
             var sections = IngredientSections(game.Config.Ingredients, item => new TileOption
             {
                 Label = $"{IngredientName(item.id)}\n{RarityName(item.rarityId)}\nx{game.State.AmountOf(item.id)}",
+                MainText = IngredientName(item.id),
+                SecondaryText = RarityName(item.rarityId),
+                DetailText = $"x{game.State.AmountOf(item.id)}",
+                VisualId = VisualIds.Ingredient(item.id),
+                RarityId = item.rarityId,
+                Locked = game.State.AmountOf(item.id) <= 0,
                 Action = ShowIngredientInventory
             });
             var products = game.State.products.Count == 0
                 ? new List<TileOption> { new() { Label = T("ui.inventory.no_products", "No products yet"), Action = ShowIngredientInventory } }
-                : game.State.products.Select(product => new TileOption { Label = $"{RecipeName(product.recipeId)}\n{RarityName(product.rarityId)}\nx{product.amount}", Action = ShowIngredientInventory }).ToList();
+                : game.State.products.Select(product =>
+                {
+                    var recipe = game.Config.Recipe(product.recipeId);
+                    return new TileOption
+                    {
+                        Label = $"{RecipeName(product.recipeId)}\n{RarityName(product.rarityId)}\nx{product.amount}",
+                        MainText = RecipeName(product.recipeId),
+                        SecondaryText = RarityName(product.rarityId),
+                        DetailText = $"x{product.amount}",
+                        VisualId = recipe == null ? null : VisualIds.Category(recipe.categoryId),
+                        RarityId = product.rarityId,
+                        Action = ShowIngredientInventory
+                    };
+                }).ToList();
             sections.Add(new TileSection { Heading = T("ui.heading.products", "PRODUCTS"), Options = products });
             ShowTileSections(sections, 132f);
         }
@@ -319,7 +352,16 @@ namespace DistilleryDiscovery
             {
                 Heading = CategoryName(category.id),
                 Options = recipes.Where(recipe => recipe.categoryId == category.id).Select(recipe =>
-                    new TileOption { Label = $"{RecipeName(recipe.id)}\n{DescribeRecipeRequirements(recipe)}", Action = () => SelectProductionRecipe(recipe.id) }).ToList()
+                    new TileOption
+                    {
+                        Label = $"{RecipeName(recipe.id)}\n{DescribeRecipeRequirements(recipe)}",
+                        MainText = RecipeName(recipe.id),
+                        SecondaryText = DescribeRecipeRequirements(recipe),
+                        VisualId = VisualIds.Category(recipe.categoryId),
+                        RarityId = recipe.collectionRarityId,
+                        Selected = selectedProductionRecipeId == recipe.id,
+                        Action = () => SelectProductionRecipe(recipe.id)
+                    }).ToList()
             }), 160f);
         }
 
@@ -335,7 +377,18 @@ namespace DistilleryDiscovery
             ShowTileSections(IngredientSections(ingredients, item =>
             {
                 var available = game.State.AmountOf(item.id) - selection.Count(x => x == item.id);
-                return new TileOption { Label = $"{IngredientName(item.id)}\n{GroupName(item.groupId)} · {RarityName(item.rarityId)}\nx{Math.Max(0, available)}", Action = () => ReserveIngredient(item.id) };
+                return new TileOption
+                {
+                    Label = $"{IngredientName(item.id)}\n{GroupName(item.groupId)} · {RarityName(item.rarityId)}\nx{Math.Max(0, available)}",
+                    MainText = IngredientName(item.id),
+                    SecondaryText = $"{GroupName(item.groupId)} · {RarityName(item.rarityId)}",
+                    DetailText = $"x{Math.Max(0, available)}",
+                    VisualId = VisualIds.Ingredient(item.id),
+                    RarityId = item.rarityId,
+                    Selected = selection.Contains(item.id),
+                    Locked = available <= 0,
+                    Action = () => ReserveIngredient(item.id)
+                };
             }), 142f);
             UpdateExperimentPreview();
         }
@@ -361,7 +414,16 @@ namespace DistilleryDiscovery
         private TileOption RecipeBookTile(RecipeDefinition recipe)
         {
             var state = game.State.RecipeState(recipe.id);
-            if (state == null) return new TileOption { Label = $"???\n{T("ui.recipe.undiscovered", "Undiscovered recipe")}", Action = ShowRecipeBook };
+            if (state == null) return new TileOption
+            {
+                Label = $"???\n{T("ui.recipe.undiscovered", "Undiscovered recipe")}",
+                MainText = "???",
+                SecondaryText = T("ui.recipe.undiscovered", "Undiscovered recipe"),
+                VisualId = VisualIds.Category(recipe.categoryId),
+                RarityId = recipe.collectionRarityId,
+                Locked = true,
+                Action = ShowRecipeBook
+            };
             var rarity = game.Config.Rarity(state.highestProductRarityId);
             var mastery = game.MasteryLevel(recipe.id);
             var next = game.Config.NextMasteryLevel(state.timesCreated);
@@ -369,6 +431,11 @@ namespace DistilleryDiscovery
             return new TileOption
             {
                 Label = $"{RecipeName(recipe.id)}\n{DescribeRecipeRequirements(recipe)}\n{T("ui.label.record", "Record")}: {RarityName(rarity.id)} · {T("ui.label.created", "Created")}: {state.timesCreated}\n{T("ui.label.mastery", "Mastery")}: {MasteryName(mastery)}\n{progress}",
+                MainText = RecipeName(recipe.id),
+                SecondaryText = DescribeRecipeRequirements(recipe),
+                DetailText = $"{T("ui.label.record", "Record")}: {RarityName(rarity.id)} · {T("ui.label.created", "Created")}: {state.timesCreated}",
+                VisualId = VisualIds.Category(recipe.categoryId),
+                RarityId = rarity.id,
                 Action = ShowRecipeBook
             };
         }
@@ -381,7 +448,16 @@ namespace DistilleryDiscovery
                 {
                     var level = game.Config.LaboratoryLevel(lab.level);
                     var label = $"{LaboratoryName(lab)}\n{T("ui.label.level", "level")} {lab.level}\n{T("ui.label.rarity_bonus", "Higher rarity bonus")}: +{level.productQualityBonus:P0}";
-                    return new TileOption { Label = label, Action = () => { selectedLaboratoryId = lab.id; SetStatus($"{T("ui.label.laboratory", "Laboratory")}: {LaboratoryName(lab)}"); afterSelect(); } };
+                    return new TileOption
+                    {
+                        Label = label,
+                        MainText = LaboratoryName(lab),
+                        SecondaryText = $"{T("ui.label.level", "level")} {lab.level}",
+                        DetailText = $"+{level.productQualityBonus:P0}",
+                        VisualId = VisualIds.NavLaboratory,
+                        Selected = selectedLaboratoryId == lab.id,
+                        Action = () => { selectedLaboratoryId = lab.id; SetStatus($"{T("ui.label.laboratory", "Laboratory")}: {LaboratoryName(lab)}"); afterSelect(); }
+                    };
                 }).ToList();
             if (options.Count == 0) options.Add(new TileOption { Label = T("ui.laboratory.no_free", "No free laboratory"), Action = ShowLaboratory });
             ShowTileSections(new[] { new TileSection { Heading = T("ui.heading.laboratories", "LABORATORIES"), Options = options } }, 150f);
@@ -426,6 +502,11 @@ namespace DistilleryDiscovery
                     options.Add(new TileOption
                     {
                         Label = $"{RoleName(role)}\n{T("ui.contract.waiting", "New contract in")} {FormatDuration(game.TimeUntilContractAvailable(role))}",
+                        MainText = RoleName(role),
+                        SecondaryText = T("ui.contract.waiting", "New contract in"),
+                        DetailText = FormatDuration(game.TimeUntilContractAvailable(role)),
+                        VisualId = VisualIds.NavContracts,
+                        Locked = true,
                         Action = ShowContracts
                     });
                     continue;
@@ -435,6 +516,11 @@ namespace DistilleryDiscovery
                 options.Add(new TileOption
                 {
                     Label = $"{RoleName(role)} - {ContractName(state.templateId)}\n{DescribeRequirement(state)}\n{T("ui.label.progress", "Progress")}: {state.progress}/{state.amount}{distinct}\n{T("ui.label.reward", "Reward")}: {ContractRewardDescription(state, template)}",
+                    MainText = $"{RoleName(role)} - {ContractName(state.templateId)}",
+                    SecondaryText = DescribeRequirement(state),
+                    DetailText = $"{T("ui.label.progress", "Progress")}: {state.progress}/{state.amount}{distinct}",
+                    VisualId = VisualIds.NavContracts,
+                    Ready = state.progress >= state.amount,
                     Action = ShowContracts
                 });
             }
@@ -452,13 +538,22 @@ namespace DistilleryDiscovery
                 var upgrade = game.Config.LaboratoryLevel(lab.level + 1);
                 var label = $"{LaboratoryName(lab)}\n{T("ui.label.level", "level")} {lab.level} - {T("ui.label.rarity_bonus", "Higher rarity bonus")} +{level.productQualityBonus:P0}\n" +
                     (upgrade == null ? T("ui.laboratory.max", "Maximum level reached.") : $"{T("ui.action.upgrade", "UPGRADE")}: {upgrade.upgradeCost} {T("ui.label.gold_lower", "gold")}");
-                return new TileOption { Label = label, Action = () => UpgradeLaboratory(lab.id) };
+                return new TileOption
+                {
+                    Label = label,
+                    MainText = LaboratoryName(lab),
+                    SecondaryText = $"{T("ui.label.level", "level")} {lab.level} - +{level.productQualityBonus:P0}",
+                    DetailText = upgrade == null ? T("ui.laboratory.max", "Maximum level reached.") : $"{T("ui.action.upgrade", "UPGRADE")}: {upgrade.upgradeCost}",
+                    VisualId = VisualIds.NavLaboratory,
+                    Selected = selectedLaboratoryId == lab.id,
+                    Action = () => UpgradeLaboratory(lab.id)
+                };
             }).ToList();
             if (game.NextLaboratoryCost >= 0)
-                labOptions.Add(new TileOption { Label = $"{T("ui.action.buy_laboratory", "BUY LABORATORY")}\n{T("ui.label.cost", "Cost")}: {game.NextLaboratoryCost} {T("ui.label.gold_lower", "gold")}", Action = PurchaseLaboratory });
+                labOptions.Add(new TileOption { Label = $"{T("ui.action.buy_laboratory", "BUY LABORATORY")}\n{T("ui.label.cost", "Cost")}: {game.NextLaboratoryCost} {T("ui.label.gold_lower", "gold")}", MainText = T("ui.action.buy_laboratory", "BUY LABORATORY"), SecondaryText = $"{T("ui.label.cost", "Cost")}: {game.NextLaboratoryCost}", VisualId = VisualIds.NavLaboratory, Action = PurchaseLaboratory });
             var jobOptions = game.State.laboratoryJobs.Where(x => x.status != LaboratoryJobStatus.Claimed)
                 .OrderBy(x => x.status == LaboratoryJobStatus.Completed ? 0 : x.type == LaboratoryJobType.Experiment ? 1 : 2)
-                .Select(job => new TileOption { Label = JobLabel(job), Action = job.status == LaboratoryJobStatus.Completed ? () => ClaimJob(job.id) : ShowLaboratory }).ToList();
+                .Select(job => new TileOption { Label = JobLabel(job), VisualId = VisualIds.NavLaboratory, Ready = job.status == LaboratoryJobStatus.Completed, Action = job.status == LaboratoryJobStatus.Completed ? () => ClaimJob(job.id) : ShowLaboratory }).ToList();
             if (jobOptions.Count == 0) jobOptions.Add(new TileOption { Label = T("ui.laboratory.no_jobs", "No active jobs"), Action = ShowLaboratory });
             ShowTileSections(new[]
             {
@@ -624,7 +719,7 @@ namespace DistilleryDiscovery
                 var grid = gridObject.GetComponent<GridLayoutGroup>(); grid.spacing = new Vector2(12, 12); grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount; grid.constraintCount = 2;
                 gridObject.GetComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
                 activeTileGrids.Add(grid); tileGrid = grid; tileGridObject = gridObject;
-                foreach (var option in section.Options) AddButton(gridObject.transform, option.Label, option.Action ?? (() => { }));
+                foreach (var option in section.Options) AddVisualTile(gridObject.transform, option);
             }
             experimentPreviewText = Label("", tileContentObject.transform, 30, TextAnchor.UpperLeft);
             experimentPreviewText.supportRichText = true;
@@ -774,11 +869,76 @@ namespace DistilleryDiscovery
         private void SetStatus(string value) => statusText.text = value;
         private void Bind(Text text, string key, string fallback) { localizedBindings.Add(new LocalizedBinding { Text = text, Key = key, Fallback = fallback }); text.text = T(key, fallback); }
         private void RefreshLocalizedBindings() { foreach (var binding in localizedBindings) binding.Text.text = T(binding.Key, binding.Fallback); SetMode(footerMode); }
-        private GameObject AddLocalizedButton(Transform parent, string key, string fallback, Action action, Color? color = null, Color? textColor = null) { var node = AddButton(parent, T(key, fallback), action, color, textColor); Bind(node.GetComponentInChildren<Text>(), key, fallback); return node; }
+        private GameObject AddLocalizedButton(Transform parent, string key, string fallback, Action action, Color? color = null, Color? textColor = null, string visualId = null)
+        {
+            var node = string.IsNullOrEmpty(visualId)
+                ? AddButton(parent, T(key, fallback), action, color, textColor)
+                : AddVisualTile(parent, new TileOption { MainText = T(key, fallback), Label = T(key, fallback), VisualId = visualId, Action = action }, color, textColor);
+            Bind(node.GetComponentInChildren<Text>(), key, fallback);
+            return node;
+        }
         private GameObject Node(string name, Transform parent, params Type[] components) { var node = new GameObject(name, components); node.transform.SetParent(parent, false); return node; }
         private GameObject Panel(string name, Transform parent, Color color) { var node = Node(name, parent, typeof(RectTransform), typeof(Image)); node.GetComponent<Image>().color = color; return node; }
         private Text Label(string value, Transform parent, int size, TextAnchor anchor) { var node = Node("Label", parent, typeof(RectTransform), typeof(Text)); var text = node.GetComponent<Text>(); text.font = font; text.fontSize = size; text.color = Cream; text.alignment = anchor; text.text = value; text.supportRichText = true; return text; }
         private GameObject AddButton(Transform parent, string label, Action action, Color? color = null, Color? textColor = null) { var node = Panel(label, parent, color ?? new Color(.28f, .20f, .31f)); node.AddComponent<Button>().onClick.AddListener(() => action()); var text = Label(label, node.transform, 24, TextAnchor.MiddleCenter); text.color = textColor ?? Cream; text.fontStyle = FontStyle.Bold; text.resizeTextForBestFit = true; text.resizeTextMinSize = 12; text.resizeTextMaxSize = 24; Stretch(text.gameObject, 5, 3); return node; }
+        private GameObject AddVisualTile(Transform parent, TileOption option, Color? color = null, Color? textColor = null)
+        {
+            option ??= new TileOption();
+            var baseColor = color ?? (option.Ready ? new Color(.18f, .31f, .24f) : option.Locked ? new Color(.16f, .15f, .17f) : new Color(.28f, .20f, .31f));
+            var node = Panel(option.MainText ?? option.Label ?? "Tile", parent, baseColor);
+            node.AddComponent<Button>().onClick.AddListener(() => (option.Action ?? (() => { }))());
+            var outline = node.AddComponent<Outline>();
+            outline.effectDistance = option.Selected ? new Vector2(5f, -5f) : new Vector2(3f, -3f);
+            outline.effectColor = option.Selected ? Gold : option.Ready ? new Color(.39f, .85f, .54f) : RarityColor(option.RarityId, new Color(.40f, .31f, .45f));
+
+            var hasIcon = !string.IsNullOrEmpty(option.VisualId) && visualCatalog?.Sprite(option.VisualId) != null;
+            if (hasIcon)
+            {
+                var icon = Node("Icon", node.transform, typeof(RectTransform), typeof(Image));
+                var image = icon.GetComponent<Image>();
+                image.sprite = visualCatalog.Sprite(option.VisualId);
+                image.color = option.Locked ? new Color(.55f, .55f, .55f, .65f) : visualCatalog.Tint(option.VisualId, Color.white);
+                image.preserveAspect = true;
+                Rect(icon, .06f, .23f, .25f, .77f);
+            }
+
+            var (main, secondary, detail) = TileText(option);
+            var text = Label(ComposeTileText(main, secondary, detail), node.transform, 23, TextAnchor.MiddleLeft);
+            text.color = option.Locked ? new Color(Cream.r, Cream.g, Cream.b, .62f) : textColor ?? Cream;
+            text.fontStyle = FontStyle.Bold;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 11;
+            text.resizeTextMaxSize = 23;
+            if (hasIcon) Rect(text.gameObject, .30f, .06f, .95f, .94f);
+            else Stretch(text.gameObject, 12, 5);
+            return node;
+        }
+
+        private Color RarityColor(string rarityId, Color fallback)
+        {
+            if (string.IsNullOrEmpty(rarityId)) return fallback;
+            var visualColor = visualCatalog?.Tint(VisualIds.Rarity(rarityId), Color.clear) ?? Color.clear;
+            if (visualColor.a > 0f) return visualColor;
+            var rarity = game.Config.Rarity(rarityId);
+            return rarity != null && ColorUtility.TryParseHtmlString(rarity.colorHex, out var color) ? color : fallback;
+        }
+
+        private static (string main, string secondary, string detail) TileText(TileOption option)
+        {
+            if (!string.IsNullOrEmpty(option.MainText) || !string.IsNullOrEmpty(option.SecondaryText) || !string.IsNullOrEmpty(option.DetailText))
+                return (option.MainText, option.SecondaryText, option.DetailText);
+            var lines = (option.Label ?? "").Split('\n');
+            return (lines.Length > 0 ? lines[0] : "", lines.Length > 1 ? lines[1] : "", lines.Length > 2 ? string.Join("\n", lines.Skip(2)) : "");
+        }
+
+        private static string ComposeTileText(string main, string secondary, string detail)
+        {
+            var lines = new List<string>();
+            if (!string.IsNullOrEmpty(main)) lines.Add(main);
+            if (!string.IsNullOrEmpty(secondary)) lines.Add(secondary);
+            if (!string.IsNullOrEmpty(detail)) lines.Add(detail);
+            return string.Join("\n", lines);
+        }
         private static void Stretch(GameObject node, float x = 0, float y = 0) { var rect = node.GetComponent<RectTransform>(); rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.offsetMin = new Vector2(x, y); rect.offsetMax = new Vector2(-x, -y); }
         private static void Rect(GameObject node, float xMin, float yMin, float xMax, float yMax) { var rect = node.GetComponent<RectTransform>(); rect.anchorMin = new Vector2(xMin, yMin); rect.anchorMax = new Vector2(xMax, yMax); rect.offsetMin = Vector2.zero; rect.offsetMax = Vector2.zero; }
     }

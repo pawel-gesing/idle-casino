@@ -60,7 +60,7 @@ namespace DistilleryDiscovery
                 }
             }
             texture.Apply(false, true);
-            return Sprite.Create(texture, new Rect(0, 0, PlaceholderSize, PlaceholderSize), new Vector2(.5f, .5f), PlaceholderSize);
+            return UnityEngine.Sprite.Create(texture, new Rect(0, 0, PlaceholderSize, PlaceholderSize), new Vector2(.5f, .5f), PlaceholderSize);
         }
     }
 }

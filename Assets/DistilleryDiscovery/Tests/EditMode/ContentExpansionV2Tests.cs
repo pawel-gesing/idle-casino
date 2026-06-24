@@ -50,11 +50,46 @@ namespace DistilleryDiscovery.Tests
         [Test] public void VisualCatalog_ReturnsPlaceholderSpriteUntilProductionAssetExists()
         {
             var catalog = new VisualCatalog(config);
-            LogAssert.Expect(LogType.Warning, "Visual ingredient_barley_common is using a placeholder sprite because Resources/Visuals/Sprites/Ingredients/ingredient_barley_common could not be loaded.");
-            var sprite = catalog.Sprite(VisualIds.Ingredient("ingredient_barley_common"));
+            LogAssert.Expect(LogType.Warning, "Visual ingredient_wheat_common is using a placeholder sprite because Resources/Visuals/Sprites/Ingredients/ingredient_wheat_common could not be loaded.");
+            var sprite = catalog.Sprite(VisualIds.Ingredient("ingredient_wheat_common"));
             Assert.That(sprite, Is.Not.Null);
             Assert.That(catalog.Contains(VisualIds.HeaderGold), Is.True);
             Assert.That(catalog.Sprite("missing.visual"), Is.Null);
+        }
+
+        [Test] public void VisualCatalog_LoadsFirstProductionSpriteBatch()
+        {
+            var catalog = new VisualCatalog(config);
+            var expectedSizes = new Dictionary<string, int>
+            {
+                [VisualIds.HeaderGold] = 128,
+                [VisualIds.HeaderRecipes] = 128,
+                [VisualIds.HeaderIngredients] = 128,
+                [VisualIds.NavExperiment] = 128,
+                [VisualIds.NavProduction] = 128,
+                [VisualIds.NavContracts] = 128,
+                [VisualIds.NavDelivery] = 128,
+                [VisualIds.NavLaboratory] = 128,
+                [VisualIds.Rarity("common")] = 256,
+                [VisualIds.Rarity("rare")] = 256,
+                [VisualIds.Rarity("epic")] = 256,
+                [VisualIds.Rarity("legendary")] = 256,
+                [VisualIds.Ingredient("barley_common")] = 256,
+                [VisualIds.Ingredient("honey_common")] = 256,
+                [VisualIds.Ingredient("apple_common")] = 256,
+                [VisualIds.Category("beer")] = 256
+            };
+
+            foreach (var expected in expectedSizes)
+            {
+                var visualId = expected.Key;
+                var expectedSize = expected.Value;
+                var sprite = catalog.Sprite(visualId);
+                Assert.That(sprite, Is.Not.Null, visualId);
+                Assert.That(sprite.texture.name, Does.Not.StartWith("Placeholder."), visualId);
+                Assert.That(sprite.texture.width, Is.EqualTo(expectedSize), visualId);
+                Assert.That(sprite.texture.height, Is.EqualTo(expectedSize), visualId);
+            }
         }
 
         [Test] public void Requirements_SupportExactGroupDistinctAndAnyOf()

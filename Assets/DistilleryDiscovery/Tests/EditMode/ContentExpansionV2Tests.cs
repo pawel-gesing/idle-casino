@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace DistilleryDiscovery.Tests
 {
@@ -32,15 +33,24 @@ namespace DistilleryDiscovery.Tests
                 VisualIds.HeaderGold, VisualIds.HeaderRecipes, VisualIds.HeaderIngredients }, Is.SubsetOf(visualIds));
         }
 
+        [Test] public void VisualCatalog_UsesPredictableIdsAndSpritePaths()
+        {
+            Assert.That(config.Visuals.Select(x => x.id), Has.All.Matches<string>(VisualIds.HasKnownPrefix));
+            Assert.That(config.Visuals, Has.All.Matches<VisualDefinition>(x => x.spriteResource == VisualIds.SpriteResourcePath(x.id)));
+            Assert.That(VisualIds.SpriteResourcePath(VisualIds.Group("grain")), Is.EqualTo("Visuals/Sprites/Groups/group_grain"));
+            Assert.That(VisualIds.SpriteResourcePath(VisualIds.HeaderGold), Is.EqualTo("Visuals/Sprites/Header/header_gold"));
+        }
+
         [Test] public void Validator_RejectsMissingVisualId()
         {
             config.Visuals.RemoveAll(x => x.id == VisualIds.Ingredient("ingredient_barley_common"));
-            Assert.That(ConfigValidator.Validate(config), Has.Some.Contains("visual id ingredient.ingredient_barley_common"));
+            Assert.That(ConfigValidator.Validate(config), Has.Some.Contains("visual id ingredient_barley_common"));
         }
 
         [Test] public void VisualCatalog_ReturnsPlaceholderSpriteUntilProductionAssetExists()
         {
             var catalog = new VisualCatalog(config);
+            LogAssert.Expect(LogType.Warning, "Visual ingredient_barley_common is using a placeholder sprite because Resources/Visuals/Sprites/Ingredients/ingredient_barley_common could not be loaded.");
             var sprite = catalog.Sprite(VisualIds.Ingredient("ingredient_barley_common"));
             Assert.That(sprite, Is.Not.Null);
             Assert.That(catalog.Contains(VisualIds.HeaderGold), Is.True);

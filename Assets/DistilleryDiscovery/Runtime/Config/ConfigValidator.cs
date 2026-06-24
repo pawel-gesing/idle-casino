@@ -243,6 +243,12 @@ namespace DistilleryDiscovery
 
             foreach (var visual in config.Visuals)
             {
+                if (!VisualIds.HasKnownPrefix(visual.id))
+                    errors.Add($"Visual {visual.id} must use a known visual id prefix.");
+                if (string.IsNullOrWhiteSpace(visual.spriteResource))
+                    errors.Add($"Visual {visual.id}.spriteResource is empty.");
+                else if (VisualIds.HasKnownPrefix(visual.id) && visual.spriteResource != VisualIds.SpriteResourcePath(visual.id))
+                    errors.Add($"Visual {visual.id}.spriteResource must be {VisualIds.SpriteResourcePath(visual.id)}.");
                 if (!string.IsNullOrEmpty(visual.tintHex) && !visual.tintHex.StartsWith("#"))
                     errors.Add($"Visual {visual.id}.tintHex must use #RRGGBB or #RRGGBBAA format.");
             }

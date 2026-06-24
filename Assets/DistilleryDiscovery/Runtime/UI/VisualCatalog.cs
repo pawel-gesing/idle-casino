@@ -9,6 +9,7 @@ namespace DistilleryDiscovery
         private const int PlaceholderSize = 32;
         private readonly Dictionary<string, VisualDefinition> definitions;
         private readonly Dictionary<string, Sprite> sprites = new();
+        private readonly HashSet<string> missingSpriteWarnings = new();
 
         public VisualCatalog(GameConfig config)
         {
@@ -29,6 +30,8 @@ namespace DistilleryDiscovery
             var sprite = string.IsNullOrWhiteSpace(definition.spriteResource)
                 ? null
                 : Resources.Load<Sprite>(definition.spriteResource);
+            if (sprite == null && !string.IsNullOrWhiteSpace(definition.spriteResource) && missingSpriteWarnings.Add(visualId))
+                Debug.LogWarning($"Visual {visualId} is using a placeholder sprite because Resources/{definition.spriteResource} could not be loaded.");
             sprite ??= CreatePlaceholderSprite(visualId, Tint(visualId, Color.white));
             sprites[visualId] = sprite;
             return sprite;
